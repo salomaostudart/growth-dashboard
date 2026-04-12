@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0a0a0f"/>
+  <rect x="40" y="40" width="1120" height="550" rx="16" fill="#111118" stroke="#242432" stroke-width="1"/>
+
+  <!-- Chart line -->
+  <path d="M120 420 L240 340 L360 380 L480 260 L600 300 L720 180 L840 220 L960 140 L1060 160"
+    fill="none" stroke="#818cf8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+  <path d="M120 420 L240 340 L360 380 L480 260 L600 300 L720 180 L840 220 L960 140 L1060 160 L1060 500 L120 500 Z"
+    fill="url(#grad)" opacity="0.08"/>
+
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#0a0a0f"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Title -->
+  <text x="120" y="160" font-family="Oswald,sans-serif" font-size="56" font-weight="600" fill="#f1f5f9" letter-spacing="0.04em">GROWTHHQ</text>
+  <text x="120" y="210" font-family="Inter,sans-serif" font-size="22" fill="#94a3b8">Digital Growth Command Center</text>
+
+  <!-- KPI badges -->
+  <rect x="120" y="240" width="160" height="60" rx="8" fill="#1a1a24" stroke="#242432" stroke-width="1"/>
+  <text x="140" y="262" font-family="Inter,sans-serif" font-size="10" fill="#8892a8" text-transform="uppercase">SESSIONS</text>
+  <text x="140" y="288" font-family="Oswald,sans-serif" font-size="24" fill="#f1f5f9" font-weight="600">28.2K</text>
+
+  <rect x="300" y="240" width="160" height="60" rx="8" fill="#1a1a24" stroke="#242432" stroke-width="1"/>
+  <text x="320" y="262" font-family="Inter,sans-serif" font-size="10" fill="#8892a8">IMPRESSIONS</text>
+  <text x="320" y="288" font-family="Oswald,sans-serif" font-size="24" fill="#f1f5f9" font-weight="600">142K</text>
+
+  <rect x="480" y="240" width="160" height="60" rx="8" fill="#1a1a24" stroke="#242432" stroke-width="1"/>
+  <text x="500" y="262" font-family="Inter,sans-serif" font-size="10" fill="#8892a8">CONVERSION</text>
+  <text x="500" y="288" font-family="Oswald,sans-serif" font-size="24" fill="#f1f5f9" font-weight="600">3.2%</text>
+
+  <!-- Dot -->
+  <circle cx="1060" cy="160" r="8" fill="#10b981"/>
+</svg>

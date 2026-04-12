@@ -1,81 +1,363 @@
 ---
 import DashboardLayout from '../layouts/DashboardLayout.astro';
+import MetricCard from '../components/ui/MetricCard.astro';
+import ChartContainer from '../components/charts/ChartContainer.astro';
+import { getConnector } from '../connectors/registry';
+import { formatNumber, formatPercent } from '../utils/formatters';
+
+const now = new Date();
+const dateRange = { start: new Date(now.getTime() - 90 * 86400000), end: now, range: '90d' as const };
+
+const seoResult = await getConnector('seo').fetch(dateRange);
+const seo = seoResult.data;
+
+// Deltas from query data
+function calcDelta(data: number[]): number {
+  const mid = Math.floor(data.length / 2);
+  const first = data.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
+  const second = data.slice(mid).reduce((a, b) => a + b, 0) / (data.length - mid);
+  return first > 0 ? ((second - first) / first) * 100 : 0;
+}
+
+const impressionsDelta = calcDelta(seo.topQueries.map(q => q.impressions));
+const clicksDelta = calcDelta(seo.topQueries.map(q => q.clicks));
+
+// Serialize for client charts
+const queriesData = JSON.stringify(seo.topQueries.slice(0, 10));
+const pagesData = JSON.stringify(seo.pagePerformance);
 ---
 
 <DashboardLayout title="SEO / AEO / GEO" activeNav="seo">
-  <div class="stub-wrapper">
-    <div class="stub-card">
-      <span class="phase-badge phase-2">Phase 2</span>
-      <h2 class="stub-title">SEO / AEO / GEO</h2>
-      <p class="stub-desc">
-        Organic search performance, keyword rankings, and AI-driven visibility metrics covering
-        traditional SEO, Answer Engine Optimization, and Generative Engine Optimization.
-      </p>
-      <div class="stub-coming">Coming in Phase 2</div>
+  <!-- KPI Cards -->
+  <section class="grid-kpi">
+    <MetricCard
+      title="Impressions"
+      value={formatNumber(seo.impressions)}
+      delta={Number(impressionsDelta.toFixed(1))}
+      source={seoResult.source}
+      sourceName="Search Console"
+      sparklineData={seo.topQueries.slice(0, 14).map(q => q.impressions)}
+    />
+    <MetricCard
+      title="Clicks"
+      value={formatNumber(seo.clicks)}
+      delta={Number(clicksDelta.toFixed(1))}
+      source={seoResult.source}
+      sourceName="Search Console"
+      sparklineData={seo.topQueries.slice(0, 14).map(q => q.clicks)}
+    />
+    <MetricCard
+      title="Avg CTR"
+      value={formatPercent(seo.ctr)}
+      source={seoResult.source}
+      sourceName="Search Console"
+    />
+    <MetricCard
+      title="Avg Position"
+      value={seo.avgPosition.toFixed(1)}
+      source={seoResult.source}
+      sourceName="Search Console"
+    />
+  </section>
+
+  <!-- Charts -->
+  <section class="grid-charts">
+    <ChartContainer
+      title="Top Queries — Impressions vs Clicks"
+      subtitle="Top 10 search queries"
+      source={seoResult.source}
+      sourceName="Search Console"
+      id="seo-queries-chart"
+      height="360px"
+    />
+    <ChartContainer
+      title="Position History"
+      subtitle="Ranking trend for top 5 queries"
+      source={seoResult.source}
+      sourceName="Search Console"
+      id="seo-position-chart"
+      height="360px"
+    />
+  </section>
+
+  <!-- Queries Table -->
+  <section class="table-section">
+    <div class="table-header">
+      <h3 class="table-title">Top Queries</h3>
+      <div class={`source-tag source-${seoResult.source}`}>
+        <span class="source-dot"></span>
+        <span>Search Console</span>
+      </div>
     </div>
-  </div>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Query</th>
+            <th class="num">Impressions</th>
+            <th class="num">Clicks</th>
+            <th class="num">CTR</th>
+            <th class="num">Position</th>
+          </tr>
+        </thead>
+        <tbody>
+          {seo.topQueries.map((q, i) => (
+            <tr>
+              <td class="query-text">
+                <span class="rank">{i + 1}</span>
+                {q.query}
+              </td>
+              <td class="num">{formatNumber(q.impressions)}</td>
+              <td class="num">{formatNumber(q.clicks)}</td>
+              <td class="num">{formatPercent(q.ctr)}</td>
+              <td class="num">
+                <span class={`position ${q.position <= 10 ? 'pos-good' : q.position <= 20 ? 'pos-mid' : 'pos-bad'}`}>
+                  {q.position.toFixed(1)}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Page Performance Table -->
+  <section class="table-section">
+    <div class="table-header">
+      <h3 class="table-title">Page Performance</h3>
+      <div class={`source-tag source-${seoResult.source}`}>
+        <span class="source-dot"></span>
+        <span>Search Console</span>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Page</th>
+            <th class="num">Impressions</th>
+            <th class="num">Clicks</th>
+            <th class="num">CTR</th>
+            <th class="num">Position</th>
+          </tr>
+        </thead>
+        <tbody>
+          {seo.pagePerformance.map((p) => (
+            <tr>
+              <td class="page-path">{p.page}</td>
+              <td class="num">{formatNumber(p.impressions)}</td>
+              <td class="num">{formatNumber(p.clicks)}</td>
+              <td class="num">{formatPercent(p.ctr)}</td>
+              <td class="num">
+                <span class={`position ${p.position <= 10 ? 'pos-good' : p.position <= 20 ? 'pos-mid' : 'pos-bad'}`}>
+                  {p.position.toFixed(1)}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
 </DashboardLayout>
 
 <style>
-  .stub-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: calc(100vh - var(--topbar-height) - var(--space-6) * 2);
-  }
+  .grid-kpi { margin-bottom: var(--space-6); }
+  .grid-charts { margin-bottom: var(--space-6); }
 
-  .stub-card {
+  .table-section {
     background: var(--surface-1);
     border: 1px solid var(--border-default);
     border-radius: var(--radius-lg);
-    padding: var(--space-10, 2.5rem) var(--space-8, 2rem);
-    max-width: 480px;
-    width: 100%;
-    text-align: center;
+    overflow: hidden;
+    margin-bottom: var(--space-6);
+  }
+
+  .table-section:last-child { margin-bottom: 0; }
+
+  .table-header {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: var(--space-4);
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--border-default);
   }
 
-  .phase-badge {
-    display: inline-block;
-    padding: var(--space-1) var(--space-3);
-    border-radius: var(--radius-sm);
-    font-size: var(--text-xs);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-  }
-
-  .phase-2 {
-    background: rgba(129, 140, 248, 0.15);
-    color: var(--accent-primary);
-    border: 1px solid rgba(129, 140, 248, 0.3);
-  }
-
-  .stub-title {
-    font-family: var(--font-heading);
-    font-size: var(--text-2xl, 1.5rem);
-    font-weight: 600;
-    color: var(--text-primary);
+  .table-title {
+    font-size: var(--text-sm);
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    margin: 0;
   }
 
-  .stub-desc {
+  .source-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: var(--radius-full);
+    font-weight: 500;
+  }
+  .source-dot { width: 5px; height: 5px; border-radius: 50%; }
+  .source-live { background: var(--accent-success-dim); color: var(--accent-success); }
+  .source-live .source-dot { background: var(--accent-success); }
+  .source-mock { background: var(--surface-3); color: var(--text-muted); }
+  .source-mock .source-dot { background: var(--text-muted); }
+
+  .table-wrapper { overflow-x: auto; }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
     font-size: var(--text-sm);
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin: 0;
   }
 
-  .stub-coming {
+  .data-table th {
+    text-align: left;
+    padding: var(--space-3) var(--space-5);
     font-size: var(--text-xs);
+    font-weight: 500;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-top: var(--space-2);
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--border-default);
   }
+
+  .data-table td {
+    padding: var(--space-3) var(--space-5);
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--surface-2);
+  }
+
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: var(--surface-2); }
+
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .query-text {
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+  }
+
+  .page-path {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--text-primary);
+  }
+
+  .rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-3);
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 600;
+    margin-right: var(--space-2);
+  }
+
+  .position {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    font-weight: 500;
+  }
+
+  .pos-good { background: var(--accent-success-dim); color: var(--accent-success); }
+  .pos-mid { background: var(--accent-warning-dim); color: var(--accent-warning); }
+  .pos-bad { background: var(--accent-danger-dim); color: var(--accent-danger); }
 </style>
+
+<script define:vars={{ queriesData, pagesData }}>
+  window.__seo_queries = JSON.parse(queriesData);
+  window.__seo_pages = JSON.parse(pagesData);
+</script>
+
+<script>
+  import * as echarts from 'echarts';
+  import { dashboardTheme } from '../utils/echarts-theme';
+
+  echarts.registerTheme('dashboard', dashboardTheme);
+
+  // Top Queries — bar chart
+  const queriesEl = document.getElementById('seo-queries-chart');
+  if (queriesEl) {
+    const chart = echarts.init(queriesEl, 'dashboard');
+    const queries = (window as any).__seo_queries || [];
+
+    chart.setOption({
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      legend: { data: ['Impressions', 'Clicks'], right: 10, top: 0 },
+      grid: { left: '3%', right: '4%', bottom: '3%', top: '14%', containLabel: true },
+      xAxis: {
+        type: 'category',
+        data: queries.map((q: any) => q.query.length > 18 ? q.query.slice(0, 18) + '…' : q.query),
+        axisLabel: { rotate: 35, fontSize: 10 },
+      },
+      yAxis: [
+        { type: 'value', name: 'Impressions', position: 'left' },
+        { type: 'value', name: 'Clicks', position: 'right' },
+      ],
+      series: [
+        {
+          name: 'Impressions',
+          type: 'bar',
+          data: queries.map((q: any) => q.impressions),
+          barMaxWidth: 30,
+          itemStyle: { borderRadius: [4, 4, 0, 0] },
+        },
+        {
+          name: 'Clicks',
+          type: 'bar',
+          yAxisIndex: 1,
+          data: queries.map((q: any) => q.clicks),
+          barMaxWidth: 30,
+          itemStyle: { borderRadius: [4, 4, 0, 0] },
+        },
+      ],
+    });
+    window.addEventListener('resize', () => chart.resize());
+  }
+
+  // Position History — line chart (inverted Y axis — lower = better)
+  const posEl = document.getElementById('seo-position-chart');
+  if (posEl) {
+    const chart = echarts.init(posEl, 'dashboard');
+    const queries = ((window as any).__seo_queries || []).slice(0, 5);
+    const weeks = ['W-7', 'W-6', 'W-5', 'W-4', 'W-3', 'W-2', 'W-1'];
+
+    chart.setOption({
+      tooltip: { trigger: 'axis' },
+      legend: {
+        data: queries.map((q: any) => q.query.length > 20 ? q.query.slice(0, 20) + '…' : q.query),
+        right: 10,
+        top: 0,
+        textStyle: { fontSize: 10 },
+      },
+      grid: { left: '3%', right: '4%', bottom: '3%', top: '18%', containLabel: true },
+      xAxis: { type: 'category', data: weeks },
+      yAxis: {
+        type: 'value',
+        inverse: true,
+        name: 'Position',
+        min: 1,
+        nameTextStyle: { fontSize: 10, color: '#8892a8' },
+      },
+      series: queries.map((q: any) => ({
+        name: q.query.length > 20 ? q.query.slice(0, 20) + '…' : q.query,
+        type: 'line',
+        data: q.positionHistory,
+        smooth: true,
+        symbolSize: 6,
+        lineStyle: { width: 2 },
+      })),
+    });
+    window.addEventListener('resize', () => chart.resize());
+  }
+</script>

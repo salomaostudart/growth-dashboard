@@ -19,7 +19,9 @@ import type {
 } from './base/connector.schema';
 
 import { WebMockConnector } from './ga4/ga4.mock';
+import { WebLiveConnector } from './ga4/ga4.connector';
 import { SeoMockConnector } from './search-console/gsc.mock';
+import { SeoLiveConnector } from './search-console/gsc.connector';
 import { EmailMockConnector } from './email/email.mock';
 import { SocialMockConnector } from './social/social.mock';
 import { CrmMockConnector } from './hubspot/hubspot.mock';
@@ -34,11 +36,15 @@ export interface ConnectorMap {
   martech: IConnector<MartechHealth>;
 }
 
+function isEnabled(envVar: string): boolean {
+  return import.meta.env[envVar] === 'true';
+}
+
 // Registry: env var switches mock → real
 function createRegistry(): ConnectorMap {
   return {
-    web: new WebMockConnector(),
-    seo: new SeoMockConnector(),
+    web: isEnabled('GA4_ENABLED') ? new WebLiveConnector() : new WebMockConnector(),
+    seo: isEnabled('GSC_ENABLED') ? new SeoLiveConnector() : new SeoMockConnector(),
     email: new EmailMockConnector(),
     social: new SocialMockConnector(),
     crm: new CrmMockConnector(),

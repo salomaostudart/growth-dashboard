@@ -1,0 +1,46 @@
+import type { IConnector, ConnectorResult, ConnectorHealth, DateRangeParams } from '../base/connector.interface';
+import type { WebMetrics } from '../base/connector.schema';
+import { WebMetricsSchema } from '../base/connector.schema';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const SNAPSHOT_PATH = path.resolve('src/data/snapshots/ga4-snapshot.json');
+
+export class WebLiveConnector implements IConnector<WebMetrics> {
+  readonly name = 'Google Analytics 4';
+  readonly source = 'live' as const;
+
+  async fetch(_params: DateRangeParams): Promise<ConnectorResult<WebMetrics>> {
+    const raw = fs.readFileSync(SNAPSHOT_PATH, 'utf-8');
+    const json = JSON.parse(raw);
+    const parsed = WebMetricsSchema.parse(json.data);
+
+    return {
+      data: parsed,
+      source: 'live',
+      fetchedAt: new Date(json.fetchedAt || Date.now()),
+      errors: [],
+    };
+  }
+
+  async health(): Promise<ConnectorHealth> {
+    try {
+      const stat = fs.statSync(SNAPSHOT_PATH);
+      const ageMs = Date.now() - stat.mtimeMs;
+      const staleHours = 48;
+
+      if (ageMs > staleHours * 3600000) {
+        return {
+          status: 'degraded',
+          lastCheck: new Date(),
+          latencyMs: 0,
+          message: `Snapshot is ${Math.round(ageMs / 3600000)}h old (stale > ${staleHours}h)`,
+        };
+      }
+
+      return { status: 'healthy', lastCheck: new Date(), latencyMs: 0, message: 'Snapshot up to date' };
+    } catch {
+      return { status: 'down', lastCheck: new Date(), latencyMs: 0, message: 'Snapshot file not found' };
+    }
+  }
+}

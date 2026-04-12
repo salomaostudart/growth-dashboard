@@ -64,6 +64,75 @@ describe('Connector Schemas — validate mock data shapes', () => {
   });
 });
 
+describe('Live Connectors — snapshot-based', () => {
+  it('WebLiveConnector reads and validates snapshot JSON', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+
+    // Create a temporary snapshot with valid mock data
+    const snapshotDir = path.resolve('src/data/snapshots');
+    const snapshotPath = path.join(snapshotDir, 'ga4-snapshot.json');
+    fs.mkdirSync(snapshotDir, { recursive: true });
+
+    const mockData = generateWebMetrics();
+    fs.writeFileSync(snapshotPath, JSON.stringify({ fetchedAt: new Date().toISOString(), data: mockData }));
+
+    try {
+      const { WebLiveConnector } = await import('../../src/connectors/ga4/ga4.connector');
+      const connector = new WebLiveConnector();
+
+      expect(connector.name).toBe('Google Analytics 4');
+      expect(connector.source).toBe('live');
+
+      const result = await connector.fetch({ start: new Date(), end: new Date(), range: '30d' });
+      expect(result.source).toBe('live');
+      expect(result.data.sessions).toBe(mockData.sessions);
+
+      const validation = WebMetricsSchema.safeParse(result.data);
+      expect(validation.success).toBe(true);
+    } finally {
+      fs.unlinkSync(snapshotPath);
+    }
+  });
+
+  it('SeoLiveConnector reads and validates snapshot JSON', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+
+    const snapshotDir = path.resolve('src/data/snapshots');
+    const snapshotPath = path.join(snapshotDir, 'gsc-snapshot.json');
+    fs.mkdirSync(snapshotDir, { recursive: true });
+
+    const mockData = generateSeoMetrics();
+    fs.writeFileSync(snapshotPath, JSON.stringify({ fetchedAt: new Date().toISOString(), data: mockData }));
+
+    try {
+      const { SeoLiveConnector } = await import('../../src/connectors/search-console/gsc.connector');
+      const connector = new SeoLiveConnector();
+
+      expect(connector.name).toBe('Google Search Console');
+      expect(connector.source).toBe('live');
+
+      const result = await connector.fetch({ start: new Date(), end: new Date(), range: '90d' });
+      expect(result.source).toBe('live');
+      expect(result.data.impressions).toBe(mockData.impressions);
+
+      const validation = SeoMetricsSchema.safeParse(result.data);
+      expect(validation.success).toBe(true);
+    } finally {
+      fs.unlinkSync(snapshotPath);
+    }
+  });
+
+  it('WebLiveConnector health() reports degraded when snapshot is missing', async () => {
+    const { WebLiveConnector } = await import('../../src/connectors/ga4/ga4.connector');
+    const connector = new WebLiveConnector();
+    const health = await connector.health();
+    // Snapshot was cleaned up, so it should be down
+    expect(['down', 'degraded']).toContain(health.status);
+  });
+});
+
 describe('Connector Registry', () => {
   it('returns mock connectors by default', async () => {
     const { getConnector } = await import('../../src/connectors/registry');

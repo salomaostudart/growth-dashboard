@@ -48,8 +48,8 @@ function calcDelta(data: number[]): number {
 
 const sessionsDelta = calcDelta(web.trafficByDay.map(d => d.sessions));
 const impressionsDelta = calcDelta(seo.topQueries.map(q => q.impressions));
-const conversionDelta = Number((Math.random() * 6 - 2).toFixed(1)); // mock — no historical conversion data yet
-const pipelineDelta = Number((Math.random() * 10 + 5).toFixed(1)); // mock — no historical pipeline data yet
+const conversionDelta = calcDelta(web.trafficByDay.map(d => d.sessions * web.conversionRate / 100));
+const pipelineDelta = calcDelta(crm.leadVelocity.map(d => d.leads));
 
 // Serialize data for client-side charts
 const trafficChartData = JSON.stringify(web.trafficByDay);
