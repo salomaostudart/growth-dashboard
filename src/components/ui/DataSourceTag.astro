@@ -1,0 +1,54 @@
+---
+interface Props {
+  source: 'live' | 'mock' | 'cached' | 'error';
+  name: string;
+  size?: 'sm' | 'md';
+}
+
+const { source, name, size = 'sm' } = Astro.props;
+---
+
+<span class:list={['ds-tag', `ds-${source}`, `ds-${size}`]}>
+  <span class="ds-dot"></span>
+  <span>{name}</span>
+</span>
+
+<style>
+  .ds-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+  }
+
+  .ds-sm {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+
+  .ds-md {
+    font-size: var(--text-xs);
+    padding: 3px 10px;
+  }
+
+  .ds-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .ds-live { background: var(--accent-success-dim); color: var(--accent-success); }
+  .ds-live .ds-dot { background: var(--accent-success); }
+
+  .ds-mock { background: var(--surface-3); color: var(--text-muted); }
+  .ds-mock .ds-dot { background: var(--text-muted); }
+
+  .ds-cached { background: var(--accent-warning-dim); color: var(--accent-warning); }
+  .ds-cached .ds-dot { background: var(--accent-warning); }
+
+  .ds-error { background: var(--accent-danger-dim); color: var(--accent-danger); }
+  .ds-error .ds-dot { background: var(--accent-danger); }
+</style>

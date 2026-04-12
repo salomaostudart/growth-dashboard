@@ -1,17 +1,317 @@
 ---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import MetricCard from '../components/ui/MetricCard.astro';
+import ChartContainer from '../components/charts/ChartContainer.astro';
+import AlertBanner from '../components/ui/AlertBanner.astro';
+import { getConnector, getAllConnectors } from '../connectors/registry';
+import { formatNumber, formatPercent, formatDuration } from '../utils/formatters';
 
+const now = new Date();
+const dateRange = { start: new Date(now.getTime() - 30 * 86400000), end: now, range: '30d' as const };
+
+const webResult = await getConnector('web').fetch(dateRange);
+const seoResult = await getConnector('seo').fetch(dateRange);
+const emailResult = await getConnector('email').fetch(dateRange);
+const crmResult = await getConnector('crm').fetch(dateRange);
+const martechResult = await getConnector('martech').fetch(dateRange);
+
+const web = webResult.data;
+const seo = seoResult.data;
+const email = emailResult.data;
+const crm = crmResult.data;
+const martech = martechResult.data;
+
+// System health summary
+const healthySystems = martech.systems.filter(s => s.status === 'healthy').length;
+const totalSystems = martech.systems.length;
+
+// Generate sparkline data from traffic
+const sessionSparkline = web.trafficByDay.slice(-14).map(d => d.sessions);
+const userSparkline = web.trafficByDay.slice(-14).map(d => d.users);
+
+// Alerts
+const alerts: Array<{ type: 'warning' | 'danger' | 'info'; message: string; metric?: string; value?: string }> = [];
+if (web.bounceRate > 50) alerts.push({ type: 'warning', message: 'Bounce rate above threshold', metric: 'Bounce Rate', value: formatPercent(web.bounceRate) });
+const degradedSystems = martech.systems.filter(s => s.status !== 'healthy');
+degradedSystems.forEach(s => alerts.push({ type: 'danger', message: `${s.name} is ${s.status}`, metric: 'Uptime', value: formatPercent(s.uptime) }));
+
+// Connector sources for all cards
+const connectors = getAllConnectors();
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<DashboardLayout title="Command Center" activeNav="overview">
+  <!-- Alerts -->
+  {alerts.length > 0 && (
+    <section class="alerts-section">
+      {alerts.map(alert => (
+        <AlertBanner type={alert.type} message={alert.message} metric={alert.metric} value={alert.value} />
+      ))}
+    </section>
+  )}
+
+  <!-- KPI Cards -->
+  <section class="grid-kpi">
+    <MetricCard
+      title="Sessions"
+      value={formatNumber(web.sessions)}
+      delta={12.4}
+      source={webResult.source}
+      sourceName="GA4"
+      sparklineData={sessionSparkline}
+    />
+    <MetricCard
+      title="Organic Impressions"
+      value={formatNumber(seo.impressions)}
+      delta={8.7}
+      source={seoResult.source}
+      sourceName="Search Console"
+      sparklineData={[]}
+    />
+    <MetricCard
+      title="Email Open Rate"
+      value={formatPercent(email.openRate)}
+      delta={-2.1}
+      source={emailResult.source}
+      sourceName="Mailchimp"
+      sparklineData={[]}
+    />
+    <MetricCard
+      title="Pipeline Influenced"
+      value={formatNumber(crm.funnel.pipeline)}
+      delta={15.3}
+      source={crmResult.source}
+      sourceName="HubSpot"
+      sparklineData={[]}
+    />
+    <MetricCard
+      title="Conversion Rate"
+      value={formatPercent(web.conversionRate)}
+      delta={3.2}
+      source={webResult.source}
+      sourceName="GA4"
+      sparklineData={[]}
+    />
+    <MetricCard
+      title="System Health"
+      value={`${healthySystems}/${totalSystems}`}
+      source={martechResult.source}
+      sourceName="Martech"
+      sparklineData={[]}
+    />
+  </section>
+
+  <!-- Charts row -->
+  <section class="grid-charts">
+    <ChartContainer
+      title="Traffic Trend"
+      subtitle="Sessions over last 90 days"
+      source={webResult.source}
+      sourceName="GA4"
+      id="traffic-trend-chart"
+      height="320px"
+    />
+    <ChartContainer
+      title="Channel Mix"
+      subtitle="Traffic source distribution"
+      source={webResult.source}
+      sourceName="GA4"
+      id="channel-mix-chart"
+      height="320px"
+    />
+  </section>
+
+  <!-- Data Sources Status -->
+  <section class="status-strip">
+    <h3 class="strip-title">Data Sources</h3>
+    <div class="strip-items">
+      {Object.entries(connectors).map(([key, connector]) => (
+        <div class="strip-item">
+          <span class={`strip-dot strip-${connector.source}`}></span>
+          <span class="strip-name">{connector.name.replace(' (Mock)', '')}</span>
+          <span class="strip-source">{connector.source}</span>
+        </div>
+      ))}
+    </div>
+  </section>
+</DashboardLayout>
+
+<style>
+  .alerts-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+  }
+
+  .grid-kpi {
+    margin-bottom: var(--space-6);
+  }
+
+  .grid-charts {
+    margin-bottom: var(--space-6);
+  }
+
+  .status-strip {
+    background: var(--surface-1);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .strip-title {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: var(--space-3);
+  }
+
+  .strip-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .strip-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+  }
+
+  .strip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .strip-live { background: var(--accent-success); }
+  .strip-mock { background: var(--text-muted); }
+  .strip-cached { background: var(--accent-warning); }
+  .strip-error { background: var(--accent-danger); }
+
+  .strip-name { font-weight: 500; }
+
+  .strip-source {
+    color: var(--text-muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+</style>
+
+<script>
+  import * as echarts from 'echarts';
+  import { dashboardTheme } from '../utils/echarts-theme';
+
+  // Register theme
+  echarts.registerTheme('dashboard', dashboardTheme);
+
+  // Traffic Trend Chart
+  const trafficEl = document.getElementById('traffic-trend-chart');
+  if (trafficEl) {
+    const chart = echarts.init(trafficEl, 'dashboard');
+
+    // Get data from the page's server-rendered data
+    // For now, generate client-side (will be replaced by connector data)
+    const days = 90;
+    const data: Array<{ date: string; sessions: number; users: number }> = [];
+    const now = new Date();
+    const seed = 42;
+    let s = seed;
+    const rand = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+      const weekendFactor = isWeekend ? 0.6 : 1.0;
+      const trend = 1 + ((days - i) / days) * 0.15;
+      const noise = 0.85 + rand() * 0.3;
+      const spike = rand() > 0.95 ? 1.5 + rand() : 1;
+      const sessions = Math.round(320 * weekendFactor * trend * noise * spike);
+      const users = Math.round(sessions * (0.65 + rand() * 0.15));
+      data.push({ date: dateStr, sessions, users });
+    }
+
+    chart.setOption({
+      tooltip: { trigger: 'axis' },
+      legend: { data: ['Sessions', 'Users'], right: 10, top: 0 },
+      xAxis: {
+        type: 'category',
+        data: data.map(d => d.date),
+        axisLabel: {
+          formatter: (val: string) => {
+            const d = new Date(val);
+            return `${d.getMonth() + 1}/${d.getDate()}`;
+          },
+          interval: 13,
+        },
+      },
+      yAxis: { type: 'value' },
+      series: [
+        {
+          name: 'Sessions',
+          type: 'line',
+          data: data.map(d => d.sessions),
+          smooth: true,
+          lineStyle: { width: 2 },
+          areaStyle: { opacity: 0.08 },
+          symbolSize: 0,
+        },
+        {
+          name: 'Users',
+          type: 'line',
+          data: data.map(d => d.users),
+          smooth: true,
+          lineStyle: { width: 2 },
+          areaStyle: { opacity: 0.08 },
+          symbolSize: 0,
+        },
+      ],
+    });
+
+    window.addEventListener('resize', () => chart.resize());
+  }
+
+  // Channel Mix Chart
+  const channelEl = document.getElementById('channel-mix-chart');
+  if (channelEl) {
+    const chart = echarts.init(channelEl, 'dashboard');
+
+    chart.setOption({
+      tooltip: {
+        trigger: 'item',
+        formatter: '{b}: {d}%',
+      },
+      series: [{
+        type: 'pie',
+        radius: ['45%', '70%'],
+        center: ['50%', '55%'],
+        avoidLabelOverlap: true,
+        itemStyle: {
+          borderRadius: 6,
+          borderColor: '#111118',
+          borderWidth: 2,
+        },
+        label: {
+          color: '#94a3b8',
+          fontSize: 11,
+        },
+        data: [
+          { value: 42, name: 'Organic' },
+          { value: 23, name: 'Direct' },
+          { value: 14, name: 'Paid' },
+          { value: 11, name: 'Social' },
+          { value: 7, name: 'Email' },
+          { value: 5, name: 'Referral' },
+        ],
+      }],
+    });
+
+    window.addEventListener('resize', () => chart.resize());
+  }
+</script>

@@ -1,0 +1,162 @@
+---
+interface Props {
+  title: string;
+  value: string;
+  delta?: number;
+  deltaLabel?: string;
+  source?: 'live' | 'mock' | 'cached' | 'error';
+  sourceName?: string;
+  sparklineData?: number[];
+}
+
+const {
+  title,
+  value,
+  delta,
+  deltaLabel = 'vs prev period',
+  source = 'mock',
+  sourceName = 'Mock',
+  sparklineData = [],
+} = Astro.props;
+
+const deltaType = delta === undefined ? 'neutral' : delta > 0 ? 'positive' : delta < 0 ? 'negative' : 'neutral';
+const deltaFormatted = delta !== undefined ? `${delta > 0 ? '+' : ''}${delta.toFixed(1)}%` : '';
+
+// Generate sparkline SVG path
+function generateSparklinePath(data: number[]): string {
+  if (data.length < 2) return '';
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
+  const width = 120;
+  const height = 32;
+  const step = width / (data.length - 1);
+  return data.map((val, i) => {
+    const x = i * step;
+    const y = height - ((val - min) / range) * height;
+    return `${i === 0 ? 'M' : 'L'}${x},${y}`;
+  }).join(' ');
+}
+
+const sparklinePath = generateSparklinePath(sparklineData);
+---
+
+<div class="metric-card">
+  {sparklineData.length > 0 && (
+    <svg class="sparkline" viewBox="0 0 120 32" preserveAspectRatio="none">
+      <path d={sparklinePath} fill="none" stroke="currentColor" stroke-width="1.5" />
+    </svg>
+  )}
+  <div class="metric-header">
+    <span class="metric-title">{title}</span>
+    <div class={`source-tag source-${source}`}>
+      <span class="source-dot"></span>
+      <span>{sourceName}</span>
+    </div>
+  </div>
+  <div class="metric-value">{value}</div>
+  {delta !== undefined && (
+    <div class={`metric-delta delta-${deltaType}`}>
+      <span class="delta-arrow">{deltaType === 'positive' ? '\u2191' : deltaType === 'negative' ? '\u2193' : '\u2192'}</span>
+      <span>{deltaFormatted}</span>
+      <span class="delta-label">{deltaLabel}</span>
+    </div>
+  )}
+</div>
+
+<style>
+  .metric-card {
+    position: relative;
+    background: var(--surface-1);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    overflow: hidden;
+    transition: all var(--transition-fast);
+  }
+
+  .metric-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .sparkline {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 50%;
+    height: 40px;
+    color: var(--accent-primary);
+    opacity: 0.15;
+  }
+
+  .metric-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+  }
+
+  .metric-title {
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .source-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: var(--radius-full);
+    font-weight: 500;
+  }
+
+  .source-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .source-live { background: var(--accent-success-dim); color: var(--accent-success); }
+  .source-live .source-dot { background: var(--accent-success); }
+
+  .source-mock { background: var(--surface-3); color: var(--text-muted); }
+  .source-mock .source-dot { background: var(--text-muted); }
+
+  .source-cached { background: var(--accent-warning-dim); color: var(--accent-warning); }
+  .source-cached .source-dot { background: var(--accent-warning); }
+
+  .source-error { background: var(--accent-danger-dim); color: var(--accent-danger); }
+  .source-error .source-dot { background: var(--accent-danger); }
+
+  .metric-value {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: var(--space-2);
+  }
+
+  .metric-delta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+    font-weight: 500;
+  }
+
+  .delta-positive { color: var(--accent-success); }
+  .delta-negative { color: var(--accent-danger); }
+  .delta-neutral { color: var(--text-muted); }
+
+  .delta-label {
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+</style>
