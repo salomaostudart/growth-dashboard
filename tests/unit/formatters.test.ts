@@ -14,6 +14,19 @@ describe('formatNumber', () => {
   it('formats zero', () => {
     expect(formatNumber(0)).toBe('0');
   });
+  // Edge cases
+  it('boundary: 999 stays as small number', () => {
+    expect(formatNumber(999)).toBe('999');
+  });
+  it('boundary: 1000 formats as K', () => {
+    expect(formatNumber(1000)).toBe('1.0K');
+  });
+  it('boundary: 999999 formats as K', () => {
+    expect(formatNumber(999999)).toBe('1000.0K');
+  });
+  it('boundary: 1000000 formats as M', () => {
+    expect(formatNumber(1_000_000)).toBe('1.0M');
+  });
 });
 
 describe('formatPercent', () => {
@@ -22,6 +35,12 @@ describe('formatPercent', () => {
   });
   it('formats with custom decimals', () => {
     expect(formatPercent(99.999, 2)).toBe('100.00%');
+  });
+  it('formats zero', () => {
+    expect(formatPercent(0)).toBe('0.0%');
+  });
+  it('formats 100', () => {
+    expect(formatPercent(100)).toBe('100.0%');
   });
 });
 
@@ -44,6 +63,12 @@ describe('formatDuration', () => {
   it('formats minutes and seconds', () => {
     expect(formatDuration(185)).toBe('3m 5s');
   });
+  it('formats exactly 60s as minutes', () => {
+    expect(formatDuration(60)).toBe('1m 0s');
+  });
+  it('formats large durations', () => {
+    expect(formatDuration(3600)).toBe('60m 0s');
+  });
 });
 
 describe('formatCurrency', () => {
@@ -53,6 +78,9 @@ describe('formatCurrency', () => {
   it('formats large amounts', () => {
     expect(formatCurrency(150000)).toBe('$150,000');
   });
+  it('formats zero', () => {
+    expect(formatCurrency(0)).toBe('$0');
+  });
 });
 
 describe('formatLatency', () => {
@@ -61,6 +89,12 @@ describe('formatLatency', () => {
   });
   it('formats seconds', () => {
     expect(formatLatency(1500)).toBe('1.5s');
+  });
+  it('boundary: 999ms stays as ms', () => {
+    expect(formatLatency(999)).toBe('999ms');
+  });
+  it('boundary: 1000ms formats as seconds', () => {
+    expect(formatLatency(1000)).toBe('1.0s');
   });
 });
 
@@ -75,5 +109,9 @@ describe('timeAgo', () => {
   it('formats hours ago', () => {
     const twoHoursAgo = new Date(Date.now() - 2 * 3600000).toISOString();
     expect(timeAgo(twoHoursAgo)).toBe('2h ago');
+  });
+  it('formats days ago', () => {
+    const threeDaysAgo = new Date(Date.now() - 3 * 86400000).toISOString();
+    expect(timeAgo(threeDaysAgo)).toBe('3d ago');
   });
 });

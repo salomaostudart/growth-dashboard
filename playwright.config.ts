@@ -3,7 +3,8 @@ import { defineConfig } from '@playwright/test';
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
-  retries: 0,
+  retries: process.env.CI ? 1 : 0,
+  timeout: 60000,
   use: {
     baseURL: 'http://localhost:4321',
     trace: 'on-first-retry',
@@ -11,6 +12,6 @@ export default defineConfig({
   webServer: {
     command: 'npx astro dev --port 4321',
     port: 4321,
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
   },
 });

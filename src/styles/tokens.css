@@ -11,6 +11,7 @@
 
   /* Accent colors */
   --accent-primary: #818cf8;
+  --accent-primary-active: #4f46e5; /* darker indigo for active buttons (WCAG AA on white text) */
   --accent-primary-hover: #a5b4fc;
   --accent-success: #10b981;
   --accent-success-dim: #065f46;

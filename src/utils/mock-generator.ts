@@ -12,15 +12,23 @@ function seededRandom(seed: number): () => number {
   };
 }
 
-const rand = seededRandom(42);
-
-function randomBetween(min: number, max: number): number {
-  return min + rand() * (max - min);
+// Each generator creates its own RNG instance to avoid shared mutable state.
+// This ensures test order independence and reproducible results per-generator.
+function createRng(seed: number) {
+  const rand = seededRandom(seed);
+  return {
+    rand,
+    between: (min: number, max: number) => min + rand() * (max - min),
+    int: (min: number, max: number) => Math.floor(min + rand() * (max - min + 1)),
+  };
 }
 
-function randomInt(min: number, max: number): number {
-  return Math.floor(randomBetween(min, max + 1));
-}
+// Each generator re-seeds before use. All helpers read from _rng.
+let _rng = createRng(42);
+
+function rand(): number { return _rng.rand(); }
+function randomBetween(min: number, max: number): number { return _rng.between(min, max); }
+function randomInt(min: number, max: number): number { return _rng.int(min, max); }
 
 function generateDateRange(days: number): string[] {
   const dates: string[] = [];
@@ -54,6 +62,7 @@ function generateDailyTraffic(days: number, baseSessions: number): Array<{ date:
 }
 
 export function generateWebMetrics() {
+  _rng = createRng(100);
   const trafficByDay = generateDailyTraffic(90, 320);
   const totalSessions = trafficByDay.reduce((sum, d) => sum + d.sessions, 0);
   const totalUsers = trafficByDay.reduce((sum, d) => sum + d.users, 0);
@@ -95,6 +104,7 @@ export function generateWebMetrics() {
 }
 
 export function generateSeoMetrics() {
+  _rng = createRng(200);
   const topQueries = [
     'demo-enterprise', 'enterprise ai platform', 'ai agents enterprise',
     'marketing automation ai', 'no code ai platform', 'ai workflow builder',
@@ -130,6 +140,7 @@ export function generateSeoMetrics() {
 }
 
 export function generateEmailMetrics() {
+  _rng = createRng(300);
   const campaigns = Array.from({ length: 10 }, (_, i) => {
     const sent = randomInt(3000, 12000);
     const opens = Math.round(sent * randomBetween(0.18, 0.35));
@@ -176,6 +187,7 @@ export function generateEmailMetrics() {
 }
 
 export function generateSocialMetrics() {
+  _rng = createRng(400);
   const dates = generateDateRange(30);
   return {
     platforms: [
@@ -208,6 +220,7 @@ export function generateSocialMetrics() {
 }
 
 export function generateCrmMetrics() {
+  _rng = createRng(500);
   const leads = randomInt(800, 1500);
   const mql = Math.round(leads * randomBetween(0.35, 0.5));
   const sql = Math.round(mql * randomBetween(0.3, 0.45));
@@ -241,6 +254,7 @@ export function generateCrmMetrics() {
 }
 
 export function generateMartechHealth() {
+  _rng = createRng(600);
   const now = new Date();
   return {
     systems: [

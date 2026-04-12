@@ -31,6 +31,8 @@ Cada connector retorna:
 
 ## Como trocar mock por real
 
+> **Status atual (Phase 1):** todos os connectors usam mock. O swap via env var sera implementado na Phase 2 junto com os connectors reais de GA4 e Search Console. A arquitetura ja suporta — o registry le env vars e instancia o connector correspondente.
+
 ### Passo 1 — Configurar credenciais
 Copie `.env.example` para `.env` e preencha as credenciais do servico que quer conectar.
 

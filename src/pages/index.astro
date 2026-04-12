@@ -37,6 +37,23 @@ degradedSystems.forEach(s => alerts.push({ type: 'danger', message: `${s.name} i
 
 // Connector sources for all cards
 const connectors = getAllConnectors();
+
+// Calculate deltas by comparing first half vs second half of trafficByDay
+function calcDelta(data: number[]): number {
+  const mid = Math.floor(data.length / 2);
+  const first = data.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
+  const second = data.slice(mid).reduce((a, b) => a + b, 0) / (data.length - mid);
+  return first > 0 ? ((second - first) / first) * 100 : 0;
+}
+
+const sessionsDelta = calcDelta(web.trafficByDay.map(d => d.sessions));
+const impressionsDelta = calcDelta(seo.topQueries.map(q => q.impressions));
+const conversionDelta = Number((Math.random() * 6 - 2).toFixed(1)); // mock — no historical conversion data yet
+const pipelineDelta = Number((Math.random() * 10 + 5).toFixed(1)); // mock — no historical pipeline data yet
+
+// Serialize data for client-side charts
+const trafficChartData = JSON.stringify(web.trafficByDay);
+const channelMixData = JSON.stringify(web.channelMix);
 ---
 
 <DashboardLayout title="Command Center" activeNav="overview">
@@ -54,7 +71,7 @@ const connectors = getAllConnectors();
     <MetricCard
       title="Sessions"
       value={formatNumber(web.sessions)}
-      delta={12.4}
+      delta={Number(sessionsDelta.toFixed(1))}
       source={webResult.source}
       sourceName="GA4"
       sparklineData={sessionSparkline}
@@ -62,34 +79,35 @@ const connectors = getAllConnectors();
     <MetricCard
       title="Organic Impressions"
       value={formatNumber(seo.impressions)}
-      delta={8.7}
+      delta={Number(impressionsDelta.toFixed(1))}
       source={seoResult.source}
       sourceName="Search Console"
-      sparklineData={[]}
+      sparklineData={seo.topQueries.slice(0, 14).map(q => q.impressions)}
     />
     <MetricCard
       title="Email Open Rate"
       value={formatPercent(email.openRate)}
-      delta={-2.1}
+      delta={Number((email.openRate - 25).toFixed(1))}
+      deltaLabel="vs benchmark 25%"
       source={emailResult.source}
       sourceName="Mailchimp"
-      sparklineData={[]}
+      sparklineData={email.campaigns.map(c => c.openRate).reverse()}
     />
     <MetricCard
       title="Pipeline Influenced"
       value={formatNumber(crm.funnel.pipeline)}
-      delta={15.3}
+      delta={pipelineDelta}
       source={crmResult.source}
       sourceName="HubSpot"
-      sparklineData={[]}
+      sparklineData={crm.leadVelocity.slice(-14).map(d => d.leads)}
     />
     <MetricCard
       title="Conversion Rate"
       value={formatPercent(web.conversionRate)}
-      delta={3.2}
+      delta={conversionDelta}
       source={webResult.source}
       sourceName="GA4"
-      sparklineData={[]}
+      sparklineData={web.trafficByDay.slice(-14).map(d => d.sessions * web.conversionRate / 100)}
     />
     <MetricCard
       title="System Health"
@@ -202,47 +220,30 @@ const connectors = getAllConnectors();
   }
 </style>
 
+<script define:vars={{ trafficChartData, channelMixData }}>
+  // Bridge: server data → client scripts via window
+  window.__traffic_data = JSON.parse(trafficChartData);
+  window.__channel_data = JSON.parse(channelMixData);
+</script>
+
 <script>
   import * as echarts from 'echarts';
   import { dashboardTheme } from '../utils/echarts-theme';
 
-  // Register theme
   echarts.registerTheme('dashboard', dashboardTheme);
 
-  // Traffic Trend Chart
+  // Traffic Trend Chart — uses server data from connectors
   const trafficEl = document.getElementById('traffic-trend-chart');
   if (trafficEl) {
     const chart = echarts.init(trafficEl, 'dashboard');
-
-    // Get data from the page's server-rendered data
-    // For now, generate client-side (will be replaced by connector data)
-    const days = 90;
-    const data: Array<{ date: string; sessions: number; users: number }> = [];
-    const now = new Date();
-    const seed = 42;
-    let s = seed;
-    const rand = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
-
-    for (let i = days - 1; i >= 0; i--) {
-      const d = new Date(now);
-      d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
-      const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-      const weekendFactor = isWeekend ? 0.6 : 1.0;
-      const trend = 1 + ((days - i) / days) * 0.15;
-      const noise = 0.85 + rand() * 0.3;
-      const spike = rand() > 0.95 ? 1.5 + rand() : 1;
-      const sessions = Math.round(320 * weekendFactor * trend * noise * spike);
-      const users = Math.round(sessions * (0.65 + rand() * 0.15));
-      data.push({ date: dateStr, sessions, users });
-    }
+    const data = (window as any).__traffic_data || [];
 
     chart.setOption({
       tooltip: { trigger: 'axis' },
       legend: { data: ['Sessions', 'Users'], right: 10, top: 0 },
       xAxis: {
         type: 'category',
-        data: data.map(d => d.date),
+        data: data.map((d: any) => d.date),
         axisLabel: {
           formatter: (val: string) => {
             const d = new Date(val);
@@ -256,7 +257,7 @@ const connectors = getAllConnectors();
         {
           name: 'Sessions',
           type: 'line',
-          data: data.map(d => d.sessions),
+          data: data.map((d: any) => d.sessions),
           smooth: true,
           lineStyle: { width: 2 },
           areaStyle: { opacity: 0.08 },
@@ -265,7 +266,7 @@ const connectors = getAllConnectors();
         {
           name: 'Users',
           type: 'line',
-          data: data.map(d => d.users),
+          data: data.map((d: any) => d.users),
           smooth: true,
           lineStyle: { width: 2 },
           areaStyle: { opacity: 0.08 },
@@ -277,10 +278,11 @@ const connectors = getAllConnectors();
     window.addEventListener('resize', () => chart.resize());
   }
 
-  // Channel Mix Chart
+  // Channel Mix Chart — uses server data from connectors
   const channelEl = document.getElementById('channel-mix-chart');
   if (channelEl) {
     const chart = echarts.init(channelEl, 'dashboard');
+    const mix = (window as any).__channel_data || {};
 
     chart.setOption({
       tooltip: {
@@ -298,16 +300,16 @@ const connectors = getAllConnectors();
           borderWidth: 2,
         },
         label: {
-          color: '#94a3b8',
+          color: '#8892a8',
           fontSize: 11,
         },
         data: [
-          { value: 42, name: 'Organic' },
-          { value: 23, name: 'Direct' },
-          { value: 14, name: 'Paid' },
-          { value: 11, name: 'Social' },
-          { value: 7, name: 'Email' },
-          { value: 5, name: 'Referral' },
+          { value: mix.organic || 0, name: 'Organic' },
+          { value: mix.direct || 0, name: 'Direct' },
+          { value: mix.paid || 0, name: 'Paid' },
+          { value: mix.social || 0, name: 'Social' },
+          { value: mix.email || 0, name: 'Email' },
+          { value: mix.referral || 0, name: 'Referral' },
         ],
       }],
     });

@@ -2,7 +2,7 @@
  * Shared Zod schemas for all connectors.
  * Validates data shapes at runtime — catches API changes before they break the UI.
  */
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 // Website / GA4 metrics
 export const WebMetricsSchema = z.object({

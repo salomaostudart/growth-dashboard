@@ -66,7 +66,7 @@ See [CONNECTORS.md](./CONNECTORS.md) for the full integration guide.
 
 | Technology | Role | Why This Over Alternatives |
 |---|---|---|
-| **Astro 5** | Framework | Static output (no server needed), TypeScript native, zero JS shipped unless opted in. Deploys to GitHub Pages or Vercel free tier. HTML-like syntax maintainable without framework expertise |
+| **Astro 6** | Framework | Static output (no server needed), TypeScript native, zero JS shipped unless opted in. Deploys to GitHub Pages or Vercel free tier. HTML-like syntax maintainable without framework expertise |
 | **Apache ECharts 6** | Data visualization | Enterprise-grade (Apache Foundation), built-in dark theme, supports heatmaps/Sankey/funnel without extra deps. Handles 10K+ data points without performance issues |
 | **Zod 4** | Runtime validation | Validates connector responses against typed schemas. Catches data shape changes from external APIs before they reach the UI |
 | **TypeScript** | Type safety | Catches errors at build time. Connector interface enforces consistent data contracts |
@@ -78,37 +78,37 @@ See [CONNECTORS.md](./CONNECTORS.md) for the full integration guide.
 
 ## Dashboard Pages
 
-### 1. Command Center (Overview) -- `/`
+### 1. Command Center (Overview) -- `/` *[Implemented]*
 The daily starting point. Shows cross-channel KPIs, traffic trends, channel mix, alerts, and data source health at a glance.
 
 **Metrics:** Sessions, Organic Impressions, Email Open Rate, Pipeline Influenced, Conversion Rate, System Health
 
-### 2. Web Performance -- `/web-performance`
+### 2. Web Performance -- `/web-performance` *[Phase 2]*
 Core Web Vitals, traffic analysis, device breakdown, geographic distribution, and conversion tracking.
 
 **Data source:** Google Analytics 4 (real when connected, mock otherwise)
 
-### 3. SEO / AEO / GEO -- `/seo`
+### 3. SEO / AEO / GEO -- `/seo` *[Phase 2]*
 Search rankings, impressions, CTR analysis, keyword tracking, and emerging AI search optimization metrics.
 
 **Data source:** Google Search Console (real) + AEO/GEO mock (labeled)
 
-### 4. Email Marketing -- `/email`
+### 4. Email Marketing -- `/email` *[Phase 3]*
 Campaign performance, automation health, subscriber engagement, and send time optimization.
 
 **Data source:** Mailchimp-shaped mock (swappable to real Mailchimp API)
 
-### 5. Social Media -- `/social`
+### 5. Social Media -- `/social` *[Phase 3]*
 Platform comparison, engagement trends, top performing content, and referral traffic analysis.
 
 **Data source:** Social mock + GA4 referral data (real when connected)
 
-### 6. CRM and Pipeline -- `/crm-pipeline`
+### 6. CRM and Pipeline -- `/crm-pipeline` *[Phase 3]*
 Full-funnel visibility from lead to closed deal, with multi-touch attribution modeling.
 
 **Data source:** HubSpot-shaped mock (matches target organization's CRM)
 
-### 7. Martech Health -- `/martech-health`
+### 7. Martech Health -- `/martech-health` *[Phase 3]*
 System uptime, integration health, automation execution logs, data freshness, and cost tracking.
 
 **Data source:** Aggregated from all connector `.health()` methods
@@ -152,7 +152,7 @@ growth-dashboard/
 │   │   └── registry.ts     # Central swap point (mock <-> real)
 │   ├── styles/             # Design tokens + global styles
 │   ├── utils/              # Formatters, mock generator, ECharts theme
-│   └── data/snapshots/     # Static JSON data (updated by GitHub Actions)
+│   └── data/snapshots/     # Static JSON data (Phase 2 — updated by GitHub Actions)
 ├── tests/
 │   ├── unit/               # Vitest -- schemas, formatters, registry
 │   └── e2e/                # Playwright -- pages, accessibility, performance
