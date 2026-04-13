@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "growth-dashboard": {
+      "command": "npx",
+      "args": ["tsx", "src/mcp/server.ts"],
+      "cwd": "."
+    }
+  }
+}
