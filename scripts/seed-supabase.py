@@ -14,20 +14,60 @@ import os
 import sys
 from datetime import date, timedelta
 
-try:
-    from supabase import create_client
-except ImportError:
-    print("ERROR: Install supabase: pip install supabase", file=sys.stderr)
-    sys.exit(1)
+import httpx
 
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_URL = os.environ.get("SUPABASE_URL") or os.environ.get("PUBLIC_SUPABASE_URL")
 SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
 
 if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
     print("ERROR: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required", file=sys.stderr)
     sys.exit(1)
 
-client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+HEADERS = {
+    "apikey": SUPABASE_SERVICE_ROLE_KEY,
+    "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+    "Content-Type": "application/json",
+    "Prefer": "return=representation",
+}
+REST_URL = f"{SUPABASE_URL}/rest/v1"
+http = httpx.Client(headers=HEADERS, timeout=30)
+
+
+class Table:
+    """Minimal Supabase REST wrapper."""
+    def __init__(self, name: str):
+        self.name = name
+        self.url = f"{REST_URL}/{name}"
+
+    def upsert(self, data: dict, on_conflict: str = ""):
+        headers = {**HEADERS, "Prefer": "return=representation,resolution=merge-duplicates"}
+        params = {"on_conflict": on_conflict} if on_conflict else {}
+        r = http.post(self.url, json=data, headers=headers, params=params)
+        r.raise_for_status()
+        return type("Resp", (), {"data": r.json()})()
+
+    def insert(self, data: dict):
+        r = http.post(self.url, json=data)
+        r.raise_for_status()
+        return type("Resp", (), {"data": r.json()})()
+
+    def select(self, columns: str = "*"):
+        self._select_cols = columns
+        return self
+
+    def eq(self, col: str, val):
+        r = http.get(self.url, params={"select": self._select_cols, col: f"eq.{val}"})
+        r.raise_for_status()
+        data = r.json()
+        return type("Resp", (), {"data": data[0] if data else None})()
+
+
+class Client:
+    def table(self, name: str):
+        return Table(name)
+
+
+client = Client()
 
 PERIOD_END = date.today()
 PERIOD_START = PERIOD_END - timedelta(days=29)
@@ -403,14 +443,13 @@ def seed():
         slug = project["slug"]
 
         # Upsert project (insert or update by slug)
-        resp = client.table("projects").upsert(project, on_conflict="slug").execute()
+        resp = client.table("projects").upsert(project, on_conflict="slug")
         if resp.data:
             pid = resp.data[0]["id"]
             project_ids[slug] = pid
             print(f"  OK project: {project['name']} (id={pid})")
         else:
-            # Fetch existing id if upsert returned nothing
-            fetch = client.table("projects").select("id").eq("slug", slug).single().execute()
+            fetch = client.table("projects").select("id").eq("slug", slug)
             pid = fetch.data["id"]
             project_ids[slug] = pid
             print(f"  EXISTS project: {project['name']} (id={pid})")
@@ -431,7 +470,7 @@ def seed():
                 "period_start": PERIOD_START.isoformat(),
                 "period_end": PERIOD_END.isoformat(),
             }
-            resp = client.table("metric_snapshots").insert(snapshot).execute()
+            resp = client.table("metric_snapshots").insert(snapshot)
             if resp.data:
                 print(f"  OK snapshot: {slug}/{source}")
             else:
