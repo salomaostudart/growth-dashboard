@@ -22,6 +22,7 @@ pnpm-debug.log*
 test-results/
 playwright-report/
 security-audit/test-*.png
+search-console-user-added.png
 
 # security plan (template generico, nao codigo do projeto)
 PLANO_SEGURANCA_OWASP_ASTRO.md

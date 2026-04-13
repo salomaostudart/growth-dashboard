@@ -177,7 +177,7 @@
 
   btn.addEventListener('click', () => {
     const isOpen = dropdown.classList.contains('open');
-    isOpen ? closeDropdown() : openDropdown();
+    if (isOpen) { closeDropdown(); } else { openDropdown(); }
   });
 
   document.addEventListener('click', (e) => {
