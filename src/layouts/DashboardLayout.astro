@@ -62,6 +62,7 @@ const navItems = [
                 href={item.href}
                 class:list={['nav-link', { active: activeNav === item.id }]}
                 aria-current={activeNav === item.id ? 'page' : undefined}
+                data-astro-prefetch="hover"
               >
                 <span class="nav-icon" data-icon={item.icon}></span>
                 <span class="nav-label">{item.label}</span>
@@ -461,9 +462,19 @@ const navItems = [
   const mobileBtn = document.getElementById('mobile-menu-btn');
   const toggleBtn = document.getElementById('sidebar-toggle');
 
+  function resizeAllCharts() {
+    setTimeout(() => {
+      document.querySelectorAll('.chart-body').forEach(el => {
+        const instance = (window as any).echarts?.getInstanceByDom(el);
+        instance?.resize();
+      });
+    }, 300);
+  }
+
   function toggleSidebar() {
     sidebar?.classList.toggle('open');
     overlay?.classList.toggle('open');
+    resizeAllCharts();
   }
 
   mobileBtn?.addEventListener('click', toggleSidebar);

@@ -114,3 +114,21 @@ a:hover { color: var(--accent-primary-hover); }
     grid-template-columns: 1fr;
   }
 }
+
+/* Chart responsive: resize all ECharts on sidebar toggle + window resize */
+@media (max-width: 768px) {
+  .grid-charts {
+    gap: var(--space-4);
+  }
+}
+
+/* Table responsive */
+@media (max-width: 640px) {
+  .data-table {
+    font-size: 0.75rem;
+  }
+  .data-table th,
+  .data-table td {
+    padding: 0.5rem 0.75rem;
+  }
+}
