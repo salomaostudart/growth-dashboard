@@ -45,6 +45,7 @@ import OnboardingBanner from '../components/ui/OnboardingBanner.astro';
 import AuthGate from '../components/ui/AuthGate.astro';
 import RoleBadge from '../components/ui/RoleBadge.astro';
 import ChatPanel from '../components/ui/ChatPanel.astro';
+import ProjectSelector from '../components/ui/ProjectSelector.astro';
 ---
 
 <!DOCTYPE html>
@@ -129,6 +130,7 @@ import ChatPanel from '../components/ui/ChatPanel.astro';
         </div>
 
         <div class="topbar-right">
+          <ProjectSelector />
           <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle light/dark mode">
             <svg class="theme-icon-dark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
             <svg class="theme-icon-light" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -602,4 +604,36 @@ import ChatPanel from '../components/ui/ChatPanel.astro';
     }
     localStorage.setItem('growthhq-theme', next);
   });
+</script>
+
+<script>
+  // Progressive enhancement — update KPI values from Supabase when configured
+  import { fetchProjectMetrics } from '../lib/data-fetcher';
+
+  async function enhanceKPIs() {
+    const slug = localStorage.getItem('growthhq-project') || '';
+    if (!slug) return; // Demo mode — keep mock data
+
+    // Fetch GA4 data for the selected project
+    const ga4 = await fetchProjectMetrics('ga4');
+    if (!ga4) return;
+
+    // Update KPI cards that show GA4 metrics
+    // Cards are identified by data-metric attribute set on kpi-value elements
+    document.querySelectorAll<HTMLElement>('[data-metric]').forEach(el => {
+      const metric = el.dataset.metric as string;
+      if (metric in ga4) {
+        const value = ga4[metric];
+        if (typeof value === 'number') {
+          el.textContent = value >= 1000
+            ? (value >= 1000000
+              ? `${(value / 1000000).toFixed(1)}M`
+              : `${(value / 1000).toFixed(1)}K`)
+            : String(value);
+        }
+      }
+    });
+  }
+
+  enhanceKPIs().catch(() => {});
 </script>

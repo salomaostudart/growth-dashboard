@@ -1,0 +1,229 @@
+---
+// ProjectSelector — client-side project switcher
+// Reads projects from Supabase if configured; falls back to "Demo Mode"
+// Selected project stored in localStorage('growthhq-project')
+---
+
+<div class="project-selector" id="project-selector">
+  <button class="project-btn" id="project-btn" aria-haspopup="listbox" aria-expanded="false">
+    <svg class="project-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="2" y="3" width="20" height="14" rx="2"/>
+      <path d="M8 21h8M12 17v4"/>
+    </svg>
+    <span class="project-name" id="project-name">Demo Mode</span>
+    <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M6 9l6 6 6-6"/>
+    </svg>
+  </button>
+
+  <ul class="project-dropdown" id="project-dropdown" role="listbox" aria-label="Select project">
+    <li class="project-option" role="option" data-slug="" aria-selected="true">
+      <span class="option-dot demo"></span>
+      Demo Mode
+    </li>
+  </ul>
+</div>
+
+<style>
+  .project-selector {
+    position: relative;
+  }
+
+  .project-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: var(--surface-2);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+    max-width: 180px;
+  }
+
+  .project-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--border-hover);
+    background: var(--surface-3);
+  }
+
+  .project-btn[aria-expanded="true"] {
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+  }
+
+  .project-icon {
+    flex-shrink: 0;
+    color: var(--accent-primary);
+  }
+
+  .project-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    text-align: left;
+  }
+
+  .chevron {
+    flex-shrink: 0;
+    transition: transform var(--transition-fast);
+  }
+
+  .project-btn[aria-expanded="true"] .chevron {
+    transform: rotate(180deg);
+  }
+
+  .project-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    min-width: 180px;
+    background: var(--surface-1);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    list-style: none;
+    padding: var(--space-1);
+    z-index: 200;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .project-dropdown.open {
+    display: block;
+  }
+
+  .project-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .project-option:hover {
+    background: var(--surface-2);
+    color: var(--text-primary);
+  }
+
+  .project-option[aria-selected="true"] {
+    background: rgba(129, 140, 248, 0.12);
+    color: var(--text-primary);
+  }
+
+  .option-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .option-dot.demo {
+    background: var(--text-muted);
+  }
+
+  .option-dot.active {
+    background: var(--accent-success);
+  }
+</style>
+
+<script>
+  import { fetchProjects } from '../../lib/data-fetcher';
+
+  const btn = document.getElementById('project-btn') as HTMLButtonElement;
+  const dropdown = document.getElementById('project-dropdown') as HTMLUListElement;
+  const nameEl = document.getElementById('project-name') as HTMLSpanElement;
+
+  const STORAGE_KEY = 'growthhq-project';
+  let currentSlug = localStorage.getItem(STORAGE_KEY) || '';
+
+  function setActiveOption(slug: string) {
+    dropdown.querySelectorAll('.project-option').forEach(el => {
+      const s = (el as HTMLElement).dataset.slug || '';
+      el.setAttribute('aria-selected', s === slug ? 'true' : 'false');
+    });
+  }
+
+  function selectProject(slug: string, name: string) {
+    const prev = currentSlug;
+    currentSlug = slug;
+    localStorage.setItem(STORAGE_KEY, slug);
+    nameEl.textContent = name || 'Demo Mode';
+    setActiveOption(slug);
+    closeDropdown();
+    if (prev !== slug) {
+      window.location.reload();
+    }
+  }
+
+  function openDropdown() {
+    dropdown.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeDropdown() {
+    dropdown.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+  }
+
+  btn.addEventListener('click', () => {
+    const isOpen = dropdown.classList.contains('open');
+    isOpen ? closeDropdown() : openDropdown();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!(e.target as HTMLElement).closest('#project-selector')) {
+      closeDropdown();
+    }
+  });
+
+  // Load projects from Supabase and populate dropdown
+  async function loadProjects() {
+    const projects = await fetchProjects();
+    if (projects.length === 0) return;
+
+    // Remove existing dynamic options (keep demo)
+    dropdown.querySelectorAll('.project-option[data-slug]:not([data-slug=""])').forEach(el => el.remove());
+
+    // Add separator
+    const sep = document.createElement('li');
+    sep.style.cssText = 'height:1px;background:var(--border-default);margin:var(--space-1) 0;';
+    dropdown.appendChild(sep);
+
+    for (const project of projects) {
+      const li = document.createElement('li');
+      li.className = 'project-option';
+      li.role = 'option';
+      li.dataset.slug = project.slug;
+      li.setAttribute('aria-selected', project.slug === currentSlug ? 'true' : 'false');
+      li.innerHTML = `<span class="option-dot active"></span>${project.name}`;
+      li.addEventListener('click', () => selectProject(project.slug, project.name));
+      dropdown.appendChild(li);
+    }
+
+    // Set current name
+    if (currentSlug) {
+      const match = projects.find(p => p.slug === currentSlug);
+      if (match) {
+        nameEl.textContent = match.name;
+        setActiveOption(currentSlug);
+      }
+    }
+  }
+
+  // Demo mode option click
+  dropdown.querySelector('.project-option[data-slug=""]')?.addEventListener('click', () => {
+    selectProject('', 'Demo Mode');
+  });
+
+  loadProjects();
+</script>

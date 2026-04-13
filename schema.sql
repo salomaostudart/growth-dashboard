@@ -103,3 +103,56 @@ CREATE POLICY "Admins can read audit log" ON public.audit_log
   );
 CREATE POLICY "Authenticated can insert audit log" ON public.audit_log
   FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+
+-- ===== PHASE 2+3: Multi-Project Data Layer =====
+
+-- Projects
+CREATE TABLE public.projects (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  domain TEXT,
+  ga4_property TEXT,
+  gsc_site_url TEXT,
+  github_org TEXT,
+  description TEXT,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Metrics snapshots (JSONB — flexible schema per source)
+CREATE TABLE public.metric_snapshots (
+  id SERIAL PRIMARY KEY,
+  project_id INTEGER REFERENCES public.projects(id) ON DELETE CASCADE,
+  source TEXT NOT NULL CHECK (source IN ('ga4', 'gsc', 'email', 'social', 'crm', 'martech', 'github')),
+  data JSONB NOT NULL,
+  period_start DATE NOT NULL,
+  period_end DATE NOT NULL,
+  fetched_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Index for fast queries
+CREATE INDEX idx_snapshots_project_source ON public.metric_snapshots(project_id, source);
+CREATE INDEX idx_snapshots_period ON public.metric_snapshots(period_start, period_end);
+
+-- RLS
+ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.metric_snapshots ENABLE ROW LEVEL SECURITY;
+
+-- Anyone authenticated can read projects and snapshots
+CREATE POLICY "Authenticated read projects" ON public.projects
+  FOR SELECT USING (auth.uid() IS NOT NULL);
+CREATE POLICY "Admins manage projects" ON public.projects
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+CREATE POLICY "Authenticated read snapshots" ON public.metric_snapshots
+  FOR SELECT USING (auth.uid() IS NOT NULL);
+CREATE POLICY "Service role insert snapshots" ON public.metric_snapshots
+  FOR INSERT WITH CHECK (true);
+
+-- Also allow anon read for demo mode (public dashboard)
+CREATE POLICY "Anon read projects" ON public.projects
+  FOR SELECT USING (true);
+CREATE POLICY "Anon read snapshots" ON public.metric_snapshots
+  FOR SELECT USING (true);
