@@ -1,0 +1,349 @@
+---
+/**
+ * Login — public auth page (not wrapped in DashboardLayout).
+ * Handles magic link and GitHub OAuth.
+ */
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign In | GrowthHQ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-header">
+        <svg class="login-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="36" height="36" aria-hidden="true">
+          <path d="M3 3v18h18" />
+          <path d="M7 16l4-8 4 4 4-6" />
+        </svg>
+        <h1 class="login-title">Growth<strong>HQ</strong></h1>
+        <p class="login-subtitle">Digital Growth Command Center</p>
+      </div>
+
+      <div class="login-form" id="login-form">
+        <div class="login-input-group">
+          <label for="login-email" class="login-label">Email</label>
+          <input type="email" id="login-email" class="login-input" placeholder="you@company.com" autocomplete="email" />
+        </div>
+        <button class="login-btn login-btn-primary" id="btn-magic-link">
+          Send Magic Link
+        </button>
+        <div class="login-divider"><span>or</span></div>
+        <button class="login-btn login-btn-github" id="btn-github">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12Z"/></svg>
+          Continue with GitHub
+        </button>
+      </div>
+
+      <div class="login-message" id="login-message" style="display: none;">
+        <p class="login-message-text" id="login-message-text"></p>
+      </div>
+
+      <p class="login-footer">Access restricted to authorized members</p>
+    </div>
+  </div>
+
+  <style is:global>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --surface-0: #0a0a0f;
+      --surface-1: #111118;
+      --surface-2: #1a1a24;
+      --surface-3: #242432;
+      --accent-primary: #818cf8;
+      --accent-primary-active: #4f46e5;
+      --accent-success: #10b981;
+      --accent-success-dim: #065f46;
+      --accent-danger: #ef4444;
+      --accent-danger-dim: #7f1d1d;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #8892a8;
+      --border-default: #242432;
+      --border-focus: #818cf8;
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --font-heading: 'Oswald', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --transition-fast: 150ms ease;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--surface-0);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+    }
+  </style>
+
+  <style>
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      background: var(--surface-0);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-logo {
+      color: var(--accent-primary);
+      margin-bottom: 1rem;
+    }
+
+    .login-title {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-primary);
+    }
+
+    .login-title strong {
+      color: var(--accent-primary);
+    }
+
+    .login-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    .login-input-group {
+      margin-bottom: 1rem;
+    }
+
+    .login-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--surface-1);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      transition: border-color var(--transition-fast);
+    }
+
+    .login-input:focus {
+      outline: none;
+      border-color: var(--border-focus);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all var(--transition-fast);
+    }
+
+    .login-btn-primary {
+      background: var(--accent-primary);
+      color: white;
+    }
+
+    .login-btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .login-btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .login-btn-github {
+      background: var(--surface-2);
+      color: var(--text-primary);
+      border: 1px solid var(--border-default);
+    }
+
+    .login-btn-github:hover {
+      background: var(--surface-3);
+    }
+
+    .login-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1rem 0;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .login-divider::before,
+    .login-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-default);
+    }
+
+    .login-message {
+      text-align: center;
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      margin-top: 1rem;
+    }
+
+    .login-message.is-success {
+      background: var(--accent-success-dim);
+    }
+
+    .login-message.is-error {
+      background: var(--accent-danger-dim);
+    }
+
+    .login-message-text {
+      font-size: 0.875rem;
+      color: var(--text-primary);
+    }
+
+    .login-message.is-success .login-message-text {
+      color: var(--accent-success);
+    }
+
+    .login-message.is-error .login-message-text {
+      color: var(--accent-danger);
+    }
+
+    .login-footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 1.5rem;
+    }
+  </style>
+
+  <script>
+    import { supabase, isConfigured } from '../lib/supabase';
+    import { isEmailAllowed } from '../lib/auth';
+
+    const params = new URLSearchParams(window.location.search);
+    const redirectTo = params.get('redirect') || '/';
+
+    const form = document.getElementById('login-form')!;
+    const message = document.getElementById('login-message')!;
+    const messageText = document.getElementById('login-message-text')!;
+    const emailInput = document.getElementById('login-email') as HTMLInputElement;
+    const btnMagicLink = document.getElementById('btn-magic-link') as HTMLButtonElement;
+
+    function showMessage(text: string, type: 'success' | 'error') {
+      messageText.textContent = text;
+      message.className = `login-message is-${type}`;
+      message.style.display = 'block';
+    }
+
+    function hideForm() {
+      form.style.display = 'none';
+    }
+
+    // If Supabase is not configured, show info and stop
+    if (!isConfigured || !supabase) {
+      showMessage('Auth not configured. Dashboard is running in demo mode.', 'error');
+    } else {
+      // Check if already logged in
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session && isEmailAllowed(session.user.email || '')) {
+        window.location.replace(redirectTo);
+      }
+
+      // Magic link
+      btnMagicLink.addEventListener('click', async () => {
+        const email = emailInput.value.trim();
+        if (!email) return;
+
+        if (!isEmailAllowed(email)) {
+          showMessage('Access restricted to authorized members.', 'error');
+          return;
+        }
+
+        btnMagicLink.disabled = true;
+        btnMagicLink.textContent = 'Sending...';
+
+        const redirectUrl = window.location.origin + '/login' + (redirectTo !== '/' ? '?redirect=' + encodeURIComponent(redirectTo) : '');
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: redirectUrl },
+        });
+
+        if (error) {
+          showMessage(error.message, 'error');
+          btnMagicLink.disabled = false;
+          btnMagicLink.textContent = 'Send Magic Link';
+        } else {
+          hideForm();
+          showMessage('Check your email for the magic link!', 'success');
+        }
+      });
+
+      // GitHub OAuth
+      document.getElementById('btn-github')?.addEventListener('click', async () => {
+        const redirectUrl = window.location.origin + '/login' + (redirectTo !== '/' ? '?redirect=' + encodeURIComponent(redirectTo) : '');
+        await supabase.auth.signInWithOAuth({
+          provider: 'github',
+          options: { redirectTo: redirectUrl },
+        });
+      });
+
+      // Auth state change — handle return from magic link / OAuth
+      supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          if (!isEmailAllowed(session.user.email || '')) {
+            await supabase.auth.signOut();
+            showMessage('Access restricted to authorized members.', 'error');
+            return;
+          }
+          // Update last_login
+          await supabase.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', session.user.id);
+          window.location.replace(redirectTo);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
