@@ -1,0 +1,917 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+---
+
+<DashboardLayout title="Documentation" activeNav="docs">
+  <div class="docs-layout">
+    <!-- Table of Contents -->
+    <nav class="docs-toc" aria-label="Table of contents">
+      <p class="toc-heading">On this page</p>
+      <ul>
+        <li><a href="#getting-started">Getting Started</a></li>
+        <li><a href="#pages">Dashboard Pages</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#roles">Roles &amp; Permissions</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </nav>
+
+    <!-- Main content -->
+    <article class="docs-content">
+
+      <!-- Header -->
+      <header class="docs-header">
+        <div class="docs-header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="docs-title">Documentation</h1>
+          <p class="docs-subtitle">Everything you need to navigate and understand GrowthHQ</p>
+        </div>
+      </header>
+
+      <!-- 1. Getting Started -->
+      <section class="docs-section" id="getting-started">
+        <div class="section-heading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 8 12 12 14 14"/>
+          </svg>
+          <h2>Getting Started</h2>
+        </div>
+
+        <div class="callout callout-welcome">
+          <strong>Welcome to GrowthHQ</strong>
+          <p>GrowthHQ is a <strong>Digital Growth Command Center</strong> — a unified dashboard that consolidates metrics from multiple marketing channels into one place, with automated insights and an AI-queryable interface.</p>
+        </div>
+
+        <h3>Navigation</h3>
+        <p>Use the <strong>sidebar</strong> on the left to move between dashboard pages. On mobile, tap the menu button in the top-left corner.</p>
+        <p>Press <kbd>Ctrl+K</kbd> (or <kbd>Cmd+K</kbd> on Mac) to open the <strong>Command Palette</strong> for quick navigation between any page without using the mouse.</p>
+
+        <h3>Understanding data badges</h3>
+        <p>Every KPI and chart in GrowthHQ displays a <strong>DataSourceTag</strong> badge indicating the origin of its data:</p>
+        <div class="badge-explainer">
+          <div class="badge-row">
+            <span class="badge badge-live">Live</span>
+            <span class="badge-desc">Real data pulled from a connected API (e.g., Google Analytics 4, Google Search Console).</span>
+          </div>
+          <div class="badge-row">
+            <span class="badge badge-mock">Mock</span>
+            <span class="badge-desc">Demonstration data that simulates realistic patterns. Real connector available — see <a href="#faq">FAQ</a>.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Dashboard Pages -->
+      <section class="docs-section" id="pages">
+        <div class="section-heading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+          </svg>
+          <h2>Dashboard Pages</h2>
+        </div>
+
+        <p>GrowthHQ covers the full digital marketing stack across 9 dedicated pages.</p>
+
+        <div class="table-wrap">
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Page</th>
+                <th>What it shows</th>
+                <th>Data source</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a href="/">Overview</a></td>
+                <td>Cross-channel KPIs, trends, automated insights</td>
+                <td>All sources</td>
+              </tr>
+              <tr>
+                <td><a href="/web-performance">Web Performance</a></td>
+                <td>Traffic, bounce rate, sessions, device breakdown</td>
+                <td>Google Analytics 4</td>
+              </tr>
+              <tr>
+                <td><a href="/seo">SEO</a></td>
+                <td>Rankings, impressions, CTR, top queries</td>
+                <td>Google Search Console</td>
+              </tr>
+              <tr>
+                <td><a href="/email">Email Marketing</a></td>
+                <td>Open rate, campaigns, automations</td>
+                <td>Mailchimp <span class="inline-badge mock">mock</span></td>
+              </tr>
+              <tr>
+                <td><a href="/social">Social Media</a></td>
+                <td>Followers, engagement, referral traffic</td>
+                <td>LinkedIn/Meta <span class="inline-badge mock">mock</span></td>
+              </tr>
+              <tr>
+                <td><a href="/crm-pipeline">CRM / Pipeline</a></td>
+                <td>Leads, conversion funnel, channel attribution</td>
+                <td>HubSpot <span class="inline-badge mock">mock</span></td>
+              </tr>
+              <tr>
+                <td><a href="/cross-channel">Channel Flow</a></td>
+                <td>Sankey diagram: source → engagement → conversion</td>
+                <td>Aggregated</td>
+              </tr>
+              <tr>
+                <td><a href="/martech-health">Martech Health</a></td>
+                <td>System uptime, automation logs, maturity score</td>
+                <td>Webflow <span class="inline-badge mock">mock</span></td>
+              </tr>
+              <tr>
+                <td><a href="/report">Report</a></td>
+                <td>Executive summary, KPIs vs targets, download</td>
+                <td>All sources</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 3. Features -->
+      <section class="docs-section" id="features">
+        <div class="section-heading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          <h2>Features</h2>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Report Downloads</h3>
+              <p>Export data as <strong>CSV</strong> (raw tabular data) or <strong>Markdown</strong> (formatted executive report) directly from the <a href="/report">Report page</a>.</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <div>
+              <h3>AI Chat <span class="feature-badge">demo</span></h3>
+              <p>Ask questions about your metrics in plain language. Press <kbd>Ctrl+/</kbd> to open the chat panel. Runs in demo mode — responses are contextual to the current dashboard data.</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Alerts &amp; Webhooks</h3>
+              <p>Configure thresholds to trigger automatic notifications when metrics cross defined bounds. Webhook support allows integration with Slack, PagerDuty, or any HTTP endpoint.</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.3-4.3"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Command Palette</h3>
+              <p>Press <kbd>Ctrl+K</kbd> from anywhere to instantly navigate to any page without lifting your hands from the keyboard.</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <circle cx="12" cy="12" r="5"/>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Dark / Light Mode</h3>
+              <p>Toggle between dark and light themes using the button in the top-right header. Your preference is saved in local storage.</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                <line x1="12" y1="18" x2="12.01" y2="18"/>
+              </svg>
+            </div>
+            <div>
+              <h3>PWA</h3>
+              <p>Install GrowthHQ as a native app on desktop or mobile. Use the browser's "Add to Home Screen" or "Install" prompt when visiting the dashboard.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Architecture -->
+      <section class="docs-section" id="architecture">
+        <div class="section-heading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+          <h2>Architecture</h2>
+        </div>
+
+        <div class="arch-grid">
+          <div class="arch-card">
+            <h3>Connector Pattern</h3>
+            <p>Every data source implements <code>IConnector&lt;T&gt;</code>. Swapping mock data for a real API requires changing a single environment variable. Zod schemas validate all data at runtime.</p>
+          </div>
+          <div class="arch-card">
+            <h3>MCP Server</h3>
+            <p>13 read-only tools expose dashboard metrics to AI agents programmatically. Compatible with Claude Code and any MCP-compatible client.</p>
+          </div>
+          <div class="arch-card">
+            <h3>Auth</h3>
+            <p>Powered by Supabase — supports magic link and GitHub OAuth. Domain whitelist restricts access to approved email addresses.</p>
+          </div>
+          <div class="arch-card">
+            <h3>Deploy</h3>
+            <p>Deployed on Cloudflare Pages with HSTS, Content Security Policy headers, and WCAG 2.1 AA accessibility compliance enforced by automated axe-core tests.</p>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <strong>Connector swap example</strong>
+          <p>To enable Google Analytics 4 real data: set <code>GA4_ENABLED=true</code> in your environment and provide a <code>GA4_PROPERTY_ID</code>. The connector registry handles the rest — no code changes required.</p>
+        </div>
+      </section>
+
+      <!-- 5. Roles & Permissions -->
+      <section class="docs-section" id="roles">
+        <div class="section-heading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <h2>Roles &amp; Permissions</h2>
+        </div>
+
+        <p>GrowthHQ uses three access levels. Roles are assigned per user in the Supabase admin panel.</p>
+
+        <div class="table-wrap">
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Permission</th>
+                <th class="col-center">Viewer</th>
+                <th class="col-center">Analyst</th>
+                <th class="col-center">Admin</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>View dashboards</td>
+                <td class="col-center"><span class="perm yes">Yes</span></td>
+                <td class="col-center"><span class="perm yes">Yes</span></td>
+                <td class="col-center"><span class="perm yes">Yes</span></td>
+              </tr>
+              <tr>
+                <td>View revenue data</td>
+                <td class="col-center"><span class="perm no">—</span></td>
+                <td class="col-center"><span class="perm yes">Yes</span></td>
+                <td class="col-center"><span class="perm yes">Yes</span></td>
+              </tr>
+              <tr>
+                <td>Export data</td>
+                <td class="col-center"><span class="perm no">—</span></td>
+                <td class="col-center"><span class="perm yes">Yes</span></td>
+                <td class="col-center"><span class="perm yes">Yes</span></td>
+              </tr>
+              <tr>
+                <td>Use AI chat</td>
+                <td class="col-center"><span class="perm no">—</span></td>
+                <td class="col-center"><span class="perm yes">Yes</span></td>
+                <td class="col-center"><span class="perm yes">Yes</span></td>
+              </tr>
+              <tr>
+                <td>Manage alerts</td>
+                <td class="col-center"><span class="perm no">—</span></td>
+                <td class="col-center"><span class="perm yes">Yes</span></td>
+                <td class="col-center"><span class="perm yes">Yes</span></td>
+              </tr>
+              <tr>
+                <td>Manage users</td>
+                <td class="col-center"><span class="perm no">—</span></td>
+                <td class="col-center"><span class="perm no">—</span></td>
+                <td class="col-center"><span class="perm yes">Yes</span></td>
+              </tr>
+              <tr>
+                <td>View audit log</td>
+                <td class="col-center"><span class="perm no">—</span></td>
+                <td class="col-center"><span class="perm no">—</span></td>
+                <td class="col-center"><span class="perm yes">Yes</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 6. FAQ -->
+      <section class="docs-section" id="faq">
+        <div class="section-heading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <h2>FAQ</h2>
+        </div>
+
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>Why is some data marked Mock?</summary>
+            <p>Mock data demonstrates the full UI with realistic patterns — weekday/weekend variance, trends, and spikes. Real connectors for GA4 and Google Search Console are active. Other sources (Mailchimp, LinkedIn, Meta, HubSpot, Webflow) will be connected as credentials become available. See <a href="#architecture">Architecture</a> for how to enable a connector.</p>
+          </details>
+
+          <details class="faq-item">
+            <summary>How do I connect a real data source?</summary>
+            <p>Set the corresponding environment variable to enable the connector. For example: <code>GA4_ENABLED=true</code> with a valid <code>GA4_PROPERTY_ID</code>. Each connector documents its required env vars. No code changes needed — the registry pattern handles the swap automatically.</p>
+          </details>
+
+          <details class="faq-item">
+            <summary>Can I add my own project?</summary>
+            <p>Multi-project support is on the roadmap. Each project will have isolated data sources and its own dashboard view. For now, fork the repo and replace the mock data and connectors with your own.</p>
+          </details>
+
+          <details class="faq-item">
+            <summary>Found a bug or have a suggestion?</summary>
+            <p>Open an issue on GitHub: <a href="https://github.com/salomaostudart/growth-dashboard/issues" target="_blank" rel="noopener">github.com/salomaostudart/growth-dashboard/issues</a></p>
+          </details>
+        </div>
+      </section>
+
+    </article>
+  </div>
+</DashboardLayout>
+
+<style>
+  /* Layout */
+  .docs-layout {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: var(--space-8);
+    align-items: start;
+    max-width: 1100px;
+  }
+
+  /* Table of Contents */
+  .docs-toc {
+    position: sticky;
+    top: calc(var(--topbar-height) + var(--space-6));
+    background: var(--surface-1);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .toc-heading {
+    font-family: var(--font-heading);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: var(--space-3);
+  }
+
+  .docs-toc ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .docs-toc a {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+  }
+
+  .docs-toc a:hover {
+    color: var(--text-primary);
+    background: var(--surface-2);
+  }
+
+  /* Content */
+  .docs-content {
+    min-width: 0;
+  }
+
+  /* Header */
+  .docs-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--border-default);
+  }
+
+  .docs-header-icon {
+    width: 56px;
+    height: 56px;
+    background: rgba(129, 140, 248, 0.1);
+    border: 1px solid rgba(129, 140, 248, 0.2);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-primary);
+    flex-shrink: 0;
+  }
+
+  .docs-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-4xl);
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-1);
+  }
+
+  .docs-subtitle {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+
+  /* Sections */
+  .docs-section {
+    margin-bottom: var(--space-10);
+    scroll-margin-top: calc(var(--topbar-height) + var(--space-4));
+  }
+
+  .section-heading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-default);
+    color: var(--accent-primary);
+  }
+
+  .section-heading h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-primary);
+  }
+
+  .docs-section h3 {
+    font-family: var(--font-heading);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-primary);
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-2);
+  }
+
+  .docs-section p {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--space-3);
+  }
+
+  /* Callouts */
+  .callout {
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+  }
+
+  .callout strong {
+    display: block;
+    font-weight: 600;
+    margin-bottom: var(--space-1);
+  }
+
+  .callout p {
+    margin: 0;
+  }
+
+  .callout-welcome {
+    background: rgba(129, 140, 248, 0.08);
+    border: 1px solid rgba(129, 140, 248, 0.2);
+    color: var(--text-secondary);
+  }
+
+  .callout-welcome strong {
+    color: var(--accent-primary);
+  }
+
+  .callout-info {
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    color: var(--text-secondary);
+  }
+
+  .callout-info strong {
+    color: #38bdf8;
+  }
+
+  /* Badges */
+  .badge-explainer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+  }
+
+  .badge-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+    min-width: 48px;
+    justify-content: center;
+  }
+
+  .badge-live {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+  }
+
+  .badge-mock {
+    background: rgba(251, 191, 36, 0.12);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.25);
+  }
+
+  .badge-desc {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .inline-badge {
+    display: inline-flex;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+
+  .inline-badge.mock {
+    background: rgba(251, 191, 36, 0.12);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.25);
+  }
+
+  /* Tables */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-default);
+    margin-bottom: var(--space-4);
+  }
+
+  .docs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-xs);
+  }
+
+  .docs-table thead {
+    background: var(--surface-2);
+  }
+
+  .docs-table th {
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    font-family: var(--font-heading);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border-default);
+  }
+
+  .docs-table th.col-center {
+    text-align: center;
+  }
+
+  .docs-table td {
+    padding: var(--space-3) var(--space-4);
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-subtle, var(--border-default));
+    vertical-align: middle;
+  }
+
+  .docs-table td.col-center {
+    text-align: center;
+  }
+
+  .docs-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .docs-table tbody tr:nth-child(even) {
+    background: var(--surface-1);
+  }
+
+  .docs-table tbody tr:hover {
+    background: var(--surface-2);
+  }
+
+  /* Permission badges */
+  .perm {
+    font-size: var(--text-xs);
+    font-weight: 500;
+  }
+
+  .perm.yes {
+    color: #34d399;
+  }
+
+  .perm.no {
+    color: var(--text-muted);
+  }
+
+  /* Features grid */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .feature-card {
+    display: flex;
+    gap: var(--space-3);
+    background: var(--surface-1);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    transition: border-color var(--transition-fast);
+  }
+
+  .feature-card:hover {
+    border-color: rgba(129, 140, 248, 0.3);
+  }
+
+  .feature-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-primary);
+    flex-shrink: 0;
+  }
+
+  .feature-card h3 {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: none;
+    letter-spacing: 0;
+    margin-top: 0;
+    margin-bottom: var(--space-1);
+  }
+
+  .feature-card p {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .feature-badge {
+    display: inline-flex;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: rgba(129, 140, 248, 0.12);
+    color: var(--accent-primary);
+    border: 1px solid rgba(129, 140, 248, 0.2);
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+
+  /* Architecture grid */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  .arch-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .arch-card h3 {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0;
+    margin-bottom: var(--space-2);
+  }
+
+  .arch-card p {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* FAQ */
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .faq-item {
+    background: var(--surface-1);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: border-color var(--transition-fast);
+  }
+
+  .faq-item[open] {
+    border-color: rgba(129, 140, 248, 0.3);
+  }
+
+  .faq-item summary {
+    padding: var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    transition: background var(--transition-fast);
+  }
+
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-item summary::after {
+    content: '+';
+    font-size: var(--text-lg);
+    color: var(--text-muted);
+    transition: transform var(--transition-fast);
+    flex-shrink: 0;
+    margin-left: var(--space-3);
+  }
+
+  .faq-item[open] summary::after {
+    content: '−';
+  }
+
+  .faq-item summary:hover {
+    background: var(--surface-2);
+  }
+
+  .faq-item p {
+    padding: 0 var(--space-4) var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin: 0;
+    border-top: 1px solid var(--border-default);
+    padding-top: var(--space-3);
+  }
+
+  /* Keyboard shortcuts */
+  kbd {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 1px 5px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-default);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  /* Code */
+  code {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    background: var(--surface-2);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    color: var(--accent-primary);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .docs-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .docs-toc {
+      position: static;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: start;
+      gap: var(--space-3) var(--space-6);
+    }
+
+    .toc-heading {
+      grid-column: 1 / -1;
+      margin-bottom: 0;
+    }
+
+    .docs-toc ul {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--space-1) var(--space-2);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .arch-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .docs-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
