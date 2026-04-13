@@ -122,6 +122,28 @@ a:hover { color: var(--accent-primary-hover); }
   }
 }
 
+/* CSV Export button */
+.csv-export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms ease;
+  margin-right: 8px;
+}
+.csv-export-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+  background: var(--surface-3);
+}
+
 /* Table responsive */
 @media (max-width: 640px) {
   .data-table {

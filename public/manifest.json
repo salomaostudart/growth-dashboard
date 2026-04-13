@@ -1,0 +1,16 @@
+{
+  "name": "GrowthHQ — Digital Growth Command Center",
+  "short_name": "GrowthHQ",
+  "description": "Real-time metrics, insights & marketing analytics dashboard",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#818cf8",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
