@@ -26,6 +26,43 @@ function createRng(seed: number) {
 // Each generator re-seeds before use. All helpers read from _rng.
 let _rng = createRng(42);
 
+function generateForecast(data: number[], daysAhead: number): Array<{ date: string; projected: number; confidence: [number, number] }> {
+  // Simple linear regression
+  const n = data.length;
+  const lastN = Math.min(n, 30); // use last 30 days for trend
+  const recent = data.slice(-lastN);
+
+  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+  for (let i = 0; i < recent.length; i++) {
+    sumX += i;
+    sumY += recent[i];
+    sumXY += i * recent[i];
+    sumX2 += i * i;
+  }
+  const slope = (recent.length * sumXY - sumX * sumY) / (recent.length * sumX2 - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / recent.length;
+
+  const forecast = [];
+  const now = new Date();
+  const variance = recent.reduce((acc, v) => acc + Math.pow(v - (sumY / recent.length), 2), 0) / recent.length;
+  const stdDev = Math.sqrt(variance);
+
+  for (let i = 1; i <= daysAhead; i++) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + i);
+    const projected = Math.max(0, Math.round(intercept + slope * (recent.length + i)));
+    forecast.push({
+      date: d.toISOString().split('T')[0],
+      projected,
+      confidence: [
+        Math.max(0, Math.round(projected - 1.96 * stdDev)),
+        Math.round(projected + 1.96 * stdDev),
+      ] as [number, number],
+    });
+  }
+  return forecast;
+}
+
 function rand(): number { return _rng.rand(); }
 function randomBetween(min: number, max: number): number { return _rng.between(min, max); }
 function randomInt(min: number, max: number): number { return _rng.int(min, max); }
@@ -100,6 +137,13 @@ export function generateWebMetrics() {
       paid: Number(randomBetween(8, 18).toFixed(1)),
       referral: Number(randomBetween(3, 8).toFixed(1)),
     },
+    targets: {
+      sessions: { target: 12000, period: 'monthly' },
+      users: { target: 8000, period: 'monthly' },
+      bounceRate: { target: 40, period: 'monthly', direction: 'lower' as const },
+      conversionRate: { target: 3.5, period: 'monthly' },
+    },
+    forecast: generateForecast(trafficByDay.map(d => d.sessions), 30),
   };
 }
 
@@ -136,6 +180,11 @@ export function generateSeoMetrics() {
       { page: '/platform', impressions: randomInt(1500, 4000), clicks: randomInt(100, 350), ctr: Number(randomBetween(4, 10).toFixed(1)), position: Number(randomBetween(3, 8).toFixed(1)) },
       { page: '/solutions', impressions: randomInt(1000, 3000), clicks: randomInt(50, 200), ctr: Number(randomBetween(3, 8).toFixed(1)), position: Number(randomBetween(5, 12).toFixed(1)) },
     ],
+    targets: {
+      impressions: { target: 15000, period: 'monthly' },
+      clicks: { target: 1500, period: 'monthly' },
+      avgPosition: { target: 8, period: 'monthly', direction: 'lower' as const },
+    },
   };
 }
 
@@ -183,6 +232,11 @@ export function generateEmailMetrics() {
       { name: 'Onboarding Flow', status: 'paused' as const, lastTriggered: new Date(Date.now() - 7 * 86400000).toISOString(), successRate: Number(randomBetween(88, 96).toFixed(1)), totalRuns: randomInt(50, 200) },
     ],
     bestSendTimes,
+    targets: {
+      openRate: { target: 28, period: 'monthly' },
+      clickRate: { target: 5, period: 'monthly' },
+      listGrowthRate: { target: 3, period: 'monthly' },
+    },
   };
 }
 
@@ -250,6 +304,12 @@ export function generateCrmMetrics() {
       { stage: 'Negotiation', value: randomInt(80000, 200000), count: randomInt(5, 15), confidence: 'medium' as const },
       { stage: 'Closed Won', value: randomInt(50000, 150000), count: randomInt(3, 10), confidence: 'high' as const },
     ],
+    targets: {
+      leads: { target: 1200, period: 'monthly' },
+      mql: { target: 500, period: 'monthly' },
+      sql: { target: 200, period: 'monthly' },
+      pipelineValue: { target: 500000, period: 'monthly' },
+    },
   };
 }
 

@@ -4,6 +4,22 @@
  */
 import { z } from 'zod';
 
+// Shared target/goal schema
+const TargetSchema = z.object({
+  target: z.number(),
+  period: z.string(),
+  direction: z.enum(['higher', 'lower']).optional(),
+}).optional();
+
+const TargetsSchema = z.record(z.string(), TargetSchema).optional();
+
+// Forecast schema
+const ForecastSchema = z.array(z.object({
+  date: z.string(),
+  projected: z.number(),
+  confidence: z.tuple([z.number(), z.number()]),
+})).optional();
+
 // Website / GA4 metrics
 export const WebMetricsSchema = z.object({
   sessions: z.number(),
@@ -35,6 +51,8 @@ export const WebMetricsSchema = z.object({
     paid: z.number(),
     referral: z.number(),
   }),
+  targets: TargetsSchema,
+  forecast: ForecastSchema,
 });
 
 // SEO / Search Console
@@ -58,6 +76,7 @@ export const SeoMetricsSchema = z.object({
     ctr: z.number(),
     position: z.number(),
   })),
+  targets: TargetsSchema,
 });
 
 // Email marketing
@@ -88,6 +107,7 @@ export const EmailMetricsSchema = z.object({
     hour: z.number(),
     engagement: z.number(),
   })),
+  targets: TargetsSchema,
 });
 
 // Social media
@@ -143,6 +163,7 @@ export const CrmMetricsSchema = z.object({
     count: z.number(),
     confidence: z.enum(['high', 'medium', 'low']),
   })),
+  targets: TargetsSchema,
 });
 
 // Martech health
