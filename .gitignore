@@ -21,6 +21,10 @@ pnpm-debug.log*
 # test results
 test-results/
 playwright-report/
+security-audit/test-*.png
+
+# security plan (template generico, nao codigo do projeto)
+PLANO_SEGURANCA_OWASP_ASTRO.md
 
 # credentials
 **/service-account*.json
