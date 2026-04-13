@@ -8,6 +8,8 @@ interface Props {
   id: string;
 }
 
+import DataSourceTag from '../ui/DataSourceTag.astro';
+
 const {
   title,
   subtitle,
@@ -25,10 +27,7 @@ const {
       {subtitle && <p class="chart-subtitle">{subtitle}</p>}
     </div>
     <div class="chart-actions">
-      <div class:list={['source-tag', `source-${source}`]}>
-        <span class="source-dot"></span>
-        <span>{sourceName}</span>
-      </div>
+      <DataSourceTag source={source} name={sourceName} />
     </div>
   </div>
   <div class="chart-body" id={id} style={`height: ${height}`}>
@@ -84,31 +83,6 @@ const {
     align-items: center;
     gap: var(--space-2);
   }
-
-  .source-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: var(--radius-full);
-    font-weight: 500;
-  }
-
-  .source-dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-  }
-
-  .source-live { background: var(--accent-success-dim); color: var(--accent-success); }
-  .source-live .source-dot { background: var(--accent-success); }
-  .source-mock { background: var(--surface-3); color: var(--text-muted); }
-  .source-mock .source-dot { background: var(--text-muted); }
-  .source-cached { background: var(--accent-warning-dim); color: var(--accent-warning); }
-  .source-cached .source-dot { background: var(--accent-warning); }
-  .source-error { background: var(--accent-danger-dim); color: var(--accent-danger); }
-  .source-error .source-dot { background: var(--accent-danger); }
 
   .chart-body {
     padding: var(--space-4);

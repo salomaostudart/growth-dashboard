@@ -4,6 +4,7 @@ import MetricCard from '../components/ui/MetricCard.astro';
 import ChartContainer from '../components/charts/ChartContainer.astro';
 import { getConnector } from '../connectors/registry';
 import { formatNumber, formatPercent, formatDuration, calcDelta } from '../utils/formatters';
+import DataSourceTag from '../components/ui/DataSourceTag.astro';
 
 const now = new Date();
 const dateRange = { start: new Date(now.getTime() - 30 * 86400000), end: now, range: '30d' as const };
@@ -103,10 +104,7 @@ const deviceData = JSON.stringify(deviceBreakdown);
   <section class="table-section">
     <div class="table-header">
       <h3 class="table-title">Top Pages</h3>
-      <div class={`source-tag source-${webResult.source}`}>
-        <span class="source-dot"></span>
-        <span>GA4</span>
-      </div>
+      <DataSourceTag source={webResult.source} name="GA4" />
     </div>
     <div class="table-wrapper">
       <table class="data-table">
@@ -159,21 +157,6 @@ const deviceData = JSON.stringify(deviceBreakdown);
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
-
-  .source-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: var(--radius-full);
-    font-weight: 500;
-  }
-  .source-dot { width: 5px; height: 5px; border-radius: 50%; }
-  .source-live { background: var(--accent-success-dim); color: var(--accent-success); }
-  .source-live .source-dot { background: var(--accent-success); }
-  .source-mock { background: var(--surface-3); color: var(--text-muted); }
-  .source-mock .source-dot { background: var(--text-muted); }
 
   .table-wrapper { overflow-x: auto; }
 
