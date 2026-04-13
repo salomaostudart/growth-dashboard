@@ -1,0 +1,20 @@
+{
+  "fetchedAt": "2026-04-13T13:57:35.679631",
+  "siteUrl": "https://salomaostudart.github.io/portfolio/",
+  "data": {
+    "impressions": 0,
+    "clicks": 0,
+    "ctr": 0,
+    "avgPosition": 0,
+    "topQueries": [],
+    "pagePerformance": [
+      {
+        "page": "https://salomaostudart.github.io/portfolio/",
+        "impressions": 2,
+        "clicks": 0,
+        "ctr": 0,
+        "position": 5
+      }
+    ]
+  }
+}
