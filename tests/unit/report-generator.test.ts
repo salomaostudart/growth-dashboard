@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { generateExecutiveReport } from '../../src/utils/report-generator';
-import { generateWebMetrics, generateSeoMetrics, generateEmailMetrics, generateCrmMetrics, generateMartechHealth } from '../../src/utils/mock-generator';
+import { generateWebMetrics, generateSeoMetrics, generateEmailMetrics, generateSocialMetrics, generateCrmMetrics, generateMartechHealth } from '../../src/utils/mock-generator';
 
 const reportData = {
   web: generateWebMetrics(),
   seo: generateSeoMetrics(),
   email: generateEmailMetrics(),
+  social: generateSocialMetrics(),
   crm: generateCrmMetrics(),
   martech: generateMartechHealth(),
 };
@@ -27,6 +28,7 @@ describe('generateExecutiveReport', () => {
     expect(report).toContain('## Web Performance');
     expect(report).toContain('## SEO Performance');
     expect(report).toContain('## Email Marketing');
+    expect(report).toContain('## Social Media');
     expect(report).toContain('## CRM Pipeline');
     expect(report).toContain('## Martech Health');
   });

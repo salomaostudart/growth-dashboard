@@ -20,8 +20,8 @@ This project solves that by providing:
 ```
 +--------------------------------------------------------------+
 |                        Dashboard UI                          |
-|  8 pages: Overview, Web, SEO, Email, Social, CRM, Martech,  |
-|  About — all functional with KPIs, charts, and tables        |
+|  9 pages: Overview, Web, SEO, Email, Social, CRM, Channel   |
+|  Flow, Martech, About — KPIs, charts, tables, AI chat       |
 +-------------------------------+------------------------------+
                                 |
 +-------------------------------v------------------------------+
@@ -45,7 +45,7 @@ This project solves that by providing:
 
 - **Connector Pattern** — `IConnector<T>` interface. Adding a source = implementing one interface. Swapping mock to real = one env var.
 - **Snapshot Strategy** — Python scripts fetch GA4/GSC data, GitHub Actions commits JSON daily. Zero API calls at build time.
-- **MCP Server** — 9 read-only tools expose dashboard data to AI assistants via stdio.
+- **MCP Server** — 13 tools (9 read + 4 write) expose dashboard data to AI assistants via stdio.
 - **Insights Engine** — 22 rule-based checks (no LLM). Transparent and auditable.
 
 See [CONNECTORS.md](./CONNECTORS.md) for the integration guide.
@@ -57,7 +57,7 @@ See [CONNECTORS.md](./CONNECTORS.md) for the integration guide.
 | **Astro** | Framework | Static output, TypeScript native, zero JS unless opted in |
 | **Apache ECharts** | Charts | Enterprise-grade, dark+light themes, heatmaps/Sankey/funnel |
 | **Zod** | Validation | Runtime schema validation on connector responses |
-| **MCP SDK** | AI interface | 9 tools queryable from Claude Code |
+| **MCP SDK** | AI interface | 13 tools queryable from Claude Code |
 | **Vitest** | Unit tests | Native TS, fast |
 | **Playwright + axe-core** | E2E + a11y | Cross-browser, WCAG 2.1 AA |
 
@@ -89,7 +89,7 @@ See [CONNECTORS.md](./CONNECTORS.md) for the integration guide.
 
 ```
 Unit (Vitest):     71 passed
-E2E specs:         38 written (8 pages load + KPIs + charts + accessibility WCAG 2.1 AA)
+E2E specs:         38 written (9 pages load + KPIs + charts + accessibility WCAG 2.1 AA)
 ```
 
 ```bash

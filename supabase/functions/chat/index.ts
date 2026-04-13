@@ -28,7 +28,7 @@ Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, {
       headers: {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': 'https://growth.sal.dev.br',
         'Access-Control-Allow-Methods': 'POST',
         'Access-Control-Allow-Headers': 'authorization, content-type',
       },
@@ -66,12 +66,18 @@ Deno.serve(async (req: Request) => {
     return new Response(JSON.stringify({ error: `Rate limit: ${RATE_LIMIT} messages/hour` }), { status: 429 });
   }
 
-  // Parse request
-  const { question, context, systemPrompt } = await req.json() as ChatRequest;
+  // Parse request — systemPrompt is server-controlled, ignore client value
+  const { question, context } = await req.json() as ChatRequest;
 
   if (!question?.trim()) {
     return new Response(JSON.stringify({ error: 'Question is required' }), { status: 400 });
   }
+
+  // Server-side system prompt (never trust client)
+  const systemPrompt = `You are GrowthHQ Assistant, an AI analyst for a Digital Growth Command Center.
+You have access to real-time dashboard data provided in the user message context.
+Answer questions about web traffic, SEO, email marketing, social media, CRM pipeline, and martech health.
+Be concise and data-driven. Use specific numbers from the context. Format with markdown.`;
 
   if (!CLAUDE_API_KEY) {
     return new Response(JSON.stringify({ error: 'Claude API key not configured' }), { status: 500 });
@@ -157,7 +163,7 @@ Deno.serve(async (req: Request) => {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
       'Connection': 'keep-alive',
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': 'https://growth.sal.dev.br',
     },
   });
 });

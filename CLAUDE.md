@@ -23,6 +23,10 @@ npm run dev        # Dev server (localhost:4321)
 npm run build      # Build estatico
 npm run test       # Unit tests (Vitest)
 npm run test:e2e   # E2E + acessibilidade + performance (Playwright)
+npm run type-check # TypeScript type checking (astro check)
+npm run lint       # ESLint (src/)
+npm run ci         # type-check + test + build (pipeline completo)
+npm run deploy     # CI + deploy Cloudflare Pages
 ```
 
 ## Testes

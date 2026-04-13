@@ -420,10 +420,11 @@ server.tool(
     const web = (await getConnector('web').fetch(dateRange)).data;
     const seo = (await getConnector('seo').fetch(dateRange)).data;
     const email = (await getConnector('email').fetch(dateRange)).data;
+    const social = (await getConnector('social').fetch(dateRange)).data;
     const crm = (await getConnector('crm').fetch(dateRange)).data;
     const martech = (await getConnector('martech').fetch(dateRange)).data;
 
-    const report = generateExecutiveReport({ web, seo, email, crm, martech });
+    const report = generateExecutiveReport({ web, seo, email, social, crm, martech });
 
     return {
       content: [{

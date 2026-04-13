@@ -13,6 +13,7 @@ export interface DashboardContext {
   web: WebMetrics;
   seo: SeoMetrics;
   email: EmailMetrics;
+  social: SocialMetrics;
   crm: CrmMetrics;
   martech: MartechHealth;
 }
@@ -35,8 +36,11 @@ export function buildChatContext(data: DashboardContext, role: Role): string {
   sections.push(`[EMAIL] Recent campaigns: ${email.campaigns.slice(0, 3).map(c => `"${c.name}" (open ${formatPercent(c.openRate)})`).join(', ')}`);
 
   // Social
-  const social = data as any; // SocialMetrics is on a different connector
-  // We include what's available in the CRM for cross-channel
+  const totalFollowers = data.social.platforms.reduce((s, p) => s + p.followers, 0);
+  const totalReferral = data.social.platforms.reduce((s, p) => s + p.referralTraffic, 0);
+  sections.push(`[SOCIAL] Followers: ${formatNumber(totalFollowers)} | Referral traffic: ${formatNumber(totalReferral)} | Platforms: ${data.social.platforms.map(p => `${p.name} (${formatNumber(p.followers)})`).join(', ')}`);
+
+  // CRM
   sections.push(`[CRM] Funnel: ${crm.funnel.leads} leads → ${crm.funnel.mql} MQL → ${crm.funnel.sql} SQL → ${crm.funnel.pipeline} pipeline → ${crm.funnel.won} won`);
 
   // Revenue-sensitive data: hide from viewers

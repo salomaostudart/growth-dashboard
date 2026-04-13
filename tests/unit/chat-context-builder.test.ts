@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { buildChatContext, estimateTokens } from '../../src/utils/chat-context-builder';
-import { generateWebMetrics, generateSeoMetrics, generateEmailMetrics, generateCrmMetrics, generateMartechHealth } from '../../src/utils/mock-generator';
+import { generateWebMetrics, generateSeoMetrics, generateEmailMetrics, generateSocialMetrics, generateCrmMetrics, generateMartechHealth } from '../../src/utils/mock-generator';
 
 const data = {
   web: generateWebMetrics(),
   seo: generateSeoMetrics(),
   email: generateEmailMetrics(),
+  social: generateSocialMetrics(),
   crm: generateCrmMetrics(),
   martech: generateMartechHealth(),
 };
@@ -22,6 +23,7 @@ describe('buildChatContext', () => {
     expect(ctx).toContain('[WEB]');
     expect(ctx).toContain('[SEO]');
     expect(ctx).toContain('[EMAIL]');
+    expect(ctx).toContain('[SOCIAL]');
     expect(ctx).toContain('[CRM]');
     expect(ctx).toContain('[MARTECH]');
   });

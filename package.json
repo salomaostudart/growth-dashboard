@@ -22,7 +22,7 @@
     "lint": "eslint src/",
     "format": "prettier --write src/ tests/",
     "type-check": "astro check",
-    "ci": "vitest run && astro build",
+    "ci": "astro check && vitest run && astro build",
     "deploy": "npm run ci && npx wrangler pages deploy dist --project-name growth-dashboard --branch main"
   },
   "dependencies": {

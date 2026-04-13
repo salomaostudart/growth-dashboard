@@ -13,12 +13,13 @@ export interface ReportData {
   web: WebMetrics;
   seo: SeoMetrics;
   email: EmailMetrics;
+  social: SocialMetrics;
   crm: CrmMetrics;
   martech: MartechHealth;
 }
 
 export function generateExecutiveReport(data: ReportData): string {
-  const { web, seo, email, crm, martech } = data;
+  const { web, seo, email, social, crm, martech } = data;
   const insights = generateInsights(data);
   const now = new Date().toISOString().split('T')[0];
 
@@ -75,6 +76,15 @@ export function generateExecutiveReport(data: ReportData): string {
   sections.push(`| Click Rate | ${formatPercent(email.clickRate)} |`);
   sections.push(`| Subscribers | ${formatNumber(email.totalSubscribers)} |`);
   sections.push(`| List Growth | ${formatPercent(email.listGrowthRate)} |`);
+  sections.push('');
+
+  // Social
+  sections.push('## Social Media');
+  sections.push('| Platform | Followers | Engagement | Referral Traffic |');
+  sections.push('|---|---|---|---|');
+  social.platforms.forEach(p => {
+    sections.push(`| ${p.name} | ${formatNumber(p.followers)} | ${formatPercent(p.engagementRate)} | ${formatNumber(p.referralTraffic)} |`);
+  });
   sections.push('');
 
   // Pipeline
