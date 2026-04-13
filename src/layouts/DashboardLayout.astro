@@ -7,7 +7,6 @@ interface Props {
 import { getConnector } from '../connectors/registry';
 import { buildChatContext } from '../utils/chat-context-builder';
 import { buildSystemPrompt } from '../utils/chat-system-prompt';
-import { hasPermission, type Role } from '../utils/rbac';
 
 const { title, activeNav = 'overview' } = Astro.props;
 const GA4_ID = 'G-LGNLCC6DYD';
@@ -60,7 +59,7 @@ import ChatPanel from '../components/ui/ChatPanel.astro';
   <title>{title} | Growth Dashboard</title>
   <!-- Google tag (gtag.js) -->
   <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`}></script>
-  <script is:inline define:vars={{ GA4_ID }}>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config',GA4_ID);</script>
+  <script is:inline define:vars={{ GA4_ID }}>window.dataLayer=window.dataLayer||[];function gtag(...args){dataLayer.push(args);}gtag('js',new Date());gtag('config',GA4_ID);</script>
   <link rel="manifest" href="/manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

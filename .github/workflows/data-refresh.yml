@@ -24,9 +24,10 @@ jobs:
       - name: Fetch GA4 snapshot
         env:
           GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          GCP_SERVICE_ACCOUNT_JSON: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/service-account.json
         run: |
-          echo '${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}' > /tmp/service-account.json
+          printenv GCP_SERVICE_ACCOUNT_JSON > /tmp/service-account.json
           python scripts/fetch-ga4-snapshot.py
 
       - name: Fetch GSC snapshot

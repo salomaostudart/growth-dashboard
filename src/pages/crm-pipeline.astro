@@ -3,7 +3,7 @@ import DashboardLayout from '../layouts/DashboardLayout.astro';
 import MetricCard from '../components/ui/MetricCard.astro';
 import ChartContainer from '../components/charts/ChartContainer.astro';
 import { getConnector } from '../connectors/registry';
-import { formatNumber, formatPercent, formatCurrency, calcDelta } from '../utils/formatters';
+import { formatNumber, formatCurrency, calcDelta } from '../utils/formatters';
 import DataSourceTag from '../components/ui/DataSourceTag.astro';
 
 const now = new Date();
@@ -196,7 +196,7 @@ const velocityData = JSON.stringify(crm.leadVelocity);
 </script>
 
 <script>
-  import * as echarts from 'echarts';
+  import echarts from '../utils/echarts-setup';
   import { dashboardTheme } from '../utils/echarts-theme';
 
   echarts.registerTheme('dashboard', dashboardTheme);

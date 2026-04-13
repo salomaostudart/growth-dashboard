@@ -30,7 +30,7 @@ const channelTable = crm.channelAttribution.map(ch => {
   const mixKey = Object.entries({
     organic: 'Organic Search', direct: 'Direct', social: 'Social Media',
     email: 'Email', paid: 'Paid Search', referral: 'Referral',
-  }).find(([_, name]) => name === ch.channel)?.[0];
+  }).find(([, name]) => name === ch.channel)?.[0];
 
   const pct = mixKey ? (web.channelMix as Record<string, number>)[mixKey] ?? 0 : 0;
   const sessions = Math.round(web.sessions * pct / 100);
@@ -166,7 +166,7 @@ const channelTable = crm.channelAttribution.map(ch => {
 </script>
 
 <script>
-  import * as echarts from 'echarts';
+  import echarts from '../utils/echarts-setup';
   import { dashboardTheme } from '../utils/echarts-theme';
 
   echarts.registerTheme('dashboard', dashboardTheme);

@@ -28,7 +28,6 @@ const pageviewsDelta = fmt(calcDelta(web.trafficByDay.map(d => d.sessions * 2.5)
 
 // Serialize for client
 const trafficData = JSON.stringify(web.trafficByDay);
-const topPagesData = JSON.stringify(web.topPages);
 const deviceData = JSON.stringify(deviceBreakdown);
 ---
 
@@ -217,7 +216,7 @@ const deviceData = JSON.stringify(deviceBreakdown);
 </script>
 
 <script>
-  import * as echarts from 'echarts';
+  import echarts from '../utils/echarts-setup';
   import { dashboardTheme } from '../utils/echarts-theme';
 
   echarts.registerTheme('dashboard', dashboardTheme);

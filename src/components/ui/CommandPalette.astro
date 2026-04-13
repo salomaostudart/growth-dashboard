@@ -190,7 +190,7 @@ const commands = [
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
       e.preventDefault();
-      palette.classList.contains('open') ? close() : open();
+      if (palette.classList.contains('open')) { close(); } else { open(); }
     }
     if (e.key === 'Escape') close();
   });

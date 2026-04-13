@@ -22,7 +22,10 @@ from google.analytics.data_v1beta.types import (
     RunReportRequest,
 )
 
-PROPERTY_ID = os.environ.get("GA4_PROPERTY_ID", "532605518")
+PROPERTY_ID = os.environ.get("GA4_PROPERTY_ID")
+if not PROPERTY_ID:
+    print("ERROR: GA4_PROPERTY_ID environment variable is required", file=sys.stderr)
+    sys.exit(1)
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "src" / "data" / "snapshots"
 
 

@@ -4,7 +4,7 @@ import MetricCard from '../components/ui/MetricCard.astro';
 import ChartContainer from '../components/charts/ChartContainer.astro';
 import AlertBanner from '../components/ui/AlertBanner.astro';
 import { getConnector, getAllConnectors } from '../connectors/registry';
-import { formatNumber, formatPercent, formatDuration, calcDelta } from '../utils/formatters';
+import { formatNumber, formatPercent, calcDelta } from '../utils/formatters';
 import { generateInsights } from '../utils/insights-engine';
 
 const now = new Date();
@@ -28,7 +28,6 @@ const totalSystems = martech.systems.length;
 
 // Generate sparkline data from traffic
 const sessionSparkline = web.trafficByDay.slice(-14).map(d => d.sessions);
-const userSparkline = web.trafficByDay.slice(-14).map(d => d.users);
 
 // Alerts
 const alerts: Array<{ type: 'warning' | 'danger' | 'info'; message: string; metric?: string; value?: string }> = [];
@@ -166,7 +165,7 @@ const channelMixData = JSON.stringify(web.channelMix);
   <section class="status-strip">
     <h3 class="strip-title">Data Sources</h3>
     <div class="strip-items">
-      {Object.entries(connectors).map(([key, connector]) => (
+      {Object.entries(connectors).map(([, connector]) => (
         <div class="strip-item">
           <span class={`strip-dot strip-${connector.source}`}></span>
           <span class="strip-name">{connector.name.replace(' (Mock)', '')}</span>
@@ -304,7 +303,7 @@ const channelMixData = JSON.stringify(web.channelMix);
 </script>
 
 <script>
-  import * as echarts from 'echarts';
+  import echarts from '../utils/echarts-setup';
   import { dashboardTheme } from '../utils/echarts-theme';
 
   echarts.registerTheme('dashboard', dashboardTheme);
