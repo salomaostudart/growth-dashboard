@@ -34,11 +34,13 @@ export function formatLatency(ms: number): string {
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
-export function calcDelta(data: number[]): number {
+export function calcDelta(data: number[]): number | null {
+  if (data.length < 2) return null;
   const mid = Math.floor(data.length / 2);
   const first = data.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
   const second = data.slice(mid).reduce((a, b) => a + b, 0) / (data.length - mid);
-  return first > 0 ? ((second - first) / first) * 100 : 0;
+  if (first === 0) return second > 0 ? 100 : null;
+  return ((second - first) / first) * 100;
 }
 
 export function timeAgo(dateStr: string): string {

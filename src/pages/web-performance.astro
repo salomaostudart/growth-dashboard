@@ -20,9 +20,10 @@ const deviceBreakdown = web.deviceBreakdown;
 const sessionSparkline = web.trafficByDay.slice(-14).map(d => d.sessions);
 const userSparkline = web.trafficByDay.slice(-14).map(d => d.users);
 
-const sessionsDelta = calcDelta(web.trafficByDay.map(d => d.sessions));
-const usersDelta = calcDelta(web.trafficByDay.map(d => d.users));
-const pageviewsDelta = calcDelta(web.trafficByDay.map(d => d.sessions * 2.5)); // approximate
+const fmt = (v: number | null) => v !== null ? Number(v.toFixed(1)) : undefined;
+const sessionsDelta = fmt(calcDelta(web.trafficByDay.map(d => d.sessions)));
+const usersDelta = fmt(calcDelta(web.trafficByDay.map(d => d.users)));
+const pageviewsDelta = fmt(calcDelta(web.trafficByDay.map(d => d.sessions * 2.5)));
 
 // Serialize for client
 const trafficData = JSON.stringify(web.trafficByDay);
@@ -36,7 +37,7 @@ const deviceData = JSON.stringify(deviceBreakdown);
     <MetricCard
       title="Sessions"
       value={formatNumber(web.sessions)}
-      delta={Number(sessionsDelta.toFixed(1))}
+      delta={sessionsDelta}
       source={webResult.source}
       sourceName="GA4"
       sparklineData={sessionSparkline}
@@ -44,7 +45,7 @@ const deviceData = JSON.stringify(deviceBreakdown);
     <MetricCard
       title="Users"
       value={formatNumber(web.users)}
-      delta={Number(usersDelta.toFixed(1))}
+      delta={usersDelta}
       source={webResult.source}
       sourceName="GA4"
       sparklineData={userSparkline}
@@ -52,7 +53,7 @@ const deviceData = JSON.stringify(deviceBreakdown);
     <MetricCard
       title="Pageviews"
       value={formatNumber(web.pageviews)}
-      delta={Number(pageviewsDelta.toFixed(1))}
+      delta={pageviewsDelta}
       source={webResult.source}
       sourceName="GA4"
     />

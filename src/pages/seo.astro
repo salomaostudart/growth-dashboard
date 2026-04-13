@@ -11,8 +11,9 @@ const dateRange = { start: new Date(now.getTime() - 90 * 86400000), end: now, ra
 const seoResult = await getConnector('seo').fetch(dateRange);
 const seo = seoResult.data;
 
-const impressionsDelta = calcDelta(seo.topQueries.map(q => q.impressions));
-const clicksDelta = calcDelta(seo.topQueries.map(q => q.clicks));
+const fmt = (v: number | null) => v !== null ? Number(v.toFixed(1)) : undefined;
+const impressionsDelta = fmt(calcDelta(seo.topQueries.map(q => q.impressions)));
+const clicksDelta = fmt(calcDelta(seo.topQueries.map(q => q.clicks)));
 
 // Serialize for client charts
 const queriesData = JSON.stringify(seo.topQueries.slice(0, 10));
@@ -25,7 +26,7 @@ const pagesData = JSON.stringify(seo.pagePerformance);
     <MetricCard
       title="Impressions"
       value={formatNumber(seo.impressions)}
-      delta={Number(impressionsDelta.toFixed(1))}
+      delta={impressionsDelta}
       source={seoResult.source}
       sourceName="Search Console"
       sparklineData={seo.topQueries.slice(0, 14).map(q => q.impressions)}
@@ -33,7 +34,7 @@ const pagesData = JSON.stringify(seo.pagePerformance);
     <MetricCard
       title="Clicks"
       value={formatNumber(seo.clicks)}
-      delta={Number(clicksDelta.toFixed(1))}
+      delta={clicksDelta}
       source={seoResult.source}
       sourceName="Search Console"
       sparklineData={seo.topQueries.slice(0, 14).map(q => q.clicks)}

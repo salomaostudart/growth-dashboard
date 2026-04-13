@@ -18,6 +18,7 @@ const navItems = [
   { id: 'about', label: 'About', href: '/about', icon: 'grid' },
 ];
 import CommandPalette from '../components/ui/CommandPalette.astro';
+import OnboardingBanner from '../components/ui/OnboardingBanner.astro';
 ---
 
 <!DOCTYPE html>
@@ -118,6 +119,7 @@ import CommandPalette from '../components/ui/CommandPalette.astro';
 
       <!-- Page content -->
       <main class="content page-content">
+        <OnboardingBanner />
         <slot />
       </main>
     </div>
@@ -198,6 +200,9 @@ import CommandPalette from '../components/ui/CommandPalette.astro';
   .sidebar-toggle:hover {
     color: var(--text-primary);
     background: var(--surface-2);
+  }
+  @media (min-width: 1025px) {
+    .sidebar-toggle { display: none; }
   }
 
   /* Navigation */

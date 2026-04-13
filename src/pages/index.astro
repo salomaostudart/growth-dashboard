@@ -3,7 +3,6 @@ import DashboardLayout from '../layouts/DashboardLayout.astro';
 import MetricCard from '../components/ui/MetricCard.astro';
 import ChartContainer from '../components/charts/ChartContainer.astro';
 import AlertBanner from '../components/ui/AlertBanner.astro';
-import OnboardingBanner from '../components/ui/OnboardingBanner.astro';
 import { getConnector, getAllConnectors } from '../connectors/registry';
 import { formatNumber, formatPercent, formatDuration, calcDelta } from '../utils/formatters';
 import { generateInsights } from '../utils/insights-engine';
@@ -40,10 +39,11 @@ degradedSystems.forEach(s => alerts.push({ type: 'danger', message: `${s.name} i
 // Connector sources for all cards
 const connectors = getAllConnectors();
 
-const sessionsDelta = calcDelta(web.trafficByDay.map(d => d.sessions));
-const impressionsDelta = calcDelta(seo.topQueries.map(q => q.impressions));
-const conversionDelta = calcDelta(web.trafficByDay.map(d => d.sessions * web.conversionRate / 100));
-const pipelineDelta = calcDelta(crm.leadVelocity.map(d => d.leads));
+const fmt = (v: number | null) => v !== null ? Number(v.toFixed(1)) : undefined;
+const sessionsDelta = fmt(calcDelta(web.trafficByDay.map(d => d.sessions)));
+const impressionsDelta = fmt(calcDelta(seo.topQueries.map(q => q.impressions)));
+const conversionDelta = fmt(calcDelta(web.trafficByDay.map(d => d.sessions * web.conversionRate / 100)));
+const pipelineDelta = fmt(calcDelta(crm.leadVelocity.map(d => d.leads)));
 
 // Insights
 const insights = generateInsights({ web, seo, email, crm, martech });
@@ -54,7 +54,6 @@ const channelMixData = JSON.stringify(web.channelMix);
 ---
 
 <DashboardLayout title="Command Center" activeNav="overview">
-  <OnboardingBanner />
 
   <!-- Alerts -->
   {alerts.length > 0 && (
@@ -70,7 +69,7 @@ const channelMixData = JSON.stringify(web.channelMix);
     <MetricCard
       title="Sessions"
       value={formatNumber(web.sessions)}
-      delta={Number(sessionsDelta.toFixed(1))}
+      delta={sessionsDelta}
       source={webResult.source}
       sourceName="GA4"
       sparklineData={sessionSparkline}
@@ -79,7 +78,7 @@ const channelMixData = JSON.stringify(web.channelMix);
     <MetricCard
       title="Organic Impressions"
       value={formatNumber(seo.impressions)}
-      delta={Number(impressionsDelta.toFixed(1))}
+      delta={impressionsDelta}
       source={seoResult.source}
       sourceName="Search Console"
       sparklineData={seo.topQueries.slice(0, 14).map(q => q.impressions)}
@@ -99,6 +98,7 @@ const channelMixData = JSON.stringify(web.channelMix);
       title="Pipeline Influenced"
       value={formatNumber(crm.funnel.pipeline)}
       delta={pipelineDelta}
+
       source={crmResult.source}
       sourceName="HubSpot"
       sparklineData={crm.leadVelocity.slice(-14).map(d => d.leads)}

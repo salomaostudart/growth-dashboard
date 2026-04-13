@@ -1,213 +1,116 @@
 # Digital Growth Command Center
 
-A comprehensive metrics capture, automation, and interactive dashboard tool for digital growth teams. Built as a production-ready template that can be deployed for any organization's marketing technology stack.
+A comprehensive metrics capture, automation, and interactive dashboard for digital growth teams. Built as a production-ready template deployable for any organization's marketing technology stack.
+
+**Live:** [growth.sal.dev.br](https://growth.sal.dev.br)
 
 ## Why This Project Exists
 
-Modern digital growth requires visibility across multiple channels -- website, SEO, email, social media, CRM, and the marketing technology stack itself. Most dashboards are either too generic (Google Analytics alone) or too expensive (enterprise BI tools).
+Modern digital growth requires visibility across multiple channels — website, SEO, email, social media, CRM, and the marketing technology stack itself. Most dashboards are either too generic (Google Analytics alone) or too expensive (enterprise BI tools).
 
 This project solves that by providing:
-- **Unified cross-channel view** -- all digital metrics in one place
-- **Connector pattern** -- swap data sources without changing dashboard code
-- **Real + mock data** -- works with live APIs and realistic simulated data
-- **Enterprise-grade quality** -- accessibility, performance, and testing built in
+- **Unified cross-channel view** — all digital metrics in one place
+- **Connector pattern** — swap data sources without changing dashboard code
+- **Real + mock data** — works with live APIs and realistic simulated data
+- **MCP Server** — AI-queryable interface for Claude Code
+- **Enterprise-grade quality** — accessibility, performance, and testing built in
 
 ## Architecture
 
 ```
 +--------------------------------------------------------------+
 |                        Dashboard UI                          |
-|  +----------+ +----------+ +----------+ +----------+        |
-|  | Overview | |   Web    | |   SEO    | |  Email   |  ...   |
-|  |(Command  | |Performanc| | AEO/GEO  | |Marketing |        |
-|  | Center)  | |    e     | |          | |          |        |
-|  +----+-----+ +----+-----+ +----+-----+ +----+-----+        |
-|       |             |            |             |              |
-|  +----v-------------v------------v-------------v--------+    |
-|  |              Connector Registry                      |    |
-|  |         (src/connectors/registry.ts)                 |    |
-|  |    Env var switches each channel mock <-> real       |    |
-|  +--+------+------+------+------+------+------------+---+    |
-|     |      |      |      |      |      |                     |
-|  +--v--++--v--++--v--++--v--++--v--++--v--+                  |
-|  | GA4 || GSC ||Email||Social| CRM ||Mart-|                  |
-|  |     ||     ||     ||     ||     ||ech  |                  |
-|  +--+--++--+--++--+--++--+--++--+--++--+--+                  |
-|     |      |      |      |      |      |                     |
-|  +--v------v------v------v------v------v----------------+    |
-|  |              Zod Schema Validation                   |    |
-|  |    Every response validated before reaching UI       |    |
-|  +------------------------------------------------------+    |
-+--------------------------------------------------------------+
+|  8 pages: Overview, Web, SEO, Email, Social, CRM, Martech,  |
+|  About — all functional with KPIs, charts, and tables        |
++-------------------------------+------------------------------+
+                                |
++-------------------------------v------------------------------+
+|              Connector Registry (registry.ts)                |
+|         Env var switches each channel mock <-> real          |
++--+------+------+------+------+------+---+--------------------+
+   |      |      |      |      |      |   |
++--v--++--v--++--v--++--v--++--v--++--v--++--v--+
+| GA4 || GSC ||Email||Soci-|| CRM ||Mart-|| MCP |
+|(live||(live||(mock)||al   ||(mock)||ech  ||Srvr|
+|+mock)||+mock)||    ||(mock)||    ||(mock)||(9  |
++-----++-----++-----++-----++-----++-----+|tool)|
+   |      |      |      |      |      |  +-----+
++--v------v------v------v------v------v--------+
+|              Zod Schema Validation           |
+|    Every response validated before UI        |
++----------------------------------------------+
 ```
 
-### Key Architectural Decision: Connector Pattern
+### Key Architectural Decisions
 
-Every data source implements the same `IConnector<T>` interface:
+- **Connector Pattern** — `IConnector<T>` interface. Adding a source = implementing one interface. Swapping mock to real = one env var.
+- **Snapshot Strategy** — Python scripts fetch GA4/GSC data, GitHub Actions commits JSON daily. Zero API calls at build time.
+- **MCP Server** — 9 read-only tools expose dashboard data to AI assistants via stdio.
+- **Insights Engine** — 22 rule-based checks (no LLM). Transparent and auditable.
 
-```typescript
-interface IConnector<T> {
-  readonly name: string;
-  readonly source: 'live' | 'mock' | 'cached';
-  fetch(params: DateRangeParams): Promise<ConnectorResult<T>>;
-  health(): Promise<ConnectorHealth>;
-}
-```
+See [CONNECTORS.md](./CONNECTORS.md) for the integration guide.
 
-**Why this matters:**
-- Adding a new data source = implementing one interface (~2 hours)
-- Swapping mock to real = changing one environment variable
-- Every connector exposes `health()` -- the Martech Health page aggregates these
-- Zod validates every response at runtime -- catches API changes before they break the UI
+## Tech Stack
 
-See [CONNECTORS.md](./CONNECTORS.md) for the full integration guide.
-
-## Tech Stack and Justifications
-
-| Technology | Role | Why This Over Alternatives |
+| Technology | Role | Why |
 |---|---|---|
-| **Astro 6** | Framework | Static output (no server needed), TypeScript native, zero JS shipped unless opted in. Deploys to GitHub Pages or Vercel free tier. HTML-like syntax maintainable without framework expertise |
-| **Apache ECharts 6** | Data visualization | Enterprise-grade (Apache Foundation), built-in dark theme, supports heatmaps/Sankey/funnel without extra deps. Handles 10K+ data points without performance issues |
-| **Zod 4** | Runtime validation | Validates connector responses against typed schemas. Catches data shape changes from external APIs before they reach the UI |
-| **TypeScript** | Type safety | Catches errors at build time. Connector interface enforces consistent data contracts |
-| **Oswald + Inter** | Typography | Same fonts used by the target organization -- demonstrates research and alignment |
-| **CSS Custom Properties** | Design system | Token-based design that's easy to theme. No CSS framework dependency |
-| **Vitest 4** | Unit testing | Native TypeScript, 3x faster than Jest, same API |
-| **Playwright** | E2E testing | Cross-browser, built-in screenshot comparison, axe-core integration for accessibility |
-| **axe-core** | Accessibility | WCAG 2.1 AA compliance validation -- enterprise requirement |
+| **Astro** | Framework | Static output, TypeScript native, zero JS unless opted in |
+| **Apache ECharts** | Charts | Enterprise-grade, dark+light themes, heatmaps/Sankey/funnel |
+| **Zod** | Validation | Runtime schema validation on connector responses |
+| **MCP SDK** | AI interface | 9 tools queryable from Claude Code |
+| **Vitest** | Unit tests | Native TS, fast |
+| **Playwright + axe-core** | E2E + a11y | Cross-browser, WCAG 2.1 AA |
 
 ## Dashboard Pages
 
-### 1. Command Center (Overview) -- `/` *[Implemented]*
-The daily starting point. Shows cross-channel KPIs, traffic trends, channel mix, alerts, and data source health at a glance.
+| Page | Route | Features |
+|---|---|---|
+| **Command Center** | `/` | Cross-channel KPIs, traffic trend, channel mix, automated insights, onboarding |
+| **Web Performance** | `/web-performance` | Sessions, users, bounce rate, device breakdown, top pages |
+| **SEO / AEO / GEO** | `/seo` | Impressions, clicks, position history, top queries |
+| **Email Marketing** | `/email` | Open/click rates, send time heatmap, campaigns, automations |
+| **Social Media** | `/social` | Followers, engagement, referral traffic by platform |
+| **CRM & Pipeline** | `/crm-pipeline` | Conversion funnel, lead velocity, channel attribution, CAC |
+| **Martech Health** | `/martech-health` | System uptime, maturity score, automation success, costs |
+| **About** | `/about` | Case study, architecture, multi-tenant guide |
 
-**Metrics:** Sessions, Organic Impressions, Email Open Rate, Pipeline Influenced, Conversion Rate, System Health
+## Features
 
-### 2. Web Performance -- `/web-performance` *[Phase 2]*
-Core Web Vitals, traffic analysis, device breakdown, geographic distribution, and conversion tracking.
+- **Light/Dark mode** — toggle with localStorage persistence
+- **Command Palette** — Ctrl+K / Cmd+K fuzzy search
+- **Export CSV** — download any table as CSV
+- **PWA** — offline support via Service Worker
+- **Tooltips** — hover ? icons for metric explanations
+- **Skeleton loaders** — pulse animation while charts render
+- **Webhook alerts** — configurable thresholds, Slack-compatible
+- **Prefetch** — hover navigation links for instant page loads
 
-**Data source:** Google Analytics 4 (real when connected, mock otherwise)
-
-### 3. SEO / AEO / GEO -- `/seo` *[Phase 2]*
-Search rankings, impressions, CTR analysis, keyword tracking, and emerging AI search optimization metrics.
-
-**Data source:** Google Search Console (real) + AEO/GEO mock (labeled)
-
-### 4. Email Marketing -- `/email` *[Phase 3]*
-Campaign performance, automation health, subscriber engagement, and send time optimization.
-
-**Data source:** Mailchimp-shaped mock (swappable to real Mailchimp API)
-
-### 5. Social Media -- `/social` *[Phase 3]*
-Platform comparison, engagement trends, top performing content, and referral traffic analysis.
-
-**Data source:** Social mock + GA4 referral data (real when connected)
-
-### 6. CRM and Pipeline -- `/crm-pipeline` *[Phase 3]*
-Full-funnel visibility from lead to closed deal, with multi-touch attribution modeling.
-
-**Data source:** HubSpot-shaped mock (matches target organization's CRM)
-
-### 7. Martech Health -- `/martech-health` *[Phase 3]*
-System uptime, integration health, automation execution logs, data freshness, and cost tracking.
-
-**Data source:** Aggregated from all connector `.health()` methods
-
-## Testing Strategy
-
-| Layer | Tool | What It Tests | When It Runs |
-|---|---|---|---|
-| **Unit** | Vitest | Formatters, Zod schemas, connector registry, date utilities | `npm run test` |
-| **E2E** | Playwright | Pages load, KPIs render, charts initialize, navigation works | `npm run test:e2e` |
-| **Accessibility** | axe-core via Playwright | WCAG 2.1 AA compliance -- zero critical/serious violations | `npm run test:e2e` |
-| **Performance** | Playwright | Page load <3s, no CLS, no console errors, proper meta tags | `npm run test:e2e` |
-| **Responsive** | Playwright | Sidebar hides on mobile, components adapt | `npm run test:e2e` |
-
-### Current Test Results
+## Testing
 
 ```
-Unit (Vitest):     27/27 passed
-E2E (Playwright):  15/15 passed
-Total:             42/42 green
+Unit (Vitest):     71 passed
+E2E specs:         38 written (8 pages load + KPIs + charts + accessibility WCAG 2.1 AA)
 ```
 
-## Project Structure
-
-```
-growth-dashboard/
-├── src/
-│   ├── pages/              # Astro pages -- 1 file = 1 route
-│   ├── layouts/            # DashboardLayout (shared shell)
-│   ├── components/
-│   │   ├── ui/             # MetricCard, DataSourceTag, StatusBadge, AlertBanner
-│   │   └── charts/         # ChartContainer (ECharts wrapper)
-│   ├── connectors/         # THE ARCHITECTURAL CORE
-│   │   ├── base/           # IConnector interface + Zod schemas
-│   │   ├── ga4/            # Google Analytics 4 connector
-│   │   ├── search-console/ # Google Search Console connector
-│   │   ├── hubspot/        # HubSpot CRM connector (mock)
-│   │   ├── email/          # Mailchimp connector (mock)
-│   │   ├── social/         # Social media connector (mock)
-│   │   ├── webflow/        # Martech health connector (mock)
-│   │   └── registry.ts     # Central swap point (mock <-> real)
-│   ├── styles/             # Design tokens + global styles
-│   ├── utils/              # Formatters, mock generator, ECharts theme
-│   └── data/snapshots/     # Static JSON data (Phase 2 — updated by GitHub Actions)
-├── tests/
-│   ├── unit/               # Vitest -- schemas, formatters, registry
-│   └── e2e/                # Playwright -- pages, accessibility, performance
-├── CLAUDE.md               # Project rules for AI-assisted development
-├── CONNECTORS.md           # Non-technical integration guide
-├── .env.example            # Required environment variables
-└── README.md               # This file
+```bash
+npm run test        # Unit tests
+npm run test:e2e    # E2E + accessibility (starts dev server)
+npm run ci          # Unit + build
 ```
 
 ## Quick Start
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
-npm run dev
-
-# Run unit tests
-npm run test
-
-# Run E2E tests (starts dev server automatically)
-npm run test:e2e
-
-# Build for production
-npm run build
+npm run dev         # localhost:4321
+npm run build       # Static output in dist/
+npm run deploy      # Build + deploy to Cloudflare Pages
 ```
 
-## Design Decisions Log
+## Multi-tenant
 
-### Why Astro over Next.js or plain HTML?
-- **vs Next.js:** No server needed. Dashboard data is fetched at build time or via static JSON snapshots. No React overhead for what is fundamentally a data display application.
-- **vs plain HTML:** Multiple pages with shared layout, component system, TypeScript, build optimization. A Director-level portfolio project needs build tooling.
-
-### Why ECharts over Chart.js or D3?
-- **vs Chart.js:** ECharts handles enterprise chart types (Sankey, funnel, heatmap, geographic) natively. Chart.js requires plugins for each.
-- **vs D3:** ECharts is declarative configuration. D3 is imperative code. For a dashboard that will be maintained by non-developers via AI tools, declarative wins.
-
-### Why Zod validation on mock data?
-Mock data doesn't need validation -- real API data does. By validating mock data against the same schemas, we guarantee that when a real connector replaces a mock, the UI won't break from data shape mismatches. The tests catch schema drift before it reaches production.
-
-### Why separate mock connector classes instead of a flag?
-Each mock connector can have its own data generation logic (realistic variance, domain-specific patterns). A flag approach would centralize all mock logic, making it harder to swap individual channels independently.
-
-### Why DataSourceTag on every KPI and chart?
-Data governance. When a dashboard mixes real and simulated data, consumers must know which is which. In an enterprise context, presenting mock data without labels is a compliance risk. This is the kind of detail a CMO notices.
-
-## Roadmap
-
-- [x] **Phase 1** -- Foundation: Overview page, connector pattern, design system, 42 tests passing
-- [ ] **Phase 2** -- Real data: GA4 + Search Console integration for existing sites
-- [ ] **Phase 3** -- Remaining pages: Email, Social, CRM, Martech Health
-- [ ] **Phase 4** -- QA polish: Visual regression, Lighthouse CI, full responsive audit
-- [ ] **Phase 5** -- Optional: Alerts, CSV export, multi-property, embed mode
+Fork this repo, update mock data to match your stack, add real connectors for your tools, deploy. The connector pattern makes swapping data sources trivial.
 
 ## License
 
-Private project -- not for redistribution.
+Private project — not for redistribution.

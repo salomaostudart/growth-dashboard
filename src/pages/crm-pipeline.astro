@@ -16,7 +16,8 @@ const mqlRate = crm.funnel.leads > 0 ? (crm.funnel.mql / crm.funnel.leads * 100)
 const sqlRate = crm.funnel.mql > 0 ? (crm.funnel.sql / crm.funnel.mql * 100) : 0;
 const winRate = crm.funnel.pipeline > 0 ? (crm.funnel.won / crm.funnel.pipeline * 100) : 0;
 
-const leadsDelta = calcDelta(crm.leadVelocity.map(d => d.leads));
+const fmt = (v: number | null) => v !== null ? Number(v.toFixed(1)) : undefined;
+const leadsDelta = fmt(calcDelta(crm.leadVelocity.map(d => d.leads)));
 
 // Serialize for client
 const funnelData = JSON.stringify(crm.funnel);
@@ -29,7 +30,7 @@ const velocityData = JSON.stringify(crm.leadVelocity);
     <MetricCard
       title="Leads"
       value={formatNumber(crm.funnel.leads)}
-      delta={Number(leadsDelta.toFixed(1))}
+      delta={leadsDelta}
       source={crmResult.source}
       sourceName="HubSpot"
       sparklineData={crm.leadVelocity.slice(-14).map(d => d.leads)}
