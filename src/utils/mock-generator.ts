@@ -150,7 +150,7 @@ export function generateWebMetrics() {
 export function generateSeoMetrics() {
   _rng = createRng(200);
   const topQueries = [
-    'demo-enterprise', 'enterprise ai platform', 'ai agents enterprise',
+    'growth dashboard', 'enterprise ai platform', 'ai agents enterprise',
     'marketing automation ai', 'no code ai platform', 'ai workflow builder',
     'enterprise ai solutions', 'ai data platform', 'predictive analytics platform',
     'machine learning enterprise', 'ai process automation', 'data science platform',

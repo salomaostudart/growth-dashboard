@@ -1,5 +1,5 @@
-const ALLOWED_DOMAINS = ['demo-enterprise.ai'];
-const ALLOWED_EMAILS = ['salomaostudart@gmail.com'];
+const ALLOWED_DOMAINS: string[] = [];
+const ALLOWED_EMAILS = ['salomaostudart@gmail.com', 'gabrielstudart0@gmail.com', 'paulorodriges1912@gmail.com'];
 
 export function isEmailAllowed(email: string): boolean {
   if (!email) return false;

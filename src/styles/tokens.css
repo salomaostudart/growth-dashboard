@@ -1,5 +1,5 @@
 /* Design Tokens — Growth Dashboard */
-/* Fontes alinhadas com Demo Enterprise: Oswald (headings) + Inter (body) */
+/* Fontes: Oswald (headings) + Inter (body) */
 
 :root {
   /* Surfaces — dark enterprise theme */
@@ -19,7 +19,7 @@
   --accent-warning-dim: #78350f;
   --accent-danger: #ef4444;
   --accent-danger-dim: #7f1d1d;
-  --accent-rc: #ff5c00; /* Demo Enterprise orange */
+  --accent-rc: #ff5c00; /* brand orange */
 
   /* Text */
   --text-primary: #f1f5f9;

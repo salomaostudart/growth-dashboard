@@ -80,11 +80,11 @@ PROJECTS = [
     {
         "name": "Demo Enterprise",
         "slug": "demo-enterprise",
-        "domain": "demo-enterprise.ai",
-        "ga4_property": "G-MOCK-RC001",
-        "gsc_site_url": "https://demo-enterprise.ai/",
+        "domain": "demo-enterprise.com",
+        "ga4_property": "G-MOCK-DE001",
+        "gsc_site_url": "https://demo-enterprise.com/",
         "github_org": "demo-enterprise",
-        "description": "AI-powered data science platform",
+        "description": "AI-powered enterprise platform",
         "is_active": True,
     },
     {
@@ -103,7 +103,7 @@ PROJECTS = [
 # Mock data generators
 # ---------------------------------------------------------------------------
 
-def ga4_data_demo-enterprise():
+def ga4_data_enterprise():
     return {
         "sessions": 52340,
         "users": 38920,
@@ -174,7 +174,7 @@ def ga4_data_portfolio():
     }
 
 
-def gsc_data_demo-enterprise():
+def gsc_data_enterprise():
     return {
         "clicks": 18240,
         "impressions": 482000,
@@ -182,7 +182,7 @@ def gsc_data_demo-enterprise():
         "avgPosition": 12.4,
         "topQueries": [
             {"query": "ai data science platform", "clicks": 2840, "impressions": 48200, "ctr": 0.059, "position": 4.2},
-            {"query": "demo-enterprise ai", "clicks": 2100, "impressions": 12400, "ctr": 0.169, "position": 1.8},
+            {"query": "growth dashboard ai", "clicks": 2100, "impressions": 12400, "ctr": 0.169, "position": 1.8},
             {"query": "automl platform", "clicks": 1820, "impressions": 38700, "ctr": 0.047, "position": 6.1},
             {"query": "data science automation", "clicks": 1640, "impressions": 52800, "ctr": 0.031, "position": 9.3},
         ],
@@ -221,7 +221,7 @@ def gsc_data_portfolio():
     }
 
 
-def email_data_demo-enterprise():
+def email_data_enterprise():
     return {
         "sends": 48200,
         "delivered": 46872,
@@ -266,7 +266,7 @@ def email_data_portfolio():
     }
 
 
-def social_data_demo-enterprise():
+def social_data_enterprise():
     return {
         "followers": {
             "linkedin": 12840,
@@ -286,7 +286,7 @@ def social_data_demo-enterprise():
         "topPosts": [
             {"platform": "linkedin", "content": "How we cut data science time by 80%", "impressions": 28400, "engagement": 0.068},
             {"platform": "twitter", "content": "AutoML is not magic — here's what it actually does", "impressions": 18200, "engagement": 0.041},
-            {"platform": "youtube", "content": "Demo Enterprise in 5 minutes", "views": 12400, "watchTime": 184},
+            {"platform": "youtube", "content": "Platform demo in 5 minutes", "views": 12400, "watchTime": 184},
         ],
         "followerGrowth": [
             {"month": "Jan", "linkedin": 10200, "twitter": 6800},
@@ -325,7 +325,7 @@ def social_data_portfolio():
     }
 
 
-def crm_data_demo-enterprise():
+def crm_data_enterprise():
     return {
         "leads": 1240,
         "mqls": 486,
@@ -374,7 +374,7 @@ def crm_data_portfolio():
     }
 
 
-def martech_data_demo-enterprise():
+def martech_data_enterprise():
     return {
         "overallHealth": 0.91,
         "systems": [
@@ -414,12 +414,12 @@ def martech_data_portfolio():
 
 MOCK_DATA = {
     "demo-enterprise": {
-        "ga4": ga4_data_demo-enterprise(),
-        "gsc": gsc_data_demo-enterprise(),
-        "email": email_data_demo-enterprise(),
-        "social": social_data_demo-enterprise(),
-        "crm": crm_data_demo-enterprise(),
-        "martech": martech_data_demo-enterprise(),
+        "ga4": ga4_data_enterprise(),
+        "gsc": gsc_data_enterprise(),
+        "email": email_data_enterprise(),
+        "social": social_data_enterprise(),
+        "crm": crm_data_enterprise(),
+        "martech": martech_data_enterprise(),
     },
     "salomao-portfolio": {
         "ga4": ga4_data_portfolio(),
