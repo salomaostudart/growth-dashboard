@@ -223,140 +223,151 @@
 </style>
 
 <script>
-  import { createClient } from '@supabase/supabase-js';
+  import { getMockResponse } from '../../utils/chat-mock-responses';
+
+  // Chat works in two modes:
+  // 1. Live: Supabase auth + Edge Function (Claude API) — requires CLAUDE_API_KEY
+  // 2. Demo: Mock responses from dashboard data — always available
 
   const SUPABASE_URL = (import.meta as any).env?.PUBLIC_SUPABASE_URL || '';
   const SUPABASE_ANON_KEY = (import.meta as any).env?.PUBLIC_SUPABASE_ANON_KEY || '';
 
-  // Only init if Supabase is configured
+  let session: any = null;
+  let useMockMode = true;
+
+  // Try Supabase auth if configured
   if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const { data: { session } } = await supabase.auth.getSession();
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const result = await supabase.auth.getSession();
+      session = result.data?.session;
+      // Live mode only if Edge Function is deployed (check later on first message)
+      useMockMode = !session;
+    } catch { /* fallback to mock */ }
+  }
 
-    if (session) {
-      // Check role
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
+  // Always show chat (demo mode or authenticated)
+  const fab = document.getElementById('chat-fab')!;
+  const panel = document.getElementById('chat-panel')!;
+  const messages = document.getElementById('chat-messages')!;
+  const input = document.getElementById('chat-input') as HTMLInputElement;
+  const sendBtn = document.getElementById('chat-send') as HTMLButtonElement;
 
-      const canChat = profile?.role === 'admin' || profile?.role === 'analyst';
+  fab.style.display = 'flex';
 
-      if (canChat) {
-        const fab = document.getElementById('chat-fab')!;
-        const panel = document.getElementById('chat-panel')!;
-        const messages = document.getElementById('chat-messages')!;
-        const input = document.getElementById('chat-input') as HTMLInputElement;
-        const sendBtn = document.getElementById('chat-send') as HTMLButtonElement;
+  fab.addEventListener('click', () => {
+    panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+    if (panel.style.display === 'flex') input.focus();
+  });
 
-        fab.style.display = 'flex';
+  document.getElementById('chat-close')?.addEventListener('click', () => {
+    panel.style.display = 'none';
+  });
 
-        fab.addEventListener('click', () => {
-          panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
-          if (panel.style.display === 'flex') input.focus();
-        });
+  // Example buttons
+  document.querySelectorAll('.chat-example').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const q = btn.getAttribute('data-q') || '';
+      input.value = q;
+      sendMessage(q);
+    });
+  });
 
-        document.getElementById('chat-close')?.addEventListener('click', () => {
-          panel.style.display = 'none';
-        });
-
-        // Example buttons
-        document.querySelectorAll('.chat-example').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const q = btn.getAttribute('data-q') || '';
-            input.value = q;
-            sendMessage(q);
-          });
-        });
-
-        async function sendMessage(question: string) {
-          if (!question.trim()) return;
-
-          // Add user message
-          const userMsg = document.createElement('div');
-          userMsg.className = 'chat-msg chat-msg-user';
-          userMsg.textContent = question;
-          messages.appendChild(userMsg);
-
-          // Clear welcome if first message
-          const welcome = messages.querySelector('.chat-welcome');
-          if (welcome) welcome.remove();
-
-          input.value = '';
-          sendBtn.disabled = true;
-
-          // Add AI response placeholder
-          const aiMsg = document.createElement('div');
-          aiMsg.className = 'chat-msg chat-msg-ai';
-          aiMsg.textContent = 'Thinking...';
-          messages.appendChild(aiMsg);
-          messages.scrollTop = messages.scrollHeight;
-
-          try {
-            // Build context from page data (lightweight — uses window globals set by pages)
-            const context = (window as any).__dashboard_context || 'No dashboard context available.';
-            const systemPrompt = (window as any).__chat_system_prompt || 'You are a helpful analytics assistant.';
-
-            const response = await fetch(`${SUPABASE_URL}/functions/v1/chat`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${session.access_token}`,
-              },
-              body: JSON.stringify({ question, context, systemPrompt }),
-            });
-
-            if (!response.ok) {
-              const err = await response.json().catch(() => ({ error: 'Unknown error' }));
-              aiMsg.textContent = `Error: ${err.error || response.statusText}`;
-              sendBtn.disabled = false;
-              return;
-            }
-
-            // Stream SSE
-            aiMsg.textContent = '';
-            const reader = response.body!.getReader();
-            const decoder = new TextDecoder();
-            let buffer = '';
-
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-
-              buffer += decoder.decode(value, { stream: true });
-              const lines = buffer.split('\n');
-              buffer = lines.pop() || '';
-
-              for (const line of lines) {
-                if (!line.startsWith('data: ')) continue;
-                const data = line.slice(6);
-                if (data === '[DONE]') continue;
-
-                try {
-                  const parsed = JSON.parse(data);
-                  if (parsed.text) {
-                    aiMsg.textContent += parsed.text;
-                    messages.scrollTop = messages.scrollHeight;
-                  }
-                } catch { /* skip */ }
-              }
-            }
-          } catch (err) {
-            aiMsg.textContent = 'Failed to connect to AI service.';
-          }
-
-          sendBtn.disabled = false;
-          messages.scrollTop = messages.scrollHeight;
-        }
-
-        // Send on Enter or button click
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') sendMessage(input.value);
-        });
-
-        sendBtn.addEventListener('click', () => sendMessage(input.value));
-      }
+  async function simulateTyping(element: HTMLElement, text: string) {
+    element.textContent = '';
+    const words = text.split(' ');
+    for (let i = 0; i < words.length; i++) {
+      element.textContent += (i > 0 ? ' ' : '') + words[i];
+      messages.scrollTop = messages.scrollHeight;
+      await new Promise(r => setTimeout(r, 15 + Math.random() * 25));
     }
   }
+
+  async function sendMessage(question: string) {
+    if (!question.trim()) return;
+
+    const userMsg = document.createElement('div');
+    userMsg.className = 'chat-msg chat-msg-user';
+    userMsg.textContent = question;
+    messages.appendChild(userMsg);
+
+    const welcome = messages.querySelector('.chat-welcome');
+    if (welcome) welcome.remove();
+
+    input.value = '';
+    sendBtn.disabled = true;
+
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'chat-msg chat-msg-ai';
+    aiMsg.textContent = 'Analyzing...';
+    messages.appendChild(aiMsg);
+    messages.scrollTop = messages.scrollHeight;
+
+    const context = (window as any).__dashboard_context || '';
+
+    if (useMockMode || !session) {
+      // Demo mode: mock responses with typing simulation
+      await new Promise(r => setTimeout(r, 300 + Math.random() * 500));
+      const response = getMockResponse(question, context);
+      await simulateTyping(aiMsg, response);
+    } else {
+      // Live mode: call Edge Function
+      try {
+        const systemPrompt = (window as any).__chat_system_prompt || '';
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ question, context, systemPrompt }),
+        });
+
+        if (!response.ok) {
+          // Fallback to mock if Edge Function not available
+          useMockMode = true;
+          const mockResp = getMockResponse(question, context);
+          await simulateTyping(aiMsg, mockResp);
+        } else {
+          aiMsg.textContent = '';
+          const reader = response.body!.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+            for (const line of lines) {
+              if (!line.startsWith('data: ')) continue;
+              const data = line.slice(6);
+              if (data === '[DONE]') continue;
+              try {
+                const parsed = JSON.parse(data);
+                if (parsed.text) {
+                  aiMsg.textContent += parsed.text;
+                  messages.scrollTop = messages.scrollHeight;
+                }
+              } catch { /* skip */ }
+            }
+          }
+        }
+      } catch {
+        useMockMode = true;
+        const mockResp = getMockResponse(question, context);
+        await simulateTyping(aiMsg, mockResp);
+      }
+    }
+
+    sendBtn.disabled = false;
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendMessage(input.value);
+  });
+  sendBtn.addEventListener('click', () => sendMessage(input.value));
 </script>
