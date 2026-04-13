@@ -17,6 +17,8 @@ import { z } from 'zod';
 import { getConnector, getAllConnectors } from '../connectors/registry.js';
 import { generateInsights } from '../utils/insights-engine.js';
 import { formatNumber, formatPercent, formatDuration, formatCurrency, formatLatency } from '../utils/formatters.js';
+import { generateExecutiveReport } from '../utils/report-generator.js';
+import * as fs from 'node:fs';
 
 const server = new McpServer({
   name: 'growth-dashboard',
@@ -326,6 +328,148 @@ server.tool(
       content: [{
         type: 'text',
         text: JSON.stringify(summary, null, 2),
+      }],
+    };
+  }
+);
+
+// --- WRITE TOOLS ---
+
+// Local alert storage (JSON file alongside MCP server)
+const ALERTS_FILE = new URL('./alerts.json', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1');
+
+function loadAlerts(): Array<{ metric: string; condition: string; threshold: number; message: string; active: boolean; createdAt: string }> {
+  try {
+    return JSON.parse(fs.readFileSync(ALERTS_FILE, 'utf-8'));
+  } catch { return []; }
+}
+
+function saveAlerts(alerts: ReturnType<typeof loadAlerts>) {
+  fs.writeFileSync(ALERTS_FILE, JSON.stringify(alerts, null, 2));
+}
+
+// Tool 10: Set Alert Threshold
+server.tool(
+  'set_alert_threshold',
+  'Create or update an alert threshold. When the metric crosses the threshold, an alert is triggered. Persists to local JSON.',
+  {
+    metric: z.string().describe('Metric name, e.g. "bounceRate", "sessions", "ctr", "pipelineWon"'),
+    condition: z.enum(['above', 'below']).describe('Trigger when metric is above or below threshold'),
+    threshold: z.number().describe('Numeric threshold value'),
+    message: z.string().describe('Alert message to display when triggered'),
+  },
+  async ({ metric, condition, threshold, message }) => {
+    const alerts = loadAlerts();
+    const existing = alerts.findIndex(a => a.metric === metric && a.condition === condition);
+
+    const entry = { metric, condition, threshold, message, active: true, createdAt: new Date().toISOString() };
+
+    if (existing >= 0) {
+      alerts[existing] = entry;
+    } else {
+      alerts.push(entry);
+    }
+
+    saveAlerts(alerts);
+
+    return {
+      content: [{
+        type: 'text',
+        text: `Alert set: ${metric} ${condition} ${threshold} — "${message}". Total active alerts: ${alerts.filter(a => a.active).length}`,
+      }],
+    };
+  }
+);
+
+// Tool 11: Clear Alerts
+server.tool(
+  'clear_alerts',
+  'Deactivate all triggered alerts, or a specific metric alert',
+  {
+    metric: z.string().optional().describe('Optional: clear only alerts for this metric. Omit to clear all.'),
+  },
+  async ({ metric }) => {
+    const alerts = loadAlerts();
+    let cleared = 0;
+
+    for (const alert of alerts) {
+      if (!metric || alert.metric === metric) {
+        if (alert.active) { alert.active = false; cleared++; }
+      }
+    }
+
+    saveAlerts(alerts);
+
+    return {
+      content: [{
+        type: 'text',
+        text: cleared > 0
+          ? `Cleared ${cleared} alert(s).${metric ? ` Metric: ${metric}` : ''}`
+          : 'No active alerts to clear.',
+      }],
+    };
+  }
+);
+
+// Tool 12: Generate Report
+server.tool(
+  'generate_report',
+  'Generate a comprehensive executive markdown report with all metrics, insights, and channel data',
+  {},
+  async () => {
+    const web = (await getConnector('web').fetch(dateRange)).data;
+    const seo = (await getConnector('seo').fetch(dateRange)).data;
+    const email = (await getConnector('email').fetch(dateRange)).data;
+    const crm = (await getConnector('crm').fetch(dateRange)).data;
+    const martech = (await getConnector('martech').fetch(dateRange)).data;
+
+    const report = generateExecutiveReport({ web, seo, email, crm, martech });
+
+    return {
+      content: [{
+        type: 'text',
+        text: report,
+      }],
+    };
+  }
+);
+
+// Tool 13: Manage Users (read-only via MCP — actual role changes require Supabase admin)
+server.tool(
+  'manage_users',
+  'List user roles and permissions. Role changes require Supabase admin access.',
+  {
+    action: z.enum(['list', 'describe_role']).describe('"list" to show all roles, "describe_role" to show permissions for a role'),
+    role: z.enum(['admin', 'analyst', 'viewer']).optional().describe('Role to describe (for describe_role action)'),
+  },
+  async ({ action, role }) => {
+    if (action === 'describe_role') {
+      const r = role || 'viewer';
+      const perms: Record<string, Record<string, boolean>> = {
+        admin: { viewDashboards: true, viewRevenue: true, manageAlerts: true, manageUsers: true, useChat: true, exportData: true, viewAuditLog: true },
+        analyst: { viewDashboards: true, viewRevenue: true, manageAlerts: true, manageUsers: false, useChat: true, exportData: true, viewAuditLog: false },
+        viewer: { viewDashboards: true, viewRevenue: false, manageAlerts: false, manageUsers: false, useChat: false, exportData: false, viewAuditLog: false },
+      };
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({ role: r, permissions: perms[r] }, null, 2),
+        }],
+      };
+    }
+
+    // list
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          roles: [
+            { role: 'admin', description: 'Full access — manage users, alerts, audit log, all data' },
+            { role: 'analyst', description: 'Data access — view revenue, manage alerts, use chat, export' },
+            { role: 'viewer', description: 'Read-only — dashboards only, no revenue or chat' },
+          ],
+          note: 'To change a user role, update the profiles table in Supabase dashboard or via SQL: UPDATE profiles SET role = \'analyst\' WHERE email = \'user@example.com\'',
+        }, null, 2),
       }],
     };
   }

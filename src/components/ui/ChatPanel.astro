@@ -1,0 +1,362 @@
+---
+/**
+ * ChatPanel — floating AI chat widget.
+ * Sends questions to Supabase Edge Function, receives streaming SSE responses.
+ * Only visible to users with `useChat` permission (analyst, admin).
+ * Hidden when Supabase is not configured.
+ */
+---
+
+<div class="chat-fab" id="chat-fab" style="display: none;" title="Ask GrowthHQ AI">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+  </svg>
+</div>
+
+<div class="chat-panel" id="chat-panel" style="display: none;">
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+      <span class="chat-title">GrowthHQ AI</span>
+    </div>
+    <button class="chat-close" id="chat-close" aria-label="Close chat">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="chat-messages" id="chat-messages">
+    <div class="chat-welcome">
+      <p>Ask me about your dashboard data. Examples:</p>
+      <div class="chat-examples">
+        <button class="chat-example" data-q="What's our top performing channel?">Top performing channel?</button>
+        <button class="chat-example" data-q="How is our email marketing doing?">Email performance?</button>
+        <button class="chat-example" data-q="What are the main concerns right now?">Main concerns?</button>
+        <button class="chat-example" data-q="Give me a quick executive summary">Executive summary</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-input-area">
+    <input type="text" class="chat-input" id="chat-input" placeholder="Ask about your data..." autocomplete="off" />
+    <button class="chat-send" id="chat-send" aria-label="Send">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4z" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+<style>
+  .chat-fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 150;
+    transition: transform var(--transition-fast);
+  }
+  .chat-fab:hover { transform: scale(1.1); }
+
+  .chat-panel {
+    position: fixed;
+    bottom: 84px;
+    right: 24px;
+    width: 380px;
+    max-height: 520px;
+    background: var(--surface-1);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    z-index: 151;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-default);
+    background: var(--surface-2);
+  }
+
+  .chat-header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--accent-primary);
+  }
+
+  .chat-title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .chat-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--radius-sm);
+  }
+  .chat-close:hover { color: var(--text-primary); }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-4);
+    min-height: 300px;
+    max-height: 380px;
+  }
+
+  .chat-welcome {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .chat-welcome p { margin-bottom: var(--space-3); }
+
+  .chat-examples {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .chat-example {
+    text-align: left;
+    padding: var(--space-2) var(--space-3);
+    background: var(--surface-2);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all var(--transition-fast);
+  }
+  .chat-example:hover { background: var(--surface-3); color: var(--text-primary); }
+
+  .chat-msg {
+    margin-bottom: var(--space-3);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .chat-msg-user {
+    background: var(--accent-primary-active);
+    color: white;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md) var(--radius-md) 4px var(--radius-md);
+    margin-left: 20%;
+  }
+
+  .chat-msg-ai {
+    background: var(--surface-2);
+    color: var(--text-secondary);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md) var(--radius-md) var(--radius-md) 4px;
+    margin-right: 10%;
+  }
+
+  .chat-msg-ai :global(strong) { color: var(--text-primary); }
+
+  .chat-input-area {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--border-default);
+    background: var(--surface-0);
+  }
+
+  .chat-input {
+    flex: 1;
+    padding: var(--space-2) var(--space-3);
+    background: var(--surface-1);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+  }
+  .chat-input:focus { outline: none; border-color: var(--accent-primary); }
+
+  .chat-send {
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: opacity var(--transition-fast);
+  }
+  .chat-send:hover { opacity: 0.9; }
+  .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  @media (max-width: 640px) {
+    .chat-panel {
+      right: 8px;
+      left: 8px;
+      bottom: 76px;
+      width: auto;
+    }
+  }
+</style>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+
+  const SUPABASE_URL = (import.meta as any).env?.PUBLIC_SUPABASE_URL || '';
+  const SUPABASE_ANON_KEY = (import.meta as any).env?.PUBLIC_SUPABASE_ANON_KEY || '';
+
+  // Only init if Supabase is configured
+  if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (session) {
+      // Check role
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+
+      const canChat = profile?.role === 'admin' || profile?.role === 'analyst';
+
+      if (canChat) {
+        const fab = document.getElementById('chat-fab')!;
+        const panel = document.getElementById('chat-panel')!;
+        const messages = document.getElementById('chat-messages')!;
+        const input = document.getElementById('chat-input') as HTMLInputElement;
+        const sendBtn = document.getElementById('chat-send') as HTMLButtonElement;
+
+        fab.style.display = 'flex';
+
+        fab.addEventListener('click', () => {
+          panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+          if (panel.style.display === 'flex') input.focus();
+        });
+
+        document.getElementById('chat-close')?.addEventListener('click', () => {
+          panel.style.display = 'none';
+        });
+
+        // Example buttons
+        document.querySelectorAll('.chat-example').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const q = btn.getAttribute('data-q') || '';
+            input.value = q;
+            sendMessage(q);
+          });
+        });
+
+        async function sendMessage(question: string) {
+          if (!question.trim()) return;
+
+          // Add user message
+          const userMsg = document.createElement('div');
+          userMsg.className = 'chat-msg chat-msg-user';
+          userMsg.textContent = question;
+          messages.appendChild(userMsg);
+
+          // Clear welcome if first message
+          const welcome = messages.querySelector('.chat-welcome');
+          if (welcome) welcome.remove();
+
+          input.value = '';
+          sendBtn.disabled = true;
+
+          // Add AI response placeholder
+          const aiMsg = document.createElement('div');
+          aiMsg.className = 'chat-msg chat-msg-ai';
+          aiMsg.textContent = 'Thinking...';
+          messages.appendChild(aiMsg);
+          messages.scrollTop = messages.scrollHeight;
+
+          try {
+            // Build context from page data (lightweight — uses window globals set by pages)
+            const context = (window as any).__dashboard_context || 'No dashboard context available.';
+            const systemPrompt = (window as any).__chat_system_prompt || 'You are a helpful analytics assistant.';
+
+            const response = await fetch(`${SUPABASE_URL}/functions/v1/chat`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify({ question, context, systemPrompt }),
+            });
+
+            if (!response.ok) {
+              const err = await response.json().catch(() => ({ error: 'Unknown error' }));
+              aiMsg.textContent = `Error: ${err.error || response.statusText}`;
+              sendBtn.disabled = false;
+              return;
+            }
+
+            // Stream SSE
+            aiMsg.textContent = '';
+            const reader = response.body!.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split('\n');
+              buffer = lines.pop() || '';
+
+              for (const line of lines) {
+                if (!line.startsWith('data: ')) continue;
+                const data = line.slice(6);
+                if (data === '[DONE]') continue;
+
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.text) {
+                    aiMsg.textContent += parsed.text;
+                    messages.scrollTop = messages.scrollHeight;
+                  }
+                } catch { /* skip */ }
+              }
+            }
+          } catch (err) {
+            aiMsg.textContent = 'Failed to connect to AI service.';
+          }
+
+          sendBtn.disabled = false;
+          messages.scrollTop = messages.scrollHeight;
+        }
+
+        // Send on Enter or button click
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') sendMessage(input.value);
+        });
+
+        sendBtn.addEventListener('click', () => sendMessage(input.value));
+      }
+    }
+  }
+</script>

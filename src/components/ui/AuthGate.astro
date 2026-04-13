@@ -1,0 +1,236 @@
+---
+/**
+ * AuthGate — client-side authentication overlay.
+ * When Supabase is configured, shows login form if no session.
+ * When not configured (dev/demo), shows nothing — dashboard is open.
+ */
+---
+
+<div class="auth-gate" id="auth-gate" style="display: none;">
+  <div class="auth-card">
+    <div class="auth-header">
+      <svg class="auth-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
+        <path d="M3 3v18h18" />
+        <path d="M7 16l4-8 4 4 4-6" />
+      </svg>
+      <h1 class="auth-title">Growth<strong>HQ</strong></h1>
+      <p class="auth-subtitle">Digital Growth Command Center</p>
+    </div>
+
+    <div class="auth-form" id="auth-form">
+      <div class="auth-input-group">
+        <label for="auth-email" class="auth-label">Email</label>
+        <input type="email" id="auth-email" class="auth-input" placeholder="you@company.com" autocomplete="email" />
+      </div>
+      <button class="auth-btn auth-btn-primary" id="auth-magic-link">
+        Send Magic Link
+      </button>
+      <div class="auth-divider"><span>or</span></div>
+      <button class="auth-btn auth-btn-github" id="auth-github">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12Z"/></svg>
+        Continue with GitHub
+      </button>
+    </div>
+
+    <div class="auth-message" id="auth-message" style="display: none;">
+      <p class="auth-message-text" id="auth-message-text"></p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .auth-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: var(--surface-0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 380px;
+    padding: var(--space-8);
+  }
+
+  .auth-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+  }
+
+  .auth-logo {
+    color: var(--accent-primary);
+    margin-bottom: var(--space-4);
+  }
+
+  .auth-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-primary);
+  }
+
+  .auth-title strong { color: var(--accent-primary); }
+
+  .auth-subtitle {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-top: var(--space-2);
+  }
+
+  .auth-input-group {
+    margin-bottom: var(--space-4);
+  }
+
+  .auth-label {
+    display: block;
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: var(--space-2);
+  }
+
+  .auth-input {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface-1);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    transition: border-color var(--transition-fast);
+  }
+
+  .auth-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+  }
+
+  .auth-btn {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    transition: all var(--transition-fast);
+  }
+
+  .auth-btn-primary {
+    background: var(--accent-primary);
+    color: white;
+  }
+
+  .auth-btn-primary:hover { opacity: 0.9; }
+
+  .auth-btn-github {
+    background: var(--surface-2);
+    color: var(--text-primary);
+    border: 1px solid var(--border-default);
+  }
+
+  .auth-btn-github:hover { background: var(--surface-3); }
+
+  .auth-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-4) 0;
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+  }
+
+  .auth-divider::before,
+  .auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-default);
+  }
+
+  .auth-message {
+    text-align: center;
+    padding: var(--space-4);
+    background: var(--accent-success-dim);
+    border-radius: var(--radius-md);
+    margin-top: var(--space-4);
+  }
+
+  .auth-message-text {
+    font-size: var(--text-sm);
+    color: var(--accent-success);
+  }
+</style>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+
+  const SUPABASE_URL = (import.meta as any).env?.PUBLIC_SUPABASE_URL || '';
+  const SUPABASE_ANON_KEY = (import.meta as any).env?.PUBLIC_SUPABASE_ANON_KEY || '';
+
+  // If Supabase is not configured, skip auth entirely (demo mode)
+  if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const gate = document.getElementById('auth-gate')!;
+    const form = document.getElementById('auth-form')!;
+    const message = document.getElementById('auth-message')!;
+    const messageText = document.getElementById('auth-message-text')!;
+    const emailInput = document.getElementById('auth-email') as HTMLInputElement;
+
+    // Check session
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      gate.style.display = 'flex';
+
+      // Magic Link
+      document.getElementById('auth-magic-link')?.addEventListener('click', async () => {
+        const email = emailInput.value.trim();
+        if (!email) return;
+
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: window.location.origin },
+        });
+
+        if (error) {
+          messageText.textContent = error.message;
+          message.style.display = 'block';
+        } else {
+          form.style.display = 'none';
+          messageText.textContent = 'Check your email for the magic link!';
+          message.style.display = 'block';
+        }
+      });
+
+      // GitHub OAuth
+      document.getElementById('auth-github')?.addEventListener('click', async () => {
+        await supabase.auth.signInWithOAuth({
+          provider: 'github',
+          options: { redirectTo: window.location.origin },
+        });
+      });
+    }
+
+    // Listen for auth state changes (e.g., returning from magic link)
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        gate.style.display = 'none';
+        // Update last_login
+        supabase.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', session.user.id);
+      }
+    });
+  }
+</script>

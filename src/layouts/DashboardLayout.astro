@@ -14,11 +14,15 @@ const navItems = [
   { id: 'email', label: 'Email Marketing', href: '/email', icon: 'mail' },
   { id: 'social', label: 'Social Media', href: '/social', icon: 'share' },
   { id: 'crm-pipeline', label: 'CRM & Pipeline', href: '/crm-pipeline', icon: 'funnel' },
+  { id: 'cross-channel', label: 'Channel Flow', href: '/cross-channel', icon: 'git-merge' },
   { id: 'martech-health', label: 'Martech Health', href: '/martech-health', icon: 'heart-pulse' },
   { id: 'about', label: 'About', href: '/about', icon: 'grid' },
 ];
 import CommandPalette from '../components/ui/CommandPalette.astro';
 import OnboardingBanner from '../components/ui/OnboardingBanner.astro';
+import AuthGate from '../components/ui/AuthGate.astro';
+import RoleBadge from '../components/ui/RoleBadge.astro';
+import ChatPanel from '../components/ui/ChatPanel.astro';
 ---
 
 <!DOCTYPE html>
@@ -41,6 +45,7 @@ import OnboardingBanner from '../components/ui/OnboardingBanner.astro';
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 </head>
 <body>
+  <AuthGate />
   <CommandPalette />
   <div class="app">
     <!-- Sidebar -->
@@ -79,6 +84,7 @@ import OnboardingBanner from '../components/ui/OnboardingBanner.astro';
       </nav>
 
       <div class="sidebar-footer">
+        <RoleBadge />
         <div class="env-badge">
           <span class="env-dot"></span>
           <span class="env-label">Template Mode</span>
@@ -124,6 +130,9 @@ import OnboardingBanner from '../components/ui/OnboardingBanner.astro';
       </main>
     </div>
   </div>
+
+  <!-- AI Chat -->
+  <ChatPanel />
 
   <!-- Mobile overlay -->
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -300,6 +309,11 @@ import OnboardingBanner from '../components/ui/OnboardingBanner.astro';
   .nav-icon[data-icon="funnel"]::before {
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpolygon points='22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3'/%3E%3C/svg%3E");
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpolygon points='22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3'/%3E%3C/svg%3E");
+  }
+
+  .nav-icon[data-icon="git-merge"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='18' cy='18' r='3'/%3E%3Ccircle cx='6' cy='6' r='3'/%3E%3Cpath d='M6 21V9a9 9 0 0 0 9 9'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='18' cy='18' r='3'/%3E%3Ccircle cx='6' cy='6' r='3'/%3E%3Cpath d='M6 21V9a9 9 0 0 0 9 9'/%3E%3C/svg%3E");
   }
 
   .nav-icon[data-icon="heart-pulse"]::before {

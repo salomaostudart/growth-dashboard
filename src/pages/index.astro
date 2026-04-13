@@ -6,6 +6,8 @@ import AlertBanner from '../components/ui/AlertBanner.astro';
 import { getConnector, getAllConnectors } from '../connectors/registry';
 import { formatNumber, formatPercent, formatDuration, calcDelta } from '../utils/formatters';
 import { generateInsights } from '../utils/insights-engine';
+import { buildChatContext } from '../utils/chat-context-builder';
+import { buildSystemPrompt } from '../utils/chat-system-prompt';
 
 const now = new Date();
 const dateRange = { start: new Date(now.getTime() - 30 * 86400000), end: now, range: '30d' as const };
@@ -297,10 +299,12 @@ const channelMixData = JSON.stringify(web.channelMix);
   }
 </style>
 
-<script define:vars={{ trafficChartData, channelMixData }}>
+<script define:vars={{ trafficChartData, channelMixData, chatContext: buildChatContext({ web, seo, email, crm, martech }, 'admin'), chatSystemPrompt: buildSystemPrompt('admin') }}>
   // Bridge: server data → client scripts via window
   window.__traffic_data = JSON.parse(trafficChartData);
   window.__channel_data = JSON.parse(channelMixData);
+  window.__dashboard_context = chatContext;
+  window.__chat_system_prompt = chatSystemPrompt;
 </script>
 
 <script>
