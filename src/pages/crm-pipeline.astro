@@ -3,7 +3,7 @@ import DashboardLayout from '../layouts/DashboardLayout.astro';
 import MetricCard from '../components/ui/MetricCard.astro';
 import ChartContainer from '../components/charts/ChartContainer.astro';
 import { getConnector } from '../connectors/registry';
-import { formatNumber, formatPercent, formatCurrency } from '../utils/formatters';
+import { formatNumber, formatPercent, formatCurrency, calcDelta } from '../utils/formatters';
 
 const now = new Date();
 const dateRange = { start: new Date(now.getTime() - 30 * 86400000), end: now, range: '30d' as const };
@@ -16,20 +16,11 @@ const mqlRate = crm.funnel.leads > 0 ? (crm.funnel.mql / crm.funnel.leads * 100)
 const sqlRate = crm.funnel.mql > 0 ? (crm.funnel.sql / crm.funnel.mql * 100) : 0;
 const winRate = crm.funnel.pipeline > 0 ? (crm.funnel.won / crm.funnel.pipeline * 100) : 0;
 
-// Delta from lead velocity
-function calcDelta(data: number[]): number {
-  const mid = Math.floor(data.length / 2);
-  const first = data.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
-  const second = data.slice(mid).reduce((a, b) => a + b, 0) / (data.length - mid);
-  return first > 0 ? ((second - first) / first) * 100 : 0;
-}
 const leadsDelta = calcDelta(crm.leadVelocity.map(d => d.leads));
 
 // Serialize for client
 const funnelData = JSON.stringify(crm.funnel);
 const velocityData = JSON.stringify(crm.leadVelocity);
-const attributionData = JSON.stringify(crm.channelAttribution);
-const pipelineData = JSON.stringify(crm.pipelineByStage);
 ---
 
 <DashboardLayout title="CRM & Pipeline" activeNav="crm-pipeline">
@@ -45,17 +36,13 @@ const pipelineData = JSON.stringify(crm.pipelineByStage);
     />
     <MetricCard
       title="MQLs"
-      value={formatNumber(crm.funnel.mql)}
-      delta={Number(mqlRate.toFixed(1))}
-      deltaLabel="of leads"
+      value={`${formatNumber(crm.funnel.mql)} (${mqlRate.toFixed(0)}%)`}
       source={crmResult.source}
       sourceName="HubSpot"
     />
     <MetricCard
       title="SQLs"
-      value={formatNumber(crm.funnel.sql)}
-      delta={Number(sqlRate.toFixed(1))}
-      deltaLabel="of MQLs"
+      value={`${formatNumber(crm.funnel.sql)} (${sqlRate.toFixed(0)}%)`}
       source={crmResult.source}
       sourceName="HubSpot"
     />

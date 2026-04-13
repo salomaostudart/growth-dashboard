@@ -19,7 +19,6 @@ const totalReferral = social.platforms.reduce((a, p) => a + p.referralTraffic, 0
 // Serialize for client
 const platformsData = JSON.stringify(social.platforms);
 const referralData = JSON.stringify(social.referralByDay);
-const topPostsData = JSON.stringify(social.topPosts);
 ---
 
 <DashboardLayout title="Social Media" activeNav="social">

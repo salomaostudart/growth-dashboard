@@ -7,11 +7,12 @@ const commands = [
   { label: 'Social Media', href: '/social', keywords: 'linkedin twitter followers engagement' },
   { label: 'CRM & Pipeline', href: '/crm-pipeline', keywords: 'hubspot leads funnel pipeline' },
   { label: 'Martech Health', href: '/martech-health', keywords: 'systems uptime status health' },
+  { label: 'About', href: '/about', keywords: 'case study architecture stack' },
 ];
 ---
 
 <div class="cmd-overlay" id="cmd-overlay"></div>
-<div class="cmd-palette" id="cmd-palette" role="dialog" aria-label="Command palette">
+<div class="cmd-palette" id="cmd-palette" role="dialog" aria-modal="true" aria-label="Command palette">
   <div class="cmd-input-wrapper">
     <svg class="cmd-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -25,9 +26,9 @@ const commands = [
     />
     <kbd class="cmd-shortcut">ESC</kbd>
   </div>
-  <ul class="cmd-list" id="cmd-list">
+  <ul class="cmd-list" id="cmd-list" role="listbox">
     {commands.map(cmd => (
-      <li class="cmd-item" data-href={cmd.href} data-keywords={cmd.keywords}>
+      <li class="cmd-item" role="option" aria-selected="false" data-href={cmd.href} data-keywords={cmd.keywords}>
         <span class="cmd-label">{cmd.label}</span>
         <span class="cmd-path">{cmd.href}</span>
       </li>
@@ -172,8 +173,11 @@ const commands = [
 
   function updateActive() {
     const visible = getVisible();
-    items.forEach(i => i.classList.remove('active'));
-    if (visible[activeIndex]) visible[activeIndex].classList.add('active');
+    items.forEach(i => { i.classList.remove('active'); i.setAttribute('aria-selected', 'false'); });
+    if (visible[activeIndex]) {
+      visible[activeIndex].classList.add('active');
+      visible[activeIndex].setAttribute('aria-selected', 'true');
+    }
   }
 
   function navigate(href: string) {

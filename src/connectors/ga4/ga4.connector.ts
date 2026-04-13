@@ -11,16 +11,26 @@ export class WebLiveConnector implements IConnector<WebMetrics> {
   readonly source = 'live' as const;
 
   async fetch(_params: DateRangeParams): Promise<ConnectorResult<WebMetrics>> {
-    const raw = fs.readFileSync(SNAPSHOT_PATH, 'utf-8');
-    const json = JSON.parse(raw);
-    const parsed = WebMetricsSchema.parse(json.data);
+    try {
+      const raw = fs.readFileSync(SNAPSHOT_PATH, 'utf-8');
+      const json = JSON.parse(raw);
+      const parsed = WebMetricsSchema.parse(json.data);
 
-    return {
-      data: parsed,
-      source: 'live',
-      fetchedAt: new Date(json.fetchedAt || Date.now()),
-      errors: [],
-    };
+      return {
+        data: parsed,
+        source: 'live',
+        fetchedAt: new Date(json.fetchedAt || Date.now()),
+        errors: [],
+      };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      return {
+        data: {} as WebMetrics,
+        source: 'live',
+        fetchedAt: new Date(),
+        errors: [{ code: 'SNAPSHOT_ERROR', message: `GA4 snapshot error: ${message}`, timestamp: new Date(), recoverable: true }],
+      };
+    }
   }
 
   async health(): Promise<ConnectorHealth> {

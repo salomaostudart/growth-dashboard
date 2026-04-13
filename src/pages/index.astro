@@ -5,7 +5,7 @@ import ChartContainer from '../components/charts/ChartContainer.astro';
 import AlertBanner from '../components/ui/AlertBanner.astro';
 import OnboardingBanner from '../components/ui/OnboardingBanner.astro';
 import { getConnector, getAllConnectors } from '../connectors/registry';
-import { formatNumber, formatPercent, formatDuration } from '../utils/formatters';
+import { formatNumber, formatPercent, formatDuration, calcDelta } from '../utils/formatters';
 import { generateInsights } from '../utils/insights-engine';
 
 const now = new Date();
@@ -33,20 +33,12 @@ const userSparkline = web.trafficByDay.slice(-14).map(d => d.users);
 
 // Alerts
 const alerts: Array<{ type: 'warning' | 'danger' | 'info'; message: string; metric?: string; value?: string }> = [];
-if (web.bounceRate > 50) alerts.push({ type: 'warning', message: 'Bounce rate above threshold', metric: 'Bounce Rate', value: formatPercent(web.bounceRate) });
+if (web.bounceRate > 55) alerts.push({ type: 'warning', message: 'Bounce rate above threshold', metric: 'Bounce Rate', value: formatPercent(web.bounceRate) });
 const degradedSystems = martech.systems.filter(s => s.status !== 'healthy');
 degradedSystems.forEach(s => alerts.push({ type: 'danger', message: `${s.name} is ${s.status}`, metric: 'Uptime', value: formatPercent(s.uptime) }));
 
 // Connector sources for all cards
 const connectors = getAllConnectors();
-
-// Calculate deltas by comparing first half vs second half of trafficByDay
-function calcDelta(data: number[]): number {
-  const mid = Math.floor(data.length / 2);
-  const first = data.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
-  const second = data.slice(mid).reduce((a, b) => a + b, 0) / (data.length - mid);
-  return first > 0 ? ((second - first) / first) * 100 : 0;
-}
 
 const sessionsDelta = calcDelta(web.trafficByDay.map(d => d.sessions));
 const impressionsDelta = calcDelta(seo.topQueries.map(q => q.impressions));

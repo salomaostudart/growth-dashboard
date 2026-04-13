@@ -37,7 +37,9 @@ export interface ConnectorMap {
 }
 
 function isEnabled(envVar: string): boolean {
-  return import.meta.env[envVar] === 'true';
+  // process.env works in both Astro build and standalone tsx (MCP server)
+  return (typeof process !== 'undefined' && process.env?.[envVar] === 'true') ||
+    (typeof import.meta !== 'undefined' && (import.meta as any).env?.[envVar] === 'true');
 }
 
 // Registry: env var switches mock → real

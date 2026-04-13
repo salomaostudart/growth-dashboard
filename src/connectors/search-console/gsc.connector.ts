@@ -11,16 +11,26 @@ export class SeoLiveConnector implements IConnector<SeoMetrics> {
   readonly source = 'live' as const;
 
   async fetch(_params: DateRangeParams): Promise<ConnectorResult<SeoMetrics>> {
-    const raw = fs.readFileSync(SNAPSHOT_PATH, 'utf-8');
-    const json = JSON.parse(raw);
-    const parsed = SeoMetricsSchema.parse(json.data);
+    try {
+      const raw = fs.readFileSync(SNAPSHOT_PATH, 'utf-8');
+      const json = JSON.parse(raw);
+      const parsed = SeoMetricsSchema.parse(json.data);
 
-    return {
-      data: parsed,
-      source: 'live',
-      fetchedAt: new Date(json.fetchedAt || Date.now()),
-      errors: [],
-    };
+      return {
+        data: parsed,
+        source: 'live',
+        fetchedAt: new Date(json.fetchedAt || Date.now()),
+        errors: [],
+      };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      return {
+        data: {} as SeoMetrics,
+        source: 'live',
+        fetchedAt: new Date(),
+        errors: [{ code: 'SNAPSHOT_ERROR', message: `GSC snapshot error: ${message}`, timestamp: new Date(), recoverable: true }],
+      };
+    }
   }
 
   async health(): Promise<ConnectorHealth> {

@@ -18,9 +18,10 @@ export function formatDelta(value: number): string {
 }
 
 export function formatDuration(seconds: number): string {
-  if (seconds < 60) return `${Math.round(seconds)}s`;
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.round(seconds % 60);
+  const total = Math.round(seconds);
+  if (total < 60) return `${total}s`;
+  const mins = Math.floor(total / 60);
+  const secs = total % 60;
   return `${mins}m ${secs}s`;
 }
 
@@ -31,6 +32,13 @@ export function formatCurrency(value: number): string {
 export function formatLatency(ms: number): string {
   if (ms < 1000) return `${Math.round(ms)}ms`;
   return `${(ms / 1000).toFixed(1)}s`;
+}
+
+export function calcDelta(data: number[]): number {
+  const mid = Math.floor(data.length / 2);
+  const first = data.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
+  const second = data.slice(mid).reduce((a, b) => a + b, 0) / (data.length - mid);
+  return first > 0 ? ((second - first) / first) * 100 : 0;
 }
 
 export function timeAgo(dateStr: string): string {

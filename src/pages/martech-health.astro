@@ -15,9 +15,9 @@ const martech = martechResult.data;
 // Aggregates
 const healthySystems = martech.systems.filter(s => s.status === 'healthy').length;
 const totalSystems = martech.systems.length;
-const avgUptime = martech.systems.reduce((a, s) => a + s.uptime, 0) / totalSystems;
+const avgUptime = totalSystems > 0 ? martech.systems.reduce((a, s) => a + s.uptime, 0) / totalSystems : 0;
 const totalCost = martech.systems.reduce((a, s) => a + s.monthlyCost, 0);
-const avgLatency = martech.systems.reduce((a, s) => a + s.latencyMs, 0) / totalSystems;
+const avgLatency = totalSystems > 0 ? martech.systems.reduce((a, s) => a + s.latencyMs, 0) / totalSystems : 0;
 
 // Maturity score (0-100): weighted by status, uptime, latency
 function calcMaturityScore(): number {
@@ -30,7 +30,7 @@ function calcMaturityScore(): number {
     sysScore += Math.max(0, 20 - (s.latencyMs / 50));
     score += sysScore;
   }
-  return Math.round(score / totalSystems);
+  return totalSystems > 0 ? Math.round(score / totalSystems) : 0;
 }
 const maturityScore = calcMaturityScore();
 const maturityLevel = maturityScore >= 80 ? 'Excellent' : maturityScore >= 60 ? 'Good' : maturityScore >= 40 ? 'Fair' : 'Needs Work';

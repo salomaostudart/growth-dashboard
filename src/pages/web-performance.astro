@@ -3,7 +3,7 @@ import DashboardLayout from '../layouts/DashboardLayout.astro';
 import MetricCard from '../components/ui/MetricCard.astro';
 import ChartContainer from '../components/charts/ChartContainer.astro';
 import { getConnector } from '../connectors/registry';
-import { formatNumber, formatPercent, formatDuration } from '../utils/formatters';
+import { formatNumber, formatPercent, formatDuration, calcDelta } from '../utils/formatters';
 
 const now = new Date();
 const dateRange = { start: new Date(now.getTime() - 30 * 86400000), end: now, range: '30d' as const };
@@ -11,8 +11,6 @@ const dateRange = { start: new Date(now.getTime() - 30 * 86400000), end: now, ra
 const webResult = await getConnector('web').fetch(dateRange);
 const web = webResult.data;
 
-// Page speed metrics (derived from session duration and bounce rate)
-const avgPageLoad = web.avgSessionDuration * 0.15; // estimate ~15% of session is loading
 const bounceRate = web.bounceRate;
 
 // Device performance
@@ -21,14 +19,6 @@ const deviceBreakdown = web.deviceBreakdown;
 // Traffic sparklines
 const sessionSparkline = web.trafficByDay.slice(-14).map(d => d.sessions);
 const userSparkline = web.trafficByDay.slice(-14).map(d => d.users);
-
-// Calculate deltas
-function calcDelta(data: number[]): number {
-  const mid = Math.floor(data.length / 2);
-  const first = data.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
-  const second = data.slice(mid).reduce((a, b) => a + b, 0) / (data.length - mid);
-  return first > 0 ? ((second - first) / first) * 100 : 0;
-}
 
 const sessionsDelta = calcDelta(web.trafficByDay.map(d => d.sessions));
 const usersDelta = calcDelta(web.trafficByDay.map(d => d.users));
@@ -69,7 +59,7 @@ const deviceData = JSON.stringify(deviceBreakdown);
     <MetricCard
       title="Bounce Rate"
       value={formatPercent(bounceRate)}
-      delta={Number((bounceRate - 45).toFixed(1))}
+      delta={Number((45 - bounceRate).toFixed(1))}
       deltaLabel="vs benchmark 45%"
       source={webResult.source}
       sourceName="GA4"

@@ -3,21 +3,13 @@ import DashboardLayout from '../layouts/DashboardLayout.astro';
 import MetricCard from '../components/ui/MetricCard.astro';
 import ChartContainer from '../components/charts/ChartContainer.astro';
 import { getConnector } from '../connectors/registry';
-import { formatNumber, formatPercent } from '../utils/formatters';
+import { formatNumber, formatPercent, calcDelta } from '../utils/formatters';
 
 const now = new Date();
 const dateRange = { start: new Date(now.getTime() - 90 * 86400000), end: now, range: '90d' as const };
 
 const seoResult = await getConnector('seo').fetch(dateRange);
 const seo = seoResult.data;
-
-// Deltas from query data
-function calcDelta(data: number[]): number {
-  const mid = Math.floor(data.length / 2);
-  const first = data.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
-  const second = data.slice(mid).reduce((a, b) => a + b, 0) / (data.length - mid);
-  return first > 0 ? ((second - first) / first) * 100 : 0;
-}
 
 const impressionsDelta = calcDelta(seo.topQueries.map(q => q.impressions));
 const clicksDelta = calcDelta(seo.topQueries.map(q => q.clicks));

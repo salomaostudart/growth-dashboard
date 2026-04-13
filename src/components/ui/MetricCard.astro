@@ -45,7 +45,7 @@ const sparklinePath = generateSparklinePath(sparklineData);
 
 <div class="metric-card">
   {sparklineData.length > 0 && (
-    <svg class="sparkline" viewBox="0 0 120 32" preserveAspectRatio="none">
+    <svg class="sparkline" viewBox="0 0 120 32" preserveAspectRatio="none" aria-hidden="true" focusable="false">
       <path d={sparklinePath} fill="none" stroke="currentColor" stroke-width="1.5" />
     </svg>
   )}
@@ -53,7 +53,7 @@ const sparklinePath = generateSparklinePath(sparklineData);
     <span class="metric-title">
       {title}
       {tooltip && (
-        <span class="tooltip-trigger" data-tooltip={tooltip}>
+        <span class="tooltip-trigger" tabindex="0" data-tooltip={tooltip}>
           <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/><text x="8" y="12" text-anchor="middle" fill="currentColor" font-size="10" font-weight="600">?</text></svg>
           <span class="tooltip-content">{tooltip}</span>
         </span>
@@ -202,5 +202,7 @@ const sparklinePath = generateSparklinePath(sparklineData);
     box-shadow: var(--shadow-md);
   }
 
-  .tooltip-trigger:hover .tooltip-content { display: block; }
+  .tooltip-trigger:hover .tooltip-content,
+  .tooltip-trigger:focus .tooltip-content,
+  .tooltip-trigger:focus-within .tooltip-content { display: block; }
 </style>
