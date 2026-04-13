@@ -14,7 +14,9 @@ const navItems = [
   { id: 'social', label: 'Social Media', href: '/social', icon: 'share' },
   { id: 'crm-pipeline', label: 'CRM & Pipeline', href: '/crm-pipeline', icon: 'funnel' },
   { id: 'martech-health', label: 'Martech Health', href: '/martech-health', icon: 'heart-pulse' },
+  { id: 'about', label: 'About', href: '/about', icon: 'grid' },
 ];
+import CommandPalette from '../components/ui/CommandPalette.astro';
 ---
 
 <!DOCTYPE html>
@@ -36,6 +38,7 @@ const navItems = [
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 </head>
 <body>
+  <CommandPalette />
   <div class="app">
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">

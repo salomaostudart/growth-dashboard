@@ -1,0 +1,203 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+---
+
+<DashboardLayout title="About This Project">
+  <article class="about">
+    <header class="about-header">
+      <h1 class="about-title">About GrowthHQ</h1>
+      <p class="about-subtitle">A case study in Digital Growth & Marketing Systems</p>
+    </header>
+
+    <section class="about-section">
+      <h2>What is this?</h2>
+      <p>
+        GrowthHQ is a <strong>Digital Growth Command Center</strong> — a real-time dashboard that
+        consolidates metrics from 6+ marketing channels into one unified interface with automated
+        insights, explainability tooltips, and an AI-queryable MCP server.
+      </p>
+    </section>
+
+    <section class="about-section">
+      <h2>Why it exists</h2>
+      <p>
+        Directors of Digital Growth spend hours switching between GA4, Search Console, HubSpot,
+        Mailchimp, and social platforms. GrowthHQ eliminates that context-switching by presenting
+        all channels in one place, with rule-based insights that surface what matters.
+      </p>
+    </section>
+
+    <section class="about-section">
+      <h2>Architecture</h2>
+      <div class="arch-grid">
+        <div class="arch-card">
+          <h3>Connector Pattern</h3>
+          <p>Every data source implements <code>IConnector&lt;T&gt;</code>. Swap mock → real by changing one env var. Zod validates all data at runtime.</p>
+        </div>
+        <div class="arch-card">
+          <h3>Snapshot Strategy</h3>
+          <p>Python scripts fetch data from GA4 and Search Console APIs. GitHub Actions cron commits JSON snapshots daily. Zero server-side API calls at build time.</p>
+        </div>
+        <div class="arch-card">
+          <h3>MCP Server</h3>
+          <p>9 read-only tools expose dashboard data to AI assistants. Query metrics, alerts, and insights programmatically via Claude Code.</p>
+        </div>
+        <div class="arch-card">
+          <h3>Insights Engine</h3>
+          <p>22 rule-based checks analyze all channels. No LLM — pure threshold, trend, and comparison logic. Transparent and auditable.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <h2>Tech Stack</h2>
+      <div class="stack-list">
+        <div class="stack-item"><strong>Framework</strong><span>Astro + TypeScript</span></div>
+        <div class="stack-item"><strong>Charts</strong><span>Apache ECharts</span></div>
+        <div class="stack-item"><strong>Validation</strong><span>Zod</span></div>
+        <div class="stack-item"><strong>Tests</strong><span>Vitest + Playwright + axe-core</span></div>
+        <div class="stack-item"><strong>AI Interface</strong><span>MCP Server (stdio)</span></div>
+        <div class="stack-item"><strong>Data Pipeline</strong><span>Python + GitHub Actions</span></div>
+        <div class="stack-item"><strong>Design</strong><span>Oswald + Inter, WCAG 2.1 AA</span></div>
+        <div class="stack-item"><strong>Accessibility</strong><span>axe-core automated, keyboard nav</span></div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <h2>Pages</h2>
+      <p>7 functional pages covering the full marketing stack:</p>
+      <ol class="pages-list">
+        <li><strong>Command Center</strong> — cross-channel KPIs, traffic trend, channel mix, automated insights</li>
+        <li><strong>Web Performance</strong> — sessions, users, bounce rate, device breakdown, top pages</li>
+        <li><strong>SEO / AEO / GEO</strong> — impressions, clicks, position history, top queries</li>
+        <li><strong>Email Marketing</strong> — open/click rates, send time heatmap, campaign performance</li>
+        <li><strong>Social Media</strong> — follower growth, engagement, referral traffic by platform</li>
+        <li><strong>CRM & Pipeline</strong> — conversion funnel, lead velocity, channel attribution</li>
+        <li><strong>Martech Health</strong> — system uptime, maturity score, automation success rates</li>
+      </ol>
+    </section>
+
+    <section class="about-section">
+      <h2>Multi-tenant</h2>
+      <p>
+        This dashboard is designed as a <strong>reusable template</strong>. To adapt for a different
+        company: fork the repo, update mock data to match your stack, add real connectors for your
+        tools, and deploy. The connector pattern makes swapping data sources trivial.
+      </p>
+    </section>
+  </article>
+</DashboardLayout>
+
+<style>
+  .about {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .about-header {
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--border-default);
+  }
+
+  .about-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-4xl);
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-2);
+  }
+
+  .about-subtitle {
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+  }
+
+  .about-section {
+    margin-bottom: var(--space-8);
+  }
+
+  .about-section h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-3);
+    color: var(--text-primary);
+  }
+
+  .about-section p {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--space-3);
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    background: var(--surface-2);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    color: var(--accent-primary);
+  }
+
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .arch-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .arch-card h3 {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .arch-card p {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .stack-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-2);
+  }
+
+  .stack-item {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-2) var(--space-3);
+    background: var(--surface-1);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+  }
+
+  .stack-item strong { color: var(--text-primary); }
+
+  .pages-list {
+    padding-left: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 2;
+  }
+
+  .pages-list strong { color: var(--text-primary); }
+</style>

@@ -1,0 +1,104 @@
+---
+---
+
+<div class="onboarding" id="onboarding-banner" style="display:none">
+  <div class="onboarding-content">
+    <div class="onboarding-text">
+      <h3 class="onboarding-title">Welcome to GrowthHQ</h3>
+      <p class="onboarding-desc">
+        This is a Digital Growth Command Center. Navigate channels via sidebar,
+        press <kbd>Ctrl+K</kbd> to search, and hover the <span class="tooltip-hint">?</span> icons for metric explanations.
+      </p>
+    </div>
+    <button class="onboarding-dismiss" id="onboarding-dismiss" aria-label="Dismiss">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<style>
+  .onboarding {
+    background: linear-gradient(135deg, rgba(129, 140, 248, 0.1), rgba(16, 185, 129, 0.05));
+    border: 1px solid rgba(129, 140, 248, 0.3);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5);
+    margin-bottom: var(--space-6);
+    animation: fadeIn var(--transition-base) ease-out;
+  }
+
+  .onboarding-content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .onboarding-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin: 0 0 var(--space-1) 0;
+  }
+
+  .onboarding-desc {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .onboarding-desc kbd {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    padding: 1px 5px;
+    background: var(--surface-3);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+  }
+
+  .tooltip-hint {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--surface-3);
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 600;
+    vertical-align: middle;
+  }
+
+  .onboarding-dismiss {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: var(--space-1);
+    flex-shrink: 0;
+    transition: color var(--transition-fast);
+  }
+
+  .onboarding-dismiss:hover { color: var(--text-primary); }
+</style>
+
+<script>
+  const banner = document.getElementById('onboarding-banner');
+  const dismiss = document.getElementById('onboarding-dismiss');
+  const KEY = 'growthhq-onboarded';
+
+  if (banner && !localStorage.getItem(KEY)) {
+    banner.style.display = 'block';
+  }
+
+  dismiss?.addEventListener('click', () => {
+    localStorage.setItem(KEY, '1');
+    banner?.remove();
+  });
+</script>

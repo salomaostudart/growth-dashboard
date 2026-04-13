@@ -1,0 +1,221 @@
+---
+const commands = [
+  { label: 'Command Center', href: '/', keywords: 'overview home dashboard' },
+  { label: 'Web Performance', href: '/web-performance', keywords: 'traffic sessions users ga4' },
+  { label: 'SEO / AEO / GEO', href: '/seo', keywords: 'search queries rankings position' },
+  { label: 'Email Marketing', href: '/email', keywords: 'mailchimp campaigns open rate' },
+  { label: 'Social Media', href: '/social', keywords: 'linkedin twitter followers engagement' },
+  { label: 'CRM & Pipeline', href: '/crm-pipeline', keywords: 'hubspot leads funnel pipeline' },
+  { label: 'Martech Health', href: '/martech-health', keywords: 'systems uptime status health' },
+];
+---
+
+<div class="cmd-overlay" id="cmd-overlay"></div>
+<div class="cmd-palette" id="cmd-palette" role="dialog" aria-label="Command palette">
+  <div class="cmd-input-wrapper">
+    <svg class="cmd-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input
+      class="cmd-input"
+      id="cmd-input"
+      type="text"
+      placeholder="Search pages..."
+      autocomplete="off"
+    />
+    <kbd class="cmd-shortcut">ESC</kbd>
+  </div>
+  <ul class="cmd-list" id="cmd-list">
+    {commands.map(cmd => (
+      <li class="cmd-item" data-href={cmd.href} data-keywords={cmd.keywords}>
+        <span class="cmd-label">{cmd.label}</span>
+        <span class="cmd-path">{cmd.href}</span>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .cmd-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+  }
+
+  .cmd-palette {
+    display: none;
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 520px;
+    background: var(--surface-1);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    z-index: 201;
+    overflow: hidden;
+  }
+
+  .cmd-overlay.open,
+  .cmd-palette.open { display: block; }
+
+  .cmd-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--border-default);
+  }
+
+  .cmd-search-icon { color: var(--text-muted); flex-shrink: 0; }
+
+  .cmd-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-size: var(--text-base);
+    font-family: var(--font-body);
+    color: var(--text-primary);
+  }
+  .cmd-input::placeholder { color: var(--text-muted); }
+
+  .cmd-shortcut {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-3);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .cmd-list {
+    list-style: none;
+    margin: 0;
+    padding: var(--space-2);
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .cmd-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+  }
+
+  .cmd-item:hover,
+  .cmd-item.active {
+    background: var(--surface-2);
+  }
+
+  .cmd-label {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .cmd-path {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .cmd-item.hidden { display: none; }
+</style>
+
+<script>
+  const overlay = document.getElementById('cmd-overlay')!;
+  const palette = document.getElementById('cmd-palette')!;
+  const input = document.getElementById('cmd-input') as HTMLInputElement;
+  const items = Array.from(document.querySelectorAll('.cmd-item'));
+  let activeIndex = 0;
+
+  function open() {
+    overlay.classList.add('open');
+    palette.classList.add('open');
+    input.value = '';
+    filter('');
+    input.focus();
+    activeIndex = 0;
+    updateActive();
+  }
+
+  function close() {
+    overlay.classList.remove('open');
+    palette.classList.remove('open');
+  }
+
+  function filter(query: string) {
+    const q = query.toLowerCase();
+    items.forEach(item => {
+      const label = item.querySelector('.cmd-label')?.textContent?.toLowerCase() || '';
+      const keywords = item.getAttribute('data-keywords') || '';
+      const match = !q || label.includes(q) || keywords.includes(q);
+      item.classList.toggle('hidden', !match);
+    });
+    activeIndex = 0;
+    updateActive();
+  }
+
+  function getVisible(): HTMLElement[] {
+    return items.filter(i => !i.classList.contains('hidden'));
+  }
+
+  function updateActive() {
+    const visible = getVisible();
+    items.forEach(i => i.classList.remove('active'));
+    if (visible[activeIndex]) visible[activeIndex].classList.add('active');
+  }
+
+  function navigate(href: string) {
+    close();
+    window.location.href = href;
+  }
+
+  // Keyboard shortcut
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      palette.classList.contains('open') ? close() : open();
+    }
+    if (e.key === 'Escape') close();
+  });
+
+  // Input filtering
+  input?.addEventListener('input', () => filter(input.value));
+
+  // Arrow keys + Enter
+  input?.addEventListener('keydown', (e) => {
+    const visible = getVisible();
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIndex = Math.min(activeIndex + 1, visible.length - 1);
+      updateActive();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIndex = Math.max(activeIndex - 1, 0);
+      updateActive();
+    } else if (e.key === 'Enter') {
+      const href = visible[activeIndex]?.getAttribute('data-href');
+      if (href) navigate(href);
+    }
+  });
+
+  // Click handlers
+  overlay.addEventListener('click', close);
+  items.forEach(item => {
+    item.addEventListener('click', () => {
+      const href = item.getAttribute('data-href');
+      if (href) navigate(href);
+    });
+  });
+</script>

@@ -3,6 +3,7 @@ import DashboardLayout from '../layouts/DashboardLayout.astro';
 import MetricCard from '../components/ui/MetricCard.astro';
 import ChartContainer from '../components/charts/ChartContainer.astro';
 import AlertBanner from '../components/ui/AlertBanner.astro';
+import OnboardingBanner from '../components/ui/OnboardingBanner.astro';
 import { getConnector, getAllConnectors } from '../connectors/registry';
 import { formatNumber, formatPercent, formatDuration } from '../utils/formatters';
 import { generateInsights } from '../utils/insights-engine';
@@ -61,6 +62,8 @@ const channelMixData = JSON.stringify(web.channelMix);
 ---
 
 <DashboardLayout title="Command Center" activeNav="overview">
+  <OnboardingBanner />
+
   <!-- Alerts -->
   {alerts.length > 0 && (
     <section class="alerts-section">
