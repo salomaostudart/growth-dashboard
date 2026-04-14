@@ -1,6 +1,6 @@
 # DEVLOG — Growth Dashboard
 
-Digital Growth Command Center — portfolio tecnico para vaga Director of Digital Growth & Marketing Systems.
+Digital Growth Command Center — log de desenvolvimento.
 
 ---
 
@@ -75,7 +75,7 @@ Digital Growth Command Center — portfolio tecnico para vaga Director of Digita
 | Cloudflare Pages > Vercel | sal.dev.br ja no CF, evita conta extra |
 | Supabase > CF D1/Access | Auth+RLS+Edge Functions, conta existente |
 | Insights por regras > LLM | Sem custo, deterministico, auditavel |
-| Mock HubSpot-shaped | Mesma estrutura da Demo Enterprise |
+| Mock HubSpot-shaped | Estrutura padrao B2B SaaS |
 | Snapshot-based connectors | GA4/GSC reais via service account, JSON estatico |
 | calcDelta retorna null quando first=0 | Evita delta 0% enganoso |
 

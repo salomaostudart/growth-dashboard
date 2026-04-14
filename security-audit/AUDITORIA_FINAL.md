@@ -21,7 +21,7 @@
 | Zod schemas | OK | Todos os connectors usam schemas do connector.schema.ts |
 | Schema SQL | OK | 6 tabelas necessarias presentes |
 | Seed script | OK | Sintaxe Python valida, usa httpx + env vars |
-| auth.ts whitelist | OK | `demo-enterprise.ai` + `salomaostudart@gmail.com` |
+| auth.ts whitelist | OK | emails configurados via env var |
 | data-fetcher.ts | OK | Compila sem erros no build |
 | 12 paginas no dist/ | OK | Todas 12 presentes |
 | Git historico | OK | Nenhum arquivo .env ou key.json no historico verificado |
@@ -239,18 +239,13 @@ Row Level Security (RLS) habilitado em todas as 6 tabelas. Politicas definidas p
 - Usa `httpx` (nao `supabase` Python lib) — corretamente alinhado com o fix do commit mais recente
 - Credenciais via `os.environ.get()` — sem hardcode
 - Valida que `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` existem antes de executar
-- Dados mock com variancia realista para Demo Enterprise e Salomao Portfolio
+- Dados mock com variancia realista para projetos demo
 - Upsert correto com `on_conflict="slug"` para projetos
 
 ### auth.ts — Whitelist
 **Status: OK**
 
-```typescript
-const ALLOWED_DOMAINS = ['demo-enterprise.ai'];
-const ALLOWED_EMAILS = ['salomaostudart@gmail.com'];
-```
-
-Whitelist correta: dominio `@demo-enterprise.ai` + email pessoal do usuario.
+Whitelist via env vars (emails e dominios configurados em .env).
 
 ### data-fetcher.ts
 **Status: OK**

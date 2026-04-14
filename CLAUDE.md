@@ -2,14 +2,14 @@
 
 ## O que e
 Digital Growth Command Center — ferramenta de captura de metricas, automacao de registro e dashboard interativo.
-Serve como portfolio tecnico, prova de competencia e template reutilizavel para a vaga de Director of Digital Growth & Marketing Systems na Demo Enterprise.
+Produto pessoal para unificacao de metricas de marketing digital em um unico painel.
 
 ## Stack
 - **Framework:** Astro 5 + TypeScript (output estatico, zero JS desnecessario)
 - **Charts:** Apache ECharts 6 (enterprise-grade, dark theme nativo)
 - **Validacao:** Zod 4 (schema validation nos connectors)
 - **Testes:** Vitest 4 (unit) + Playwright (E2E + acessibilidade + performance)
-- **Design:** Oswald + Inter (mesmas fontes da Demo Enterprise) + CSS tokens
+- **Design:** Oswald + Inter + CSS tokens
 
 ## Arquitetura
 Connector Pattern — cada fonte de dados implementa `IConnector<T>`.
@@ -44,7 +44,7 @@ Cada canal tem sua pasta em `src/connectors/`:
 - `base/` — interface e schemas compartilhados
 - `ga4/` — Google Analytics 4
 - `search-console/` — Google Search Console
-- `hubspot/` — HubSpot CRM (mock HubSpot-shaped, mesma estrutura da Demo Enterprise)
+- `hubspot/` — HubSpot CRM (mock HubSpot-shaped, estrutura padrao B2B SaaS)
 - `email/` — Email marketing (mock Mailchimp-shaped)
 - `social/` — Social media (mock LinkedIn/Meta-shaped)
 - `webflow/` — Martech health (mock Webflow-shaped)
