@@ -50,7 +50,7 @@ export function isAtLeast(userRole: Role, requiredRole: Role): boolean {
 }
 
 /** Nav items visible to this role */
-export function getVisibleNavItems(role: Role): string[] {
+export function getVisibleNavItems(_role: Role): string[] {
   const base = [
     'overview', 'web-performance', 'seo', 'email',
     'social', 'crm-pipeline', 'cross-channel', 'martech-health', 'about',

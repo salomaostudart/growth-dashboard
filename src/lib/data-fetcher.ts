@@ -7,7 +7,7 @@ import { supabase, isConfigured } from './supabase';
 export async function fetchProjectMetrics(source: string): Promise<Record<string, unknown> | null> {
   if (!isConfigured || !supabase) return null;
 
-  const slug = localStorage.getItem('growthhq-project') || 'demo-enterprise';
+  const slug = (typeof localStorage !== 'undefined' ? localStorage.getItem('growthhq-project') : null) || 'demo-enterprise';
   if (!slug) return null;
 
   // Resolve project id

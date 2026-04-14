@@ -35,7 +35,7 @@ export const CHANNEL_MAP: Record<string, string> = {
 export function buildSankeyData(web: WebMetrics, crm: CrmMetrics): SankeyData {
   const mix = web.channelMix;
   const totalSessions = web.sessions;
-  const attrByChannel = new Map(crm.channelAttribution.map(a => [a.channel, a]));
+  const _attrByChannel = new Map(crm.channelAttribution.map(a => [a.channel, a]));
 
   const nodes: SankeyNode[] = [];
   const nodeSet = new Set<string>();
@@ -68,7 +68,7 @@ export function buildSankeyData(web: WebMetrics, crm: CrmMetrics): SankeyData {
     links.push({ source: 'Sessions', target: 'Leads', value: totalLeads });
 
     // Non-converting sessions
-    const nonConverting = totalSessions - totalLeads;
+    const nonConverting = Math.max(0, totalSessions - totalLeads);
     if (nonConverting > 0) {
       addNode('Bounced / No Conversion');
       links.push({ source: 'Sessions', target: 'Bounced / No Conversion', value: nonConverting });

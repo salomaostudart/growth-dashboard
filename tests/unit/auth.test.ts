@@ -1,9 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-
-// Mock import.meta.env before importing auth module
-const mockEnv: Record<string, string> = {};
-
-vi.stubGlobal('import', { meta: { env: mockEnv } });
+import { describe, it, expect } from 'vitest';
 
 // We need to test isEmailAllowed with different env configurations
 // Since the module reads env at import time, we test via dynamic import

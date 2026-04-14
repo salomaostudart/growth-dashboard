@@ -7,7 +7,7 @@ import type {
   SocialMetrics, CrmMetrics, MartechHealth,
 } from '../connectors/base/connector.schema';
 import { formatNumber, formatPercent, formatCurrency, formatDuration, formatLatency } from './formatters';
-import { generateInsights, type Insight } from './insights-engine';
+import { generateInsights } from './insights-engine';
 
 export interface ReportData {
   web: WebMetrics;
