@@ -205,7 +205,10 @@
       li.role = 'option';
       li.dataset.slug = project.slug;
       li.setAttribute('aria-selected', project.slug === currentSlug ? 'true' : 'false');
-      li.innerHTML = `<span class="option-dot active"></span>${project.name}`;
+      const dot = document.createElement('span');
+      dot.className = 'option-dot active';
+      li.appendChild(dot);
+      li.appendChild(document.createTextNode(project.name));
       li.addEventListener('click', () => selectProject(project.slug, project.name));
       dropdown.appendChild(li);
     }

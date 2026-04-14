@@ -1,10 +1,15 @@
-const ALLOWED_DOMAINS: string[] = [];
-const ALLOWED_EMAILS = ['salomaostudart@gmail.com', 'gabrielstudart0@gmail.com', 'paulorodriges1912@gmail.com'];
+const ALLOWED_DOMAINS: string[] = ((import.meta as any).env?.PUBLIC_ALLOWED_DOMAINS || '')
+  .split(',').map((d: string) => d.trim().toLowerCase()).filter(Boolean);
+
+const ALLOWED_EMAILS: string[] = ((import.meta as any).env?.PUBLIC_ALLOWED_EMAILS || '')
+  .split(',').map((e: string) => e.trim().toLowerCase()).filter(Boolean);
 
 export function isEmailAllowed(email: string): boolean {
   if (!email) return false;
-  const domain = email.split('@')[1]?.toLowerCase();
-  return ALLOWED_DOMAINS.includes(domain) || ALLOWED_EMAILS.includes(email.toLowerCase());
+  const normalized = email.trim().toLowerCase();
+  const domain = normalized.split('@')[1];
+  if (!domain) return false;
+  return ALLOWED_DOMAINS.includes(domain) || ALLOWED_EMAILS.includes(normalized);
 }
 
 export function redirectToLogin(returnPath?: string): void {
