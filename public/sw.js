@@ -1,13 +1,14 @@
-const CACHE_NAME = 'growthhq-v1';
+const CACHE_NAME = 'growthhq-v2';
 const PRECACHE = [
   '/',
-  '/web-performance',
-  '/seo',
-  '/email',
-  '/social',
-  '/crm-pipeline',
-  '/martech-health',
-  '/about',
+  '/web-performance/',
+  '/seo/',
+  '/email/',
+  '/social/',
+  '/crm-pipeline/',
+  '/cross-channel/',
+  '/martech-health/',
+  '/about/',
   '/favicon.svg',
 ];
 
@@ -29,6 +30,10 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+
+  // Don't intercept auth or external requests
+  const url = new URL(event.request.url);
+  if (url.pathname.startsWith('/login') || url.hostname.includes('supabase.co')) return;
 
   event.respondWith(
     caches.match(event.request).then((cached) => {
