@@ -262,7 +262,9 @@
     import { supabase, isConfigured } from '../lib/supabase';
 
     const params = new URLSearchParams(window.location.search);
-    const redirectTo = params.get('redirect') || '/';
+    const rawRedirect = params.get('redirect') || '/';
+    // Prevent open redirect — only allow relative paths, block protocol-relative URLs
+    const redirectTo = rawRedirect.startsWith('/') && !rawRedirect.startsWith('//') ? rawRedirect : '/';
 
     const form = document.getElementById('login-form')!;
     const message = document.getElementById('login-message')!;

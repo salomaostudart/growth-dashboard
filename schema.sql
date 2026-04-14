@@ -151,8 +151,5 @@ CREATE POLICY "Authenticated read snapshots" ON public.metric_snapshots
 CREATE POLICY "Service role insert snapshots" ON public.metric_snapshots
   FOR INSERT WITH CHECK (true);
 
--- Also allow anon read for demo mode (public dashboard)
-CREATE POLICY "Anon read projects" ON public.projects
-  FOR SELECT USING (true);
-CREATE POLICY "Anon read snapshots" ON public.metric_snapshots
-  FOR SELECT USING (true);
+-- Access control: invite-only. No anonymous access to data.
+-- To add demo mode in the future, use an is_public flag per project.
