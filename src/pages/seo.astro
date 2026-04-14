@@ -6,8 +6,8 @@ import { getConnector } from '../connectors/registry';
 import { formatNumber, formatPercent, calcDelta } from '../utils/formatters';
 import DataSourceTag from '../components/ui/DataSourceTag.astro';
 
-const now = new Date();
-const dateRange = { start: new Date(now.getTime() - 90 * 86400000), end: now, range: '90d' as const };
+import { getDefaultDateRange } from '../utils/date-range';
+const dateRange = getDefaultDateRange('90d');
 
 const seoResult = await getConnector('seo').fetch(dateRange);
 const seo = seoResult.data;

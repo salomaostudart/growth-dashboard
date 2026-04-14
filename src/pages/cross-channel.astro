@@ -7,8 +7,8 @@ import { formatNumber, formatPercent } from '../utils/formatters';
 import DataSourceTag from '../components/ui/DataSourceTag.astro';
 import { buildSankeyData, buildCrossChannelSummary } from '../utils/sankey-transformer';
 
-const now = new Date();
-const dateRange = { start: new Date(now.getTime() - 30 * 86400000), end: now, range: '30d' as const };
+import { getDefaultDateRange } from '../utils/date-range';
+const dateRange = getDefaultDateRange('30d');
 
 const [webResult, crmResult] = await Promise.all([
   getConnector('web').fetch(dateRange),

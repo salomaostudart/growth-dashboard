@@ -129,14 +129,20 @@ export function generateWebMetrics() {
       tablet: Number(randomBetween(4, 8).toFixed(1)),
     },
     trafficByDay,
-    channelMix: {
-      organic: Number(randomBetween(35, 48).toFixed(1)),
-      direct: Number(randomBetween(18, 28).toFixed(1)),
-      social: Number(randomBetween(8, 15).toFixed(1)),
-      email: Number(randomBetween(5, 12).toFixed(1)),
-      paid: Number(randomBetween(8, 18).toFixed(1)),
-      referral: Number(randomBetween(3, 8).toFixed(1)),
-    },
+    channelMix: (() => {
+      const raw = {
+        organic: randomBetween(35, 48),
+        direct: randomBetween(18, 28),
+        social: randomBetween(8, 15),
+        email: randomBetween(5, 12),
+        paid: randomBetween(8, 18),
+        referral: randomBetween(3, 8),
+      };
+      const total = Object.values(raw).reduce((s, v) => s + v, 0);
+      return Object.fromEntries(
+        Object.entries(raw).map(([k, v]) => [k, Number((v / total * 100).toFixed(1))])
+      ) as typeof raw;
+    })(),
     targets: {
       sessions: { target: 12000, period: 'monthly' },
       users: { target: 8000, period: 'monthly' },
@@ -287,7 +293,7 @@ export function generateCrmMetrics() {
     funnel: { leads, mql, sql, pipeline, won },
     leadVelocity: dates.map(date => ({
       date,
-      leads: randomInt(15, 60) * (isWeekend(date) ? 0.3 : 1),
+      leads: Math.round(randomInt(15, 60) * (isWeekend(date) ? 0.3 : 1)),
     })),
     channelAttribution: [
       { channel: 'Organic Search', leads: randomInt(200, 400), mql: randomInt(80, 180), sql: randomInt(25, 70), pipeline: randomInt(10, 35), won: randomInt(3, 12), cac: randomInt(50, 150) },

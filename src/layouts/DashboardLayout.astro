@@ -7,12 +7,13 @@ interface Props {
 import { getConnector } from '../connectors/registry';
 import { buildChatContext } from '../utils/chat-context-builder';
 import { buildSystemPrompt } from '../utils/chat-system-prompt';
+import { getDefaultDateRange } from '../utils/date-range';
 
 const { title, activeNav = 'overview' } = Astro.props;
 const GA4_ID = 'G-LGNLCC6DYD';
 
 // Fetch all connectors for chat context (shared across all pages)
-const dateRange = { start: new Date(Date.now() - 30 * 86400000), end: new Date(), range: '30d' as const };
+const dateRange = getDefaultDateRange('30d');
 const [webR, seoR, emailR, socialR, crmR, martechR] = await Promise.all([
   getConnector('web').fetch(dateRange),
   getConnector('seo').fetch(dateRange),

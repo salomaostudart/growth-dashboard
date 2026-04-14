@@ -5,8 +5,8 @@ import { formatNumber, formatPercent, formatCurrency } from '../utils/formatters
 import { generateInsights } from '../utils/insights-engine';
 import { generateExecutiveReport } from '../utils/report-generator';
 
-const now = new Date();
-const dateRange = { start: new Date(now.getTime() - 90 * 86400000), end: now, range: '90d' as const };
+import { getDefaultDateRange } from '../utils/date-range';
+const dateRange = getDefaultDateRange('90d');
 
 const [webR, seoR, emailR, socialR, crmR, martechR] = await Promise.all([
   getConnector('web').fetch(dateRange),
@@ -28,7 +28,7 @@ const insights = generateInsights({ web, seo, email, crm, martech });
 const topInsights = insights.slice(0, 5);
 const recommendations = insights.filter(i => i.type === 'negative').slice(0, 5);
 
-const currentDate = now.toISOString().split('T')[0];
+const currentDate = new Date().toISOString().split('T')[0];
 
 // KPI rows: metric_name, current_value (raw), target (raw), category, display format
 interface KpiRow {

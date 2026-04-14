@@ -6,8 +6,8 @@ import { getConnector } from '../connectors/registry';
 import { formatNumber, formatPercent } from '../utils/formatters';
 import DataSourceTag from '../components/ui/DataSourceTag.astro';
 
-const now = new Date();
-const dateRange = { start: new Date(now.getTime() - 30 * 86400000), end: now, range: '30d' as const };
+import { getDefaultDateRange } from '../utils/date-range';
+const dateRange = getDefaultDateRange('30d');
 
 const socialResult = await getConnector('social').fetch(dateRange);
 const social = socialResult.data;
