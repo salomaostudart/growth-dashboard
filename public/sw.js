@@ -31,9 +31,10 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
-  // Don't intercept auth or external requests
+  // Only intercept same-origin requests (skip external APIs, fonts, analytics)
   const url = new URL(event.request.url);
-  if (url.pathname.startsWith('/login') || url.hostname.includes('supabase.co')) return;
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith('/login')) return;
 
   event.respondWith(
     caches.match(event.request).then((cached) => {
