@@ -7,15 +7,12 @@
 
 <script>
   import { supabase, isConfigured } from '../../lib/supabase';
-  import { isEmailAllowed, redirectToLogin } from '../../lib/auth';
+  import { redirectToLogin } from '../../lib/auth';
 
   if (isConfigured && supabase) {
     const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
-      redirectToLogin();
-    } else if (!isEmailAllowed(session.user.email || '')) {
-      await supabase.auth.signOut();
       redirectToLogin();
     }
 

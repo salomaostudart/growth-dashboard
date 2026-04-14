@@ -260,7 +260,6 @@
 
   <script>
     import { supabase, isConfigured } from '../lib/supabase';
-    import { isEmailAllowed } from '../lib/auth';
 
     const params = new URLSearchParams(window.location.search);
     const redirectTo = params.get('redirect') || '/';
@@ -289,19 +288,14 @@
       // Check if already logged in
       const { data: { session } } = await sb.auth.getSession();
 
-      if (session && isEmailAllowed(session.user.email || '')) {
+      if (session) {
         window.location.replace(redirectTo);
       }
 
-      // Magic link
+      // Magic link — Supabase is set to invite-only, so only pre-invited users can sign in
       btnMagicLink.addEventListener('click', async () => {
         const email = emailInput.value.trim();
         if (!email) return;
-
-        if (!isEmailAllowed(email)) {
-          showMessage('Access restricted to authorized members.', 'error');
-          return;
-        }
 
         btnMagicLink.disabled = true;
         btnMagicLink.textContent = 'Sending...';
@@ -334,11 +328,6 @@
       // Auth state change — handle return from magic link / OAuth
       sb.auth.onAuthStateChange(async (event, session) => {
         if (event === 'SIGNED_IN' && session) {
-          if (!isEmailAllowed(session.user.email || '')) {
-            await sb.auth.signOut();
-            showMessage('Access restricted to authorized members.', 'error');
-            return;
-          }
           // Update last_login
           await sb.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', session.user.id);
           window.location.replace(redirectTo);

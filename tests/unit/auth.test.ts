@@ -1,68 +1,25 @@
 import { describe, it, expect } from 'vitest';
 
-// We need to test isEmailAllowed with different env configurations
-// Since the module reads env at import time, we test via dynamic import
-
 describe('auth', () => {
-  describe('isEmailAllowed', () => {
-    // Direct unit tests using a reimplementation that mirrors auth.ts logic
-    // This avoids import.meta.env issues in test environment
+  describe('redirectToLogin', () => {
+    // redirectToLogin uses window.location which is not available in Node test environment.
+    // The function is simple enough that we test the URL construction logic directly.
 
-    function isEmailAllowed(
-      email: string,
-      allowedDomains: string[],
-      allowedEmails: string[]
-    ): boolean {
-      if (!email) return false;
-      const normalized = email.trim().toLowerCase();
-      const domain = normalized.split('@')[1];
-      if (!domain) return false;
-      return allowedDomains.includes(domain) || allowedEmails.includes(normalized);
+    function buildLoginUrl(returnPath?: string): string {
+      const redirect = returnPath || '/current-page';
+      return '/login' + (redirect !== '/' ? '?redirect=' + encodeURIComponent(redirect) : '');
     }
 
-    const domains = ['company.com', 'partner.org'];
-    const emails = ['admin@example.com', 'user@test.com'];
-
-    it('returns true for allowed email', () => {
-      expect(isEmailAllowed('admin@example.com', [], emails)).toBe(true);
+    it('redirects to /login without query when path is /', () => {
+      expect(buildLoginUrl('/')).toBe('/login');
     });
 
-    it('returns true for allowed domain', () => {
-      expect(isEmailAllowed('anyone@company.com', domains, [])).toBe(true);
+    it('includes redirect param for non-root paths', () => {
+      expect(buildLoginUrl('/web-performance')).toBe('/login?redirect=%2Fweb-performance');
     });
 
-    it('returns false for disallowed email', () => {
-      expect(isEmailAllowed('stranger@unknown.com', domains, emails)).toBe(false);
-    });
-
-    it('is case-insensitive', () => {
-      expect(isEmailAllowed('Admin@EXAMPLE.COM', [], emails)).toBe(true);
-      expect(isEmailAllowed('user@COMPANY.COM', domains, [])).toBe(true);
-    });
-
-    it('trims whitespace', () => {
-      expect(isEmailAllowed('  admin@example.com  ', [], emails)).toBe(true);
-    });
-
-    it('returns false for empty string', () => {
-      expect(isEmailAllowed('', domains, emails)).toBe(false);
-    });
-
-    it('returns false for string without @', () => {
-      expect(isEmailAllowed('notanemail', domains, emails)).toBe(false);
-    });
-
-    it('returns false for string with @ but no domain', () => {
-      expect(isEmailAllowed('user@', domains, emails)).toBe(false);
-    });
-
-    it('returns false when both lists are empty (demo mode)', () => {
-      expect(isEmailAllowed('anyone@any.com', [], [])).toBe(false);
-    });
-
-    it('matches domain regardless of local part', () => {
-      expect(isEmailAllowed('ceo@company.com', domains, [])).toBe(true);
-      expect(isEmailAllowed('intern@company.com', domains, [])).toBe(true);
+    it('encodes special characters in redirect path', () => {
+      expect(buildLoginUrl('/report?date=2026-01-01')).toBe('/login?redirect=%2Freport%3Fdate%3D2026-01-01');
     });
   });
 });
