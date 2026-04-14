@@ -224,7 +224,7 @@ const deviceData = JSON.stringify(deviceBreakdown);
   // Traffic Trend
   const trafficEl = document.getElementById('wp-traffic-chart');
   if (trafficEl) {
-    const chart = echarts.init(trafficEl, 'dashboard');
+    const chart = echarts.init(trafficEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
     const data = (window as any).__wp_traffic || [];
 
     chart.setOption({

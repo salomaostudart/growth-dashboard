@@ -261,7 +261,7 @@ const pagesData = JSON.stringify(seo.pagePerformance);
   // Top Queries — bar chart
   const queriesEl = document.getElementById('seo-queries-chart');
   if (queriesEl) {
-    const chart = echarts.init(queriesEl, 'dashboard');
+    const chart = echarts.init(queriesEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
     const queries = (window as any).__seo_queries || [];
 
     chart.setOption({
@@ -301,7 +301,7 @@ const pagesData = JSON.stringify(seo.pagePerformance);
   // Position History — line chart (inverted Y axis — lower = better)
   const posEl = document.getElementById('seo-position-chart');
   if (posEl) {
-    const chart = echarts.init(posEl, 'dashboard');
+    const chart = echarts.init(posEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
     const queries = ((window as any).__seo_queries || []).slice(0, 5);
     const weeks = ['W-7', 'W-6', 'W-5', 'W-4', 'W-3', 'W-2', 'W-1'];
 

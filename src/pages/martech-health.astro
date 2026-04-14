@@ -284,7 +284,7 @@ const automationData = JSON.stringify(martech.automationLog);
   // System Uptime bar
   const uptimeEl = document.getElementById('martech-uptime-chart');
   if (uptimeEl) {
-    const chart = echarts.init(uptimeEl, 'dashboard');
+    const chart = echarts.init(uptimeEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
     const systems = (window as any).__martech_systems || [];
 
     chart.setOption({

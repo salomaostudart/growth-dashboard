@@ -173,7 +173,7 @@ const channelTable = crm.channelAttribution.map(ch => {
 
   const el = document.getElementById('sankey-chart');
   if (el) {
-    const chart = echarts.init(el, 'dashboard');
+    const chart = echarts.init(el, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
     const data = (window as any).__sankey_data || { nodes: [], links: [] };
 
     const channelColors: Record<string, string> = {

@@ -204,7 +204,7 @@ const referralData = JSON.stringify(social.referralByDay);
   // Followers bar chart
   const followEl = document.getElementById('social-followers-chart');
   if (followEl) {
-    const chart = echarts.init(followEl, 'dashboard');
+    const chart = echarts.init(followEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
     const platforms = (window as any).__social_platforms || [];
 
     chart.setOption({
@@ -240,7 +240,7 @@ const referralData = JSON.stringify(social.referralByDay);
   // Referral stacked area
   const refEl = document.getElementById('social-referral-chart');
   if (refEl) {
-    const chart = echarts.init(refEl, 'dashboard');
+    const chart = echarts.init(refEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
     const raw = (window as any).__social_referral || [];
 
     // Group by date, stack by platform

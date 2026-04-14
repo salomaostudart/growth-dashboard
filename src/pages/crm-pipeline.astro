@@ -204,7 +204,7 @@ const velocityData = JSON.stringify(crm.leadVelocity);
   // Funnel chart
   const funnelEl = document.getElementById('crm-funnel-chart');
   if (funnelEl) {
-    const chart = echarts.init(funnelEl, 'dashboard');
+    const chart = echarts.init(funnelEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
     const funnel = (window as any).__crm_funnel || {};
 
     chart.setOption({
@@ -234,7 +234,7 @@ const velocityData = JSON.stringify(crm.leadVelocity);
   // Lead Velocity
   const velEl = document.getElementById('crm-velocity-chart');
   if (velEl) {
-    const chart = echarts.init(velEl, 'dashboard');
+    const chart = echarts.init(velEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
     const velocity = (window as any).__crm_velocity || [];
 
     chart.setOption({

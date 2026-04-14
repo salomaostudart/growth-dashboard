@@ -311,7 +311,7 @@ const channelMixData = JSON.stringify(web.channelMix);
   // Traffic Trend Chart — uses server data from connectors
   const trafficEl = document.getElementById('traffic-trend-chart');
   if (trafficEl) {
-    const chart = echarts.init(trafficEl, 'dashboard');
+    const chart = echarts.init(trafficEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
     const data = (window as any).__traffic_data || [];
 
     chart.setOption({

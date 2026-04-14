@@ -228,7 +228,7 @@ const heatmapData = JSON.stringify(email.bestSendTimes);
   // Campaign Performance
   const campEl = document.getElementById('email-campaigns-chart');
   if (campEl) {
-    const chart = echarts.init(campEl, 'dashboard');
+    const chart = echarts.init(campEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
     const campaigns = (window as any).__email_campaigns || [];
 
     chart.setOption({
@@ -264,7 +264,7 @@ const heatmapData = JSON.stringify(email.bestSendTimes);
   // Send Times Heatmap
   const heatEl = document.getElementById('email-heatmap-chart');
   if (heatEl) {
-    const chart = echarts.init(heatEl, 'dashboard');
+    const chart = echarts.init(heatEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
     const raw = (window as any).__email_heatmap || [];
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const hours = Array.from({ length: 16 }, (_, i) => `${i + 6}:00`);
