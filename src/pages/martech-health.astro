@@ -310,7 +310,7 @@ const automationData = JSON.stringify(martech.automationLog);
   // Automation success/fail pie
   const autoEl = document.getElementById('martech-automation-chart');
   if (autoEl) {
-    const chart = echarts.init(autoEl, 'dashboard');
+    const chart = echarts.init(autoEl, 'dashboard', { renderer: 'svg' });
     const logs = (window as any).__martech_automation || [];
 
     const counts = { success: 0, failed: 0, partial: 0 };
