@@ -130,7 +130,7 @@ const channelMixData = JSON.stringify(web.channelMix);
       source={webResult.source}
       sourceName="GA4"
       id="traffic-trend-chart"
-      height="320px"
+      height="360px"
     />
     <ChartContainer
       title="Channel Mix"
@@ -138,7 +138,7 @@ const channelMixData = JSON.stringify(web.channelMix);
       source={webResult.source}
       sourceName="GA4"
       id="channel-mix-chart"
-      height="320px"
+      height="360px"
     />
   </section>
 
@@ -196,7 +196,12 @@ const channelMixData = JSON.stringify(web.channelMix);
     background: var(--surface-1);
     border: 1px solid var(--border-default);
     border-radius: var(--radius-lg);
-    padding: var(--space-4) var(--space-5);
+    padding: var(--space-2) var(--space-4);
+    opacity: 0.7;
+    transition: opacity var(--transition-fast);
+  }
+  .status-strip:hover {
+    opacity: 1;
   }
 
   .strip-title {
@@ -242,7 +247,11 @@ const channelMixData = JSON.stringify(web.channelMix);
     margin-left: auto;
   }
 
-  .insights-section { margin-bottom: var(--space-6); }
+  .insights-section {
+    margin-bottom: var(--space-6);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--border-default);
+  }
   .section-title {
     font-size: var(--text-xs);
     color: var(--text-muted);
@@ -252,15 +261,21 @@ const channelMixData = JSON.stringify(web.channelMix);
   }
   .insights-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--space-3);
+  }
+  @media (max-width: 1024px) {
+    .insights-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .insights-grid { grid-template-columns: 1fr; }
   }
   .insight-card {
     background: var(--surface-1);
     border: 1px solid var(--border-default);
     border-radius: var(--radius-md);
     padding: var(--space-4);
-    border-left: 3px solid;
+    border-left: 4px solid;
   }
   .insight-positive { border-left-color: var(--accent-success); }
   .insight-negative { border-left-color: var(--accent-danger); }
