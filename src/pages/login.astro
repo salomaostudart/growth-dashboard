@@ -306,7 +306,7 @@
         btnMagicLink.disabled = true;
         btnMagicLink.textContent = 'Sending...';
 
-        const redirectUrl = window.location.origin + '/login' + (redirectTo !== '/' ? '?redirect=' + encodeURIComponent(redirectTo) : '');
+        const redirectUrl = window.location.origin + '/login/' + (redirectTo !== '/' ? '?redirect=' + encodeURIComponent(redirectTo) : '');
         const { error } = await sb.auth.signInWithOtp({
           email,
           options: { emailRedirectTo: redirectUrl },
@@ -324,7 +324,7 @@
 
       // GitHub OAuth
       document.getElementById('btn-github')?.addEventListener('click', async () => {
-        const redirectUrl = window.location.origin + '/login' + (redirectTo !== '/' ? '?redirect=' + encodeURIComponent(redirectTo) : '');
+        const redirectUrl = window.location.origin + '/login/' + (redirectTo !== '/' ? '?redirect=' + encodeURIComponent(redirectTo) : '');
         await sb.auth.signInWithOAuth({
           provider: 'github',
           options: { redirectTo: redirectUrl },
