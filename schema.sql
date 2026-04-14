@@ -65,16 +65,18 @@ ALTER TABLE public.audit_log ENABLE ROW LEVEL SECURITY;
 -- Policies: profiles
 CREATE POLICY "Users can read own profile" ON public.profiles
   FOR SELECT USING (auth.uid() = id);
+-- SECURITY DEFINER function to check admin without RLS recursion
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'
+  );
+$$ LANGUAGE sql SECURITY DEFINER STABLE;
+
 CREATE POLICY "Admins can read all profiles" ON public.profiles
-  FOR SELECT USING (
-    (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
-    OR EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = 'admin' AND p.id != profiles.id)
-  );
+  FOR SELECT USING (auth.uid() = id OR public.is_admin());
 CREATE POLICY "Admins can update roles" ON public.profiles
-  FOR UPDATE USING (
-    (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
-    OR EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = 'admin' AND p.id != profiles.id)
-  );
+  FOR UPDATE USING (public.is_admin());
 
 -- Policies: alert_configs
 CREATE POLICY "Authenticated can read alerts" ON public.alert_configs
