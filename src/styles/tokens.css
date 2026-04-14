@@ -128,3 +128,38 @@
 svg:not([role]):not([aria-label]) {
   pointer-events: none;
 }
+
+/* Touch devices — tap highlight and minimum touch targets */
+* {
+  -webkit-tap-highlight-color: rgba(129, 140, 248, 0.15);
+}
+
+button, a, [role="button"], [role="option"], input, select, textarea {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Exceptions — inline elements that shouldn't be 44px */
+a:not([class]), .data-table a, .ds-tag, .delta, .nav-icon::before {
+  min-height: unset;
+  min-width: unset;
+}
+
+/* Safe area insets — iPhone notch / Dynamic Island */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Hover-only interactions — disable on touch devices */
+@media (hover: none) {
+  .metric-card:hover,
+  .chart-container:hover,
+  .data-table tr:hover td {
+    background: unset;
+  }
+}

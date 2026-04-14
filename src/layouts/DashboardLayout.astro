@@ -56,8 +56,15 @@ import ProjectSelector from '../components/ui/ProjectSelector.astro';
 <head>
   <meta charset="utf-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="description" content="Digital Growth Command Center — metrics capture, automation & interactive dashboard" />
+  <meta name="theme-color" content="#0a0a0f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="GrowthHQ" />
+  <link rel="apple-touch-icon" href="/icon-192.png" />
   <meta property="og:title" content={`${title} | GrowthHQ`} />
   <meta property="og:description" content="Digital Growth Command Center — real-time metrics, insights & marketing analytics" />
   <meta property="og:image" content="/og-image.svg" />
@@ -173,7 +180,7 @@ import ProjectSelector from '../components/ui/ProjectSelector.astro';
 <style>
   .app {
     display: flex;
-    min-height: 100vh;
+    min-height: 100dvh;
   }
 
   /* Sidebar */
@@ -182,7 +189,7 @@ import ProjectSelector from '../components/ui/ProjectSelector.astro';
     top: 0;
     left: 0;
     width: var(--sidebar-width);
-    height: 100vh;
+    height: 100dvh;
     background: var(--surface-1);
     border-right: 1px solid var(--border-default);
     display: flex;
@@ -384,7 +391,7 @@ import ProjectSelector from '../components/ui/ProjectSelector.astro';
   .main-wrapper {
     flex: 1;
     margin-left: var(--sidebar-width);
-    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
   }
@@ -392,7 +399,7 @@ import ProjectSelector from '../components/ui/ProjectSelector.astro';
   /* Topbar */
   .topbar {
     position: sticky;
-    top: 0;
+    top: env(safe-area-inset-top, 0);
     height: var(--topbar-height);
     background: color-mix(in srgb, var(--surface-0) 85%, transparent);
     backdrop-filter: blur(12px);
