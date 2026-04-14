@@ -2,9 +2,9 @@ import type { IConnector, ConnectorResult, ConnectorHealth, DateRangeParams } fr
 import type { WebMetrics } from '../base/connector.schema';
 import { WebMetricsSchema } from '../base/connector.schema';
 import fs from 'node:fs';
-import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const SNAPSHOT_PATH = path.resolve('src/data/snapshots/ga4-snapshot.json');
+const SNAPSHOT_PATH = fileURLToPath(new URL('../../data/snapshots/ga4-snapshot.json', import.meta.url));
 
 export class WebLiveConnector implements IConnector<WebMetrics> {
   readonly name = 'Google Analytics 4';
@@ -25,7 +25,7 @@ export class WebLiveConnector implements IConnector<WebMetrics> {
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Unknown error';
       return {
-        data: {} as WebMetrics,
+        data: null as unknown as WebMetrics,
         source: 'live',
         fetchedAt: new Date(),
         errors: [{ code: 'SNAPSHOT_ERROR', message: `GA4 snapshot error: ${message}`, timestamp: new Date(), recoverable: true }],

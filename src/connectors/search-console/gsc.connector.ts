@@ -2,9 +2,9 @@ import type { IConnector, ConnectorResult, ConnectorHealth, DateRangeParams } fr
 import type { SeoMetrics } from '../base/connector.schema';
 import { SeoMetricsSchema } from '../base/connector.schema';
 import fs from 'node:fs';
-import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const SNAPSHOT_PATH = path.resolve('src/data/snapshots/gsc-snapshot.json');
+const SNAPSHOT_PATH = fileURLToPath(new URL('../../data/snapshots/gsc-snapshot.json', import.meta.url));
 
 export class SeoLiveConnector implements IConnector<SeoMetrics> {
   readonly name = 'Google Search Console';
@@ -25,7 +25,7 @@ export class SeoLiveConnector implements IConnector<SeoMetrics> {
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Unknown error';
       return {
-        data: {} as SeoMetrics,
+        data: null as unknown as SeoMetrics,
         source: 'live',
         fetchedAt: new Date(),
         errors: [{ code: 'SNAPSHOT_ERROR', message: `GSC snapshot error: ${message}`, timestamp: new Date(), recoverable: true }],

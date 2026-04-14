@@ -71,10 +71,11 @@
   import { supabase, isConfigured } from '../../lib/supabase';
 
   if (isConfigured && supabase) {
-    const { data: { session } } = await supabase.auth.getSession();
+    const sb = supabase!;
+    const { data: { session } } = await sb.auth.getSession();
 
     if (session) {
-      const { data: profile } = await supabase
+      const { data: profile } = await sb
         .from('profiles')
         .select('role, email')
         .eq('id', session.user.id)
@@ -98,7 +99,7 @@
 
         // Logout
         document.getElementById('role-logout')?.addEventListener('click', async () => {
-          await supabase.auth.signOut();
+          await sb.auth.signOut();
           window.location.reload();
         });
       }

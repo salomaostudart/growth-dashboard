@@ -21,11 +21,13 @@ const [webR, seoR, emailR, socialR, crmR, martechR] = await Promise.all([
   getConnector('crm').fetch(dateRange),
   getConnector('martech').fetch(dateRange),
 ]);
+// Role determined at runtime via Supabase session (default: 'viewer' for safety)
+const userRole = 'viewer' as const;
 const chatContext = buildChatContext({
   web: webR.data, seo: seoR.data, email: emailR.data,
   social: socialR.data, crm: crmR.data, martech: martechR.data,
-}, 'analyst');
-const chatSystemPrompt = buildSystemPrompt('analyst');
+}, userRole);
+const chatSystemPrompt = buildSystemPrompt(userRole);
 
 const navItems = [
   { id: 'overview', label: 'Command Center', href: '/', icon: 'grid' },
@@ -548,11 +550,16 @@ import ProjectSelector from '../components/ui/ProjectSelector.astro';
 
   function resizeAllCharts() {
     setTimeout(() => {
-      document.querySelectorAll('.chart-body').forEach(el => {
-        const instance = (window as any).echarts?.getInstanceByDom(el);
-        instance?.resize();
-      });
+      const instances = (window as any).__echarts_instances as any[] | undefined;
+      if (instances) {
+        instances.forEach(instance => instance?.resize());
+      }
     }, 300);
+  }
+
+  // Global registry for ECharts instances (pages push here after init)
+  if (!(window as any).__echarts_instances) {
+    (window as any).__echarts_instances = [];
   }
 
   function toggleSidebar() {

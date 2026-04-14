@@ -169,7 +169,7 @@ const commands = [
   }
 
   function getVisible(): HTMLElement[] {
-    return items.filter(i => !i.classList.contains('hidden'));
+    return items.filter(i => !i.classList.contains('hidden')) as HTMLElement[];
   }
 
   function updateActive() {

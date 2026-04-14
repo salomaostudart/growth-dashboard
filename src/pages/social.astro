@@ -247,7 +247,7 @@ const referralData = JSON.stringify(social.referralByDay);
     const dates = [...new Set(raw.map((r: any) => r.date))].sort();
     const platforms = [...new Set(raw.map((r: any) => r.platform))];
 
-    const series = platforms.map((platform: string) => ({
+    const series = (platforms as string[]).map((platform: string) => ({
       name: platform,
       type: 'line',
       stack: 'referral',
@@ -255,7 +255,7 @@ const referralData = JSON.stringify(social.referralByDay);
       smooth: true,
       symbolSize: 0,
       lineStyle: { width: 1.5 },
-      data: dates.map((date: string) => {
+      data: (dates as string[]).map((date: string) => {
         const entry = raw.find((r: any) => r.date === date && r.platform === platform);
         return entry ? entry.sessions : 0;
       }),

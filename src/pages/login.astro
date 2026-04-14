@@ -285,8 +285,9 @@
     if (!isConfigured || !supabase) {
       showMessage('Auth not configured. Dashboard is running in demo mode.', 'error');
     } else {
+      const sb = supabase!;
       // Check if already logged in
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await sb.auth.getSession();
 
       if (session && isEmailAllowed(session.user.email || '')) {
         window.location.replace(redirectTo);
@@ -306,7 +307,7 @@
         btnMagicLink.textContent = 'Sending...';
 
         const redirectUrl = window.location.origin + '/login' + (redirectTo !== '/' ? '?redirect=' + encodeURIComponent(redirectTo) : '');
-        const { error } = await supabase.auth.signInWithOtp({
+        const { error } = await sb.auth.signInWithOtp({
           email,
           options: { emailRedirectTo: redirectUrl },
         });
@@ -324,22 +325,22 @@
       // GitHub OAuth
       document.getElementById('btn-github')?.addEventListener('click', async () => {
         const redirectUrl = window.location.origin + '/login' + (redirectTo !== '/' ? '?redirect=' + encodeURIComponent(redirectTo) : '');
-        await supabase.auth.signInWithOAuth({
+        await sb.auth.signInWithOAuth({
           provider: 'github',
           options: { redirectTo: redirectUrl },
         });
       });
 
       // Auth state change — handle return from magic link / OAuth
-      supabase.auth.onAuthStateChange(async (event, session) => {
+      sb.auth.onAuthStateChange(async (event, session) => {
         if (event === 'SIGNED_IN' && session) {
           if (!isEmailAllowed(session.user.email || '')) {
-            await supabase.auth.signOut();
+            await sb.auth.signOut();
             showMessage('Access restricted to authorized members.', 'error');
             return;
           }
           // Update last_login
-          await supabase.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', session.user.id);
+          await sb.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', session.user.id);
           window.location.replace(redirectTo);
         }
       });
