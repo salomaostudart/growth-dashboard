@@ -357,7 +357,7 @@ const channelMixData = JSON.stringify(web.channelMix);
   // Channel Mix Chart — uses server data from connectors
   const channelEl = document.getElementById('channel-mix-chart');
   if (channelEl) {
-    const chart = echarts.init(channelEl, 'dashboard', { renderer: 'svg' });
+    const chart = echarts.init(channelEl, 'dashboard');
     const mix = (window as any).__channel_data || {};
 
     chart.setOption({

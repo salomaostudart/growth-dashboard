@@ -269,7 +269,7 @@ const deviceData = JSON.stringify(deviceBreakdown);
   // Device Breakdown
   const deviceEl = document.getElementById('wp-device-chart');
   if (deviceEl) {
-    const chart = echarts.init(deviceEl, 'dashboard', { renderer: 'svg' });
+    const chart = echarts.init(deviceEl, 'dashboard');
     const device = (window as any).__wp_device || {};
 
     chart.setOption({
