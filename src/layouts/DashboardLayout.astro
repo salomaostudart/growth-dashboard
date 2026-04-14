@@ -78,14 +78,14 @@ import ProjectSelector from '../components/ui/ProjectSelector.astro';
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="logo">
-          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M3 3v18h18" />
             <path d="M7 16l4-8 4 4 4-6" />
           </svg>
           <span class="logo-text">Growth<strong>HQ</strong></span>
         </div>
         <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true">
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>
@@ -123,7 +123,7 @@ import ProjectSelector from '../components/ui/ProjectSelector.astro';
       <!-- Topbar -->
       <header class="topbar">
         <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true">
             <path d="M3 12h18M3 6h18M3 18h18" />
           </svg>
         </button>
@@ -135,8 +135,8 @@ import ProjectSelector from '../components/ui/ProjectSelector.astro';
         <div class="topbar-right">
           <ProjectSelector />
           <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle light/dark mode">
-            <svg class="theme-icon-dark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-            <svg class="theme-icon-light" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg class="theme-icon-dark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            <svg class="theme-icon-light" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
           </button>
           <div class="date-range-selector" id="date-range-selector">
             <button class="range-btn" data-range="7d">7D</button>
@@ -414,8 +414,8 @@ import ProjectSelector from '../components/ui/ProjectSelector.astro';
   }
 
   .page-title {
-    font-size: var(--text-lg);
-    font-weight: 500;
+    font-size: 1.5rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }

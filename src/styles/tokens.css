@@ -100,7 +100,7 @@
   --accent-success-dim: #d1fae5;
   --accent-warning: #d97706;
   --accent-warning-dim: #fef3c7;
-  --accent-danger: #dc2626;
+  --accent-danger: #ef4444;
   --accent-danger-dim: #fee2e2;
 
   --text-primary: #0f172a;
@@ -116,4 +116,15 @@
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
   --shadow-glow: 0 0 20px rgba(79, 70, 229, 0.1);
+}
+
+/* Accessibility — focus indicators (WCAG 2.4.7) */
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Decorative SVG icons — hide from screen readers */
+svg:not([role]):not([aria-label]) {
+  pointer-events: none;
 }
