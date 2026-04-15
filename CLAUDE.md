@@ -1,5 +1,7 @@
 # Growth Dashboard — Regras do Projeto
 
+> Referencia tecnica do workspace: `hq/reference/boas-praticas.md` (Sec 1.1 Python scripts, 1.3 Astro/TS, 3.8 Supabase RLS)
+
 ## O que e
 Digital Growth Command Center — ferramenta de captura de metricas, automacao de registro e dashboard interativo.
 Produto pessoal para unificacao de metricas de marketing digital em um unico painel.
