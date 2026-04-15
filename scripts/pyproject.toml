@@ -1,0 +1,13 @@
+[project]
+name = "growth-dashboard-scripts"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "google-analytics-data",
+    "google-auth",
+    "supabase",
+    "google-api-python-client",
+]
+
+[tool.uv]
+dev-dependencies = []
