@@ -152,8 +152,10 @@ CREATE POLICY "Admins manage projects" ON public.projects
   );
 CREATE POLICY "Authenticated read snapshots" ON public.metric_snapshots
   FOR SELECT USING (auth.uid() IS NOT NULL);
+-- Restrito ao service_role key (scripts fetch-*.py via Edge Functions / CI secrets).
+-- Nunca permitir INSERT de role autenticado comum.
 CREATE POLICY "Service role insert snapshots" ON public.metric_snapshots
-  FOR INSERT WITH CHECK (true);
+  FOR INSERT WITH CHECK (auth.role() = 'service_role');
 
 -- Access control: invite-only. No anonymous access to data.
 -- To add demo mode in the future, use an is_public flag per project.
