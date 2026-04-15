@@ -14,27 +14,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v3
         with:
-          python-version: '3.12'
+          enable-cache: true
 
-      - name: Install dependencies
-        run: pip install google-analytics-data google-api-python-client google-auth
+      - name: Install Python
+        run: uv python install 3.12
+
+      - name: Install deps
+        working-directory: ./scripts
+        run: uv sync
 
       - name: Fetch GA4 snapshot
         env:
           GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
           GCP_SERVICE_ACCOUNT_JSON: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/service-account.json
+        working-directory: ./scripts
         run: |
           printenv GCP_SERVICE_ACCOUNT_JSON > /tmp/service-account.json
-          python scripts/fetch-ga4-snapshot.py
+          uv run python fetch-ga4-snapshot.py
 
       - name: Fetch GSC snapshot
         env:
           GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/service-account.json
-        run: python scripts/fetch-gsc-snapshot.py
+        working-directory: ./scripts
+        run: uv run python fetch-gsc-snapshot.py
 
       - name: Cleanup credentials
         if: always()
