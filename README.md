@@ -111,6 +111,15 @@ npm run deploy      # Build + deploy to Cloudflare Pages
 
 Fork this repo, update mock data to match your stack, add real connectors for your tools, deploy. The connector pattern makes swapping data sources trivial.
 
+## Seguranca dos scripts Python
+
+`scripts/seed-supabase.py` usa `SUPABASE_SERVICE_ROLE_KEY` que bypassa
+RLS. Regras:
+- NUNCA rodar em producao
+- Rodar apenas em ambiente dev com credenciais de dev Supabase
+- Service role key vem de env var (nunca hardcoded)
+- Revisar o que o script faz antes de executar
+
 ## License
 
 Private project — not for redistribution.
