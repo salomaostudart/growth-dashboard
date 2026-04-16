@@ -1,6 +1,8 @@
 # Growth Dashboard — Regras do Projeto
 
 > Referencia tecnica do workspace: `hq/reference/boas-praticas.md` (Sec 1.1 Python scripts, 1.3 Astro/TS, 3.8 Supabase RLS)
+> **Deps:** MAINTENANCE | Referencia: boas-praticas.md | Fonte arquitetural de webscope
+> **Registry:** hq/reference/dependencias.md
 
 ## O que e
 Digital Growth Command Center — ferramenta de captura de metricas, automacao de registro e dashboard interativo.
