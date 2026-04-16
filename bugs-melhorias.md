@@ -1,5 +1,8 @@
 # Bugs e Melhorias — Growth Dashboard
 
+> **Deps:** Tracker local MAINTENANCE
+> **Registry:** hq/reference/dependencias.md
+
 ## Abertos
 
 ### Bugs
