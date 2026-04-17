@@ -122,4 +122,4 @@ RLS. Regras:
 
 ## License
 
-Private project — not for redistribution.
+MIT License — see [LICENSE](LICENSE) for details.
