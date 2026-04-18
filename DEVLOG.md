@@ -132,4 +132,4 @@ Digital Growth Command Center — log de desenvolvimento.
 - Criar projeto Supabase + executar schema.sql
 - Configurar `PUBLIC_SUPABASE_URL` + `PUBLIC_SUPABASE_ANON_KEY` em .env
 - Deploy Edge Function: `supabase functions deploy chat`
-- Set secret: `supabase secrets set CLAUDE_API_KEY=sk-ant-...`
+- Set secret: `supabase secrets set CLAUDE_API_KEY=<sua-chave-anthropic>`

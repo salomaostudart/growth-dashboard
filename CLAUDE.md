@@ -30,8 +30,17 @@ npm run test:e2e   # E2E + acessibilidade + performance (Playwright)
 npm run type-check # TypeScript type checking (astro check)
 npm run lint       # ESLint (src/)
 npm run ci         # type-check + test + build (pipeline completo)
-npm run deploy     # CI + deploy Cloudflare Pages
 ```
+
+## Deploy
+- **Auto (recomendado):** Workers Builds dispara build automatico em push pra `main`.
+- **Manual:** `npx wrangler deploy` (publica no Worker `growth-dashboard-worker`).
+- **Rollback:** `npx wrangler rollback` (volta pro deployment anterior).
+- **Logs:** `npx wrangler tail` (streaming em tempo real).
+- **Pages legacy (pre-cutover):** `npm run deploy` ainda funciona ate TP3 custom domain ser migrado.
+
+Config: `wrangler.jsonc` na raiz. Build cmd no Workers Builds = `npm run ci`.
+Contexto: `hq/reference/cicd-cloudflare-roadmap-2026-04.md`.
 
 ## Testes
 Rodar unit tests antes de qualquer implementacao. Se falhar, corrigir primeiro.
