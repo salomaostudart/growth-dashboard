@@ -27,8 +27,16 @@ search-console-user-added.png
 # security plan (template generico, nao codigo do projeto)
 PLANO_SEGURANCA_OWASP_ASTRO.md
 
+# Cloudflare Wrangler
+.wrangler/
+.dev.vars
+
 # credentials
 **/service-account*.json
+credentials.json
+*.pem
+*.key
+*.secret
 
 # macOS-specific files
 .DS_Store
