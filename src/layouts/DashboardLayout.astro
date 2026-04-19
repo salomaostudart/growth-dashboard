@@ -5,12 +5,12 @@ interface Props {
 }
 
 import { getConnector } from '../connectors/registry';
+import { GA4_ID } from '../lib/config';
 import { buildChatContext } from '../utils/chat-context-builder';
 import { buildSystemPrompt } from '../utils/chat-system-prompt';
 import { getDefaultDateRange } from '../utils/date-range';
 
 const { title, activeNav = 'overview' } = Astro.props;
-const GA4_ID = 'G-LGNLCC6DYD';
 
 // Fetch all connectors for chat context (shared across all pages)
 const dateRange = getDefaultDateRange('30d');
@@ -77,9 +77,19 @@ import RoleBadge from '../components/ui/RoleBadge.astro';
   <meta property="og:image" content="/og-image.svg" />
   <meta property="og:type" content="website" />
   <title>{title} | Growth Dashboard</title>
-  <!-- Google tag (gtag.js) -->
-  <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`}></script>
-  <script is:inline define:vars={{ GA4_ID }}>window.dataLayer=window.dataLayer||[];function gtag(...args){dataLayer.push(args);}gtag('js',new Date());gtag('config',GA4_ID);</script>
+  <!-- Google tag (gtag.js) - GA4_ID injected at build time via define:vars -->
+  <script is:inline define:vars={{ GA4_ID }}>
+    (function(){
+      var s=document.createElement('script');
+      s.async=true;
+      s.src='https://www.googletagmanager.com/gtag/js?id='+GA4_ID;
+      document.head.appendChild(s);
+    })();
+    window.dataLayer=window.dataLayer||[];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js',new Date());
+    gtag('config',GA4_ID);
+  </script>
   <link rel="manifest" href="/manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

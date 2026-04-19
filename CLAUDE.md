@@ -9,7 +9,7 @@ Digital Growth Command Center — ferramenta de captura de metricas, automacao d
 Produto pessoal para unificacao de metricas de marketing digital em um unico painel.
 
 ## Stack
-- **Framework:** Astro 5 + TypeScript (output estatico, zero JS desnecessario)
+- **Framework:** Astro 6.1.5 + TypeScript (output estatico, zero JS desnecessario)
 - **Charts:** Apache ECharts 6 (enterprise-grade, dark theme nativo)
 - **Validacao:** Zod 4 (schema validation nos connectors)
 - **Testes:** Vitest 4 (unit) + Playwright (E2E + acessibilidade + performance)

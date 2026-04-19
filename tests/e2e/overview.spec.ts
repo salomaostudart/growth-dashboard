@@ -30,10 +30,10 @@ test.describe('Overview Page', () => {
     await expect(chart).toBeVisible();
   });
 
-  test('sidebar navigation has 7 links', async ({ page }) => {
+  test('sidebar navigation has 11 links', async ({ page }) => {
     await page.goto('/');
     const navLinks = page.locator('.nav-link');
-    await expect(navLinks).toHaveCount(7);
+    await expect(navLinks).toHaveCount(11);
   });
 
   test('Command Center nav is active', async ({ page }) => {

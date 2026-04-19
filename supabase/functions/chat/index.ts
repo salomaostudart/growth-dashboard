@@ -15,6 +15,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 
 const RATE_LIMIT = 50; // per hour per user
+// TODO: avaliar upgrade para claude-haiku-4-5-latest quando Supabase Edge Runtime suportar
 const MODEL = 'claude-haiku-4-5-20251001';
 
 interface ChatRequest {
@@ -44,7 +45,9 @@ Deno.serve(async (req: Request) => {
   const token = authHeader.replace('Bearer ', '');
 
   if (!token) {
-    return new Response(JSON.stringify({ error: 'Missing auth token' }), { status: 401 });
+    return new Response(JSON.stringify({ error: 'Missing auth token' }), {
+      status: 401,
+    });
   }
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
@@ -54,7 +57,9 @@ Deno.serve(async (req: Request) => {
   } = await supabase.auth.getUser(token);
 
   if (authError || !user) {
-    return new Response(JSON.stringify({ error: 'Invalid token' }), { status: 401 });
+    return new Response(JSON.stringify({ error: 'Invalid token' }), {
+      status: 401,
+    });
   }
 
   // Rate limit: count messages in last hour
@@ -75,7 +80,9 @@ Deno.serve(async (req: Request) => {
   const { question, context } = (await req.json()) as ChatRequest;
 
   if (!question?.trim()) {
-    return new Response(JSON.stringify({ error: 'Question is required' }), { status: 400 });
+    return new Response(JSON.stringify({ error: 'Question is required' }), {
+      status: 400,
+    });
   }
 
   // Server-side system prompt (never trust client)
