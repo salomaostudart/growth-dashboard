@@ -285,63 +285,65 @@ const automationData = JSON.stringify(martech.automationLog);
 </script>
 
 <script>
-  import echarts from '../utils/echarts-setup';
-  import { dashboardTheme } from '../utils/echarts-theme';
+  import { lazyInitCharts } from '../utils/echarts-loader';
 
-  echarts.registerTheme('dashboard', dashboardTheme);
+  lazyInitCharts([
+    {
+      id: 'martech-uptime-chart',
+      setup: (echarts) => {
+        const el = document.getElementById('martech-uptime-chart')!;
+        const chart = echarts.init(el, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
+        const systems = (window as any).__martech_systems || [];
 
-  // System Uptime bar
-  const uptimeEl = document.getElementById('martech-uptime-chart');
-  if (uptimeEl) {
-    const chart = echarts.init(uptimeEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
-    const systems = (window as any).__martech_systems || [];
+        chart.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: (p: any) => `${p[0].name}: ${p[0].value}%` },
+          grid: { left: '3%', right: '4%', bottom: '3%', top: '10%', containLabel: true },
+          xAxis: { type: 'category', data: systems.map((s: any) => s.name) },
+          yAxis: { type: 'value', min: 95, max: 100, axisLabel: { formatter: '{value}%' } },
+          series: [{
+            type: 'bar',
+            data: systems.map((s: any) => ({
+              value: s.uptime,
+              itemStyle: {
+                color: s.uptime >= 99.5 ? '#10b981' : s.uptime >= 99 ? '#f59e0b' : '#ef4444',
+                borderRadius: [4, 4, 0, 0],
+              },
+            })),
+            barMaxWidth: 40,
+          }],
+        });
+        window.addEventListener('resize', () => chart.resize());
+      },
+    },
+    {
+      id: 'martech-automation-chart',
+      setup: (echarts) => {
+        const el = document.getElementById('martech-automation-chart')!;
+        const chart = echarts.init(el, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
+        const logs = (window as any).__martech_automation || [];
 
-    chart.setOption({
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: (p: any) => `${p[0].name}: ${p[0].value}%` },
-      grid: { left: '3%', right: '4%', bottom: '3%', top: '10%', containLabel: true },
-      xAxis: { type: 'category', data: systems.map((s: any) => s.name) },
-      yAxis: { type: 'value', min: 95, max: 100, axisLabel: { formatter: '{value}%' } },
-      series: [{
-        type: 'bar',
-        data: systems.map((s: any) => ({
-          value: s.uptime,
-          itemStyle: {
-            color: s.uptime >= 99.5 ? '#10b981' : s.uptime >= 99 ? '#f59e0b' : '#ef4444',
-            borderRadius: [4, 4, 0, 0],
-          },
-        })),
-        barMaxWidth: 40,
-      }],
-    });
-    window.addEventListener('resize', () => chart.resize());
-  }
+        const counts = { success: 0, failed: 0, partial: 0 };
+        logs.forEach((l: any) => { counts[l.status as keyof typeof counts]++; });
 
-  // Automation success/fail pie
-  const autoEl = document.getElementById('martech-automation-chart');
-  if (autoEl) {
-    const chart = echarts.init(autoEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
-    const logs = (window as any).__martech_automation || [];
-
-    const counts = { success: 0, failed: 0, partial: 0 };
-    logs.forEach((l: any) => { counts[l.status as keyof typeof counts]++; });
-
-    chart.setOption({
-      tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
-      series: [{
-        type: 'pie',
-        radius: ['45%', '70%'],
-        center: ['50%', '55%'],
-        avoidLabelOverlap: true,
-        itemStyle: { borderRadius: 3, borderColor: '#111118', borderWidth: 2 },
-        label: { color: '#8892a8', fontSize: 11 },
-        labelLayout: { hideOverlap: true },
-        data: [
-          { value: counts.success, name: 'Success', itemStyle: { color: '#10b981' } },
-          { value: counts.failed, name: 'Failed', itemStyle: { color: '#ef4444' } },
-          { value: counts.partial, name: 'Partial', itemStyle: { color: '#f59e0b' } },
-        ],
-      }],
-    });
-    window.addEventListener('resize', () => chart.resize());
-  }
+        chart.setOption({
+          tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+          series: [{
+            type: 'pie',
+            radius: ['45%', '70%'],
+            center: ['50%', '55%'],
+            avoidLabelOverlap: true,
+            itemStyle: { borderRadius: 3, borderColor: '#111118', borderWidth: 2 },
+            label: { color: '#8892a8', fontSize: 11 },
+            labelLayout: { hideOverlap: true },
+            data: [
+              { value: counts.success, name: 'Success', itemStyle: { color: '#10b981' } },
+              { value: counts.failed, name: 'Failed', itemStyle: { color: '#ef4444' } },
+              { value: counts.partial, name: 'Partial', itemStyle: { color: '#f59e0b' } },
+            ],
+          }],
+        });
+        window.addEventListener('resize', () => chart.resize());
+      },
+    },
+  ]);
 </script>

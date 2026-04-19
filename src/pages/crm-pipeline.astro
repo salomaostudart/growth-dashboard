@@ -196,63 +196,65 @@ const velocityData = JSON.stringify(crm.leadVelocity);
 </script>
 
 <script>
-  import echarts from '../utils/echarts-setup';
-  import { dashboardTheme } from '../utils/echarts-theme';
+  import { lazyInitCharts } from '../utils/echarts-loader';
 
-  echarts.registerTheme('dashboard', dashboardTheme);
+  lazyInitCharts([
+    {
+      id: 'crm-funnel-chart',
+      setup: (echarts) => {
+        const el = document.getElementById('crm-funnel-chart')!;
+        const chart = echarts.init(el, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
+        const funnel = (window as any).__crm_funnel || {};
 
-  // Funnel chart
-  const funnelEl = document.getElementById('crm-funnel-chart');
-  if (funnelEl) {
-    const chart = echarts.init(funnelEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
-    const funnel = (window as any).__crm_funnel || {};
-
-    chart.setOption({
-      tooltip: { trigger: 'item', formatter: '{b}: {c}' },
-      series: [{
-        type: 'funnel',
-        left: '10%',
-        top: '10%',
-        bottom: '10%',
-        width: '80%',
-        sort: 'descending',
-        gap: 4,
-        label: { show: true, position: 'inside', fontSize: 12, color: '#f1f5f9' },
-        itemStyle: { borderColor: '#111118', borderWidth: 2, borderRadius: 4 },
-        data: [
-          { value: funnel.leads || 0, name: 'Leads' },
-          { value: funnel.mql || 0, name: 'MQL' },
-          { value: funnel.sql || 0, name: 'SQL' },
-          { value: funnel.pipeline || 0, name: 'Pipeline' },
-          { value: funnel.won || 0, name: 'Won' },
-        ],
-      }],
-    });
-    window.addEventListener('resize', () => chart.resize());
-  }
-
-  // Lead Velocity
-  const velEl = document.getElementById('crm-velocity-chart');
-  if (velEl) {
-    const chart = echarts.init(velEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
-    const velocity = (window as any).__crm_velocity || [];
-
-    chart.setOption({
-      tooltip: { trigger: 'axis' },
-      grid: { left: '3%', right: '4%', bottom: '3%', top: '10%', containLabel: true },
-      xAxis: {
-        type: 'category',
-        data: velocity.map((d: any) => d.date),
-        axisLabel: { formatter: (v: string) => { const d = new Date(v); return `${d.getMonth()+1}/${d.getDate()}`; }, interval: 6 },
+        chart.setOption({
+          tooltip: { trigger: 'item', formatter: '{b}: {c}' },
+          series: [{
+            type: 'funnel',
+            left: '10%',
+            top: '10%',
+            bottom: '10%',
+            width: '80%',
+            sort: 'descending',
+            gap: 4,
+            label: { show: true, position: 'inside', fontSize: 12, color: '#f1f5f9' },
+            itemStyle: { borderColor: '#111118', borderWidth: 2, borderRadius: 4 },
+            data: [
+              { value: funnel.leads || 0, name: 'Leads' },
+              { value: funnel.mql || 0, name: 'MQL' },
+              { value: funnel.sql || 0, name: 'SQL' },
+              { value: funnel.pipeline || 0, name: 'Pipeline' },
+              { value: funnel.won || 0, name: 'Won' },
+            ],
+          }],
+        });
+        window.addEventListener('resize', () => chart.resize());
       },
-      yAxis: { type: 'value', name: 'Leads' },
-      series: [{
-        type: 'bar',
-        data: velocity.map((d: any) => d.leads),
-        barMaxWidth: 12,
-        itemStyle: { borderRadius: [2, 2, 0, 0] },
-      }],
-    });
-    window.addEventListener('resize', () => chart.resize());
-  }
+    },
+    {
+      id: 'crm-velocity-chart',
+      setup: (echarts) => {
+        const el = document.getElementById('crm-velocity-chart')!;
+        const chart = echarts.init(el, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
+        const velocity = (window as any).__crm_velocity || [];
+
+        chart.setOption({
+          tooltip: { trigger: 'axis' },
+          grid: { left: '3%', right: '4%', bottom: '3%', top: '10%', containLabel: true },
+          xAxis: {
+            type: 'category',
+            data: velocity.map((d: any) => d.date),
+            axisLabel: { formatter: (v: string) => { const d = new Date(v); return `${d.getMonth()+1}/${d.getDate()}`; }, interval: 6 },
+          },
+          yAxis: { type: 'value', name: 'Leads' },
+          series: [{
+            type: 'bar',
+            data: velocity.map((d: any) => d.leads),
+            barMaxWidth: 12,
+            itemStyle: { borderRadius: [2, 2, 0, 0] },
+          }],
+        });
+        window.addEventListener('resize', () => chart.resize());
+      },
+    },
+  ]);
 </script>

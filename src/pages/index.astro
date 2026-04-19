@@ -338,96 +338,86 @@ const channelMixData = JSON.stringify(web.channelMix);
 </script>
 
 <script>
-  import echarts from '../utils/echarts-setup';
-  import { dashboardTheme } from '../utils/echarts-theme';
+  import { lazyInitCharts } from '../utils/echarts-loader';
 
-  echarts.registerTheme('dashboard', dashboardTheme);
+  lazyInitCharts([
+    {
+      id: 'traffic-trend-chart',
+      setup: (echarts) => {
+        const el = document.getElementById('traffic-trend-chart')!;
+        const chart = echarts.init(el, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
+        const data = (window as any).__traffic_data || [];
 
-  // Traffic Trend Chart — uses server data from connectors
-  const trafficEl = document.getElementById('traffic-trend-chart');
-  if (trafficEl) {
-    const chart = echarts.init(trafficEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
-    const data = (window as any).__traffic_data || [];
-
-    chart.setOption({
-      tooltip: { trigger: 'axis' },
-      legend: { data: ['Sessions', 'Users'], right: 10, top: 0 },
-      xAxis: {
-        type: 'category',
-        data: data.map((d: any) => d.date),
-        axisLabel: {
-          formatter: (val: string) => {
-            const d = new Date(val);
-            return `${d.getMonth() + 1}/${d.getDate()}`;
+        chart.setOption({
+          tooltip: { trigger: 'axis' },
+          legend: { data: ['Sessions', 'Users'], right: 10, top: 0 },
+          xAxis: {
+            type: 'category',
+            data: data.map((d: any) => d.date),
+            axisLabel: {
+              formatter: (val: string) => {
+                const d = new Date(val);
+                return `${d.getMonth() + 1}/${d.getDate()}`;
+              },
+              interval: 13,
+            },
           },
-          interval: 13,
-        },
+          yAxis: { type: 'value' },
+          series: [
+            {
+              name: 'Sessions',
+              type: 'line',
+              data: data.map((d: any) => d.sessions),
+              smooth: true,
+              lineStyle: { width: 2 },
+              areaStyle: { opacity: 0.08 },
+              symbolSize: 0,
+            },
+            {
+              name: 'Users',
+              type: 'line',
+              data: data.map((d: any) => d.users),
+              smooth: true,
+              lineStyle: { width: 2 },
+              areaStyle: { opacity: 0.08 },
+              symbolSize: 0,
+            },
+          ],
+        });
+
+        window.addEventListener('resize', () => chart.resize());
       },
-      yAxis: { type: 'value' },
-      series: [
-        {
-          name: 'Sessions',
-          type: 'line',
-          data: data.map((d: any) => d.sessions),
-          smooth: true,
-          lineStyle: { width: 2 },
-          areaStyle: { opacity: 0.08 },
-          symbolSize: 0,
-        },
-        {
-          name: 'Users',
-          type: 'line',
-          data: data.map((d: any) => d.users),
-          smooth: true,
-          lineStyle: { width: 2 },
-          areaStyle: { opacity: 0.08 },
-          symbolSize: 0,
-        },
-      ],
-    });
+    },
+    {
+      id: 'channel-mix-chart',
+      setup: (echarts) => {
+        const el = document.getElementById('channel-mix-chart')!;
+        const chart = echarts.init(el, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
+        const mix = (window as any).__channel_data || {};
 
-    window.addEventListener('resize', () => chart.resize());
-  }
+        chart.setOption({
+          tooltip: { trigger: 'item', formatter: '{b}: {d}%' },
+          series: [{
+            type: 'pie',
+            radius: ['45%', '70%'],
+            center: ['50%', '55%'],
+            avoidLabelOverlap: true,
+            itemStyle: { borderRadius: 3, borderColor: '#111118', borderWidth: 2 },
+            label: { color: '#8892a8', fontSize: 11 },
+            labelLayout: { hideOverlap: true },
+            data: [
+              { value: mix.organic || 0, name: 'Organic' },
+              { value: mix.direct || 0, name: 'Direct' },
+              { value: mix.paid || 0, name: 'Paid' },
+              { value: mix.social || 0, name: 'Social' },
+              { value: mix.email || 0, name: 'Email' },
+              { value: mix.referral || 0, name: 'Referral' },
+            ],
+          }],
+        });
 
-  // Channel Mix Chart — uses server data from connectors
-  const channelEl = document.getElementById('channel-mix-chart');
-  if (channelEl) {
-    const chart = echarts.init(channelEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
-    const mix = (window as any).__channel_data || {};
-
-    chart.setOption({
-      tooltip: {
-        trigger: 'item',
-        formatter: '{b}: {d}%',
+        window.addEventListener('resize', () => chart.resize());
       },
-      series: [{
-        type: 'pie',
-        radius: ['45%', '70%'],
-        center: ['50%', '55%'],
-        avoidLabelOverlap: true,
-        itemStyle: {
-          borderRadius: 3,
-          borderColor: '#111118',
-          borderWidth: 2,
-        },
-        label: {
-          color: '#8892a8',
-          fontSize: 11,
-        },
-        labelLayout: {
-          hideOverlap: true,
-        },
-        data: [
-          { value: mix.organic || 0, name: 'Organic' },
-          { value: mix.direct || 0, name: 'Direct' },
-          { value: mix.paid || 0, name: 'Paid' },
-          { value: mix.social || 0, name: 'Social' },
-          { value: mix.email || 0, name: 'Email' },
-          { value: mix.referral || 0, name: 'Referral' },
-        ],
-      }],
-    });
-
-    window.addEventListener('resize', () => chart.resize());
-  }
+    },
+  ]);
 </script>

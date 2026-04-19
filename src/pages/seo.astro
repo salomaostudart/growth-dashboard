@@ -253,84 +253,86 @@ const pagesData = JSON.stringify(seo.pagePerformance);
 </script>
 
 <script>
-  import echarts from '../utils/echarts-setup';
-  import { dashboardTheme } from '../utils/echarts-theme';
+  import { lazyInitCharts } from '../utils/echarts-loader';
 
-  echarts.registerTheme('dashboard', dashboardTheme);
+  lazyInitCharts([
+    {
+      id: 'seo-queries-chart',
+      setup: (echarts) => {
+        const el = document.getElementById('seo-queries-chart')!;
+        const chart = echarts.init(el, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
+        const queries = (window as any).__seo_queries || [];
 
-  // Top Queries — bar chart
-  const queriesEl = document.getElementById('seo-queries-chart');
-  if (queriesEl) {
-    const chart = echarts.init(queriesEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
-    const queries = (window as any).__seo_queries || [];
-
-    chart.setOption({
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      legend: { data: ['Impressions', 'Clicks'], right: 10, top: 0 },
-      grid: { left: '3%', right: '4%', bottom: '3%', top: '14%', containLabel: true },
-      xAxis: {
-        type: 'category',
-        data: queries.map((q: any) => q.query.length > 18 ? q.query.slice(0, 18) + '…' : q.query),
-        axisLabel: { rotate: 35, fontSize: 10 },
+        chart.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          legend: { data: ['Impressions', 'Clicks'], right: 10, top: 0 },
+          grid: { left: '3%', right: '4%', bottom: '3%', top: '14%', containLabel: true },
+          xAxis: {
+            type: 'category',
+            data: queries.map((q: any) => q.query.length > 18 ? q.query.slice(0, 18) + '…' : q.query),
+            axisLabel: { rotate: 35, fontSize: 10 },
+          },
+          yAxis: [
+            { type: 'value', name: 'Impressions', position: 'left' },
+            { type: 'value', name: 'Clicks', position: 'right' },
+          ],
+          series: [
+            {
+              name: 'Impressions',
+              type: 'bar',
+              data: queries.map((q: any) => q.impressions),
+              barMaxWidth: 30,
+              itemStyle: { borderRadius: [4, 4, 0, 0] },
+            },
+            {
+              name: 'Clicks',
+              type: 'bar',
+              yAxisIndex: 1,
+              data: queries.map((q: any) => q.clicks),
+              barMaxWidth: 30,
+              itemStyle: { borderRadius: [4, 4, 0, 0] },
+            },
+          ],
+        });
+        window.addEventListener('resize', () => chart.resize());
       },
-      yAxis: [
-        { type: 'value', name: 'Impressions', position: 'left' },
-        { type: 'value', name: 'Clicks', position: 'right' },
-      ],
-      series: [
-        {
-          name: 'Impressions',
-          type: 'bar',
-          data: queries.map((q: any) => q.impressions),
-          barMaxWidth: 30,
-          itemStyle: { borderRadius: [4, 4, 0, 0] },
-        },
-        {
-          name: 'Clicks',
-          type: 'bar',
-          yAxisIndex: 1,
-          data: queries.map((q: any) => q.clicks),
-          barMaxWidth: 30,
-          itemStyle: { borderRadius: [4, 4, 0, 0] },
-        },
-      ],
-    });
-    window.addEventListener('resize', () => chart.resize());
-  }
+    },
+    {
+      id: 'seo-position-chart',
+      setup: (echarts) => {
+        const el = document.getElementById('seo-position-chart')!;
+        const chart = echarts.init(el, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
+        const queries = ((window as any).__seo_queries || []).slice(0, 5);
+        const weeks = ['W-7', 'W-6', 'W-5', 'W-4', 'W-3', 'W-2', 'W-1'];
 
-  // Position History — line chart (inverted Y axis — lower = better)
-  const posEl = document.getElementById('seo-position-chart');
-  if (posEl) {
-    const chart = echarts.init(posEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
-    const queries = ((window as any).__seo_queries || []).slice(0, 5);
-    const weeks = ['W-7', 'W-6', 'W-5', 'W-4', 'W-3', 'W-2', 'W-1'];
-
-    chart.setOption({
-      tooltip: { trigger: 'axis' },
-      legend: {
-        data: queries.map((q: any) => q.query.length > 20 ? q.query.slice(0, 20) + '…' : q.query),
-        right: 10,
-        top: 0,
-        textStyle: { fontSize: 10 },
+        chart.setOption({
+          tooltip: { trigger: 'axis' },
+          legend: {
+            data: queries.map((q: any) => q.query.length > 20 ? q.query.slice(0, 20) + '…' : q.query),
+            right: 10,
+            top: 0,
+            textStyle: { fontSize: 10 },
+          },
+          grid: { left: '3%', right: '4%', bottom: '3%', top: '18%', containLabel: true },
+          xAxis: { type: 'category', data: weeks },
+          yAxis: {
+            type: 'value',
+            inverse: true,
+            name: 'Position',
+            min: 1,
+            nameTextStyle: { fontSize: 10, color: '#8892a8' },
+          },
+          series: queries.map((q: any) => ({
+            name: q.query.length > 20 ? q.query.slice(0, 20) + '…' : q.query,
+            type: 'line',
+            data: q.positionHistory,
+            smooth: true,
+            symbolSize: 6,
+            lineStyle: { width: 2 },
+          })),
+        });
+        window.addEventListener('resize', () => chart.resize());
       },
-      grid: { left: '3%', right: '4%', bottom: '3%', top: '18%', containLabel: true },
-      xAxis: { type: 'category', data: weeks },
-      yAxis: {
-        type: 'value',
-        inverse: true,
-        name: 'Position',
-        min: 1,
-        nameTextStyle: { fontSize: 10, color: '#8892a8' },
-      },
-      series: queries.map((q: any) => ({
-        name: q.query.length > 20 ? q.query.slice(0, 20) + '…' : q.query,
-        type: 'line',
-        data: q.positionHistory,
-        smooth: true,
-        symbolSize: 6,
-        lineStyle: { width: 2 },
-      })),
-    });
-    window.addEventListener('resize', () => chart.resize());
-  }
+    },
+  ]);
 </script>

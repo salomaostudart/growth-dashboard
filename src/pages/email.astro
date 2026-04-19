@@ -220,82 +220,84 @@ const heatmapData = JSON.stringify(email.bestSendTimes);
 </script>
 
 <script>
-  import echarts from '../utils/echarts-setup';
-  import { dashboardTheme } from '../utils/echarts-theme';
+  import { lazyInitCharts } from '../utils/echarts-loader';
 
-  echarts.registerTheme('dashboard', dashboardTheme);
+  lazyInitCharts([
+    {
+      id: 'email-campaigns-chart',
+      setup: (echarts) => {
+        const el = document.getElementById('email-campaigns-chart')!;
+        const chart = echarts.init(el, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
+        const campaigns = (window as any).__email_campaigns || [];
 
-  // Campaign Performance
-  const campEl = document.getElementById('email-campaigns-chart');
-  if (campEl) {
-    const chart = echarts.init(campEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
-    const campaigns = (window as any).__email_campaigns || [];
-
-    chart.setOption({
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      legend: { data: ['Open Rate', 'Click Rate'], right: 10, top: 0 },
-      grid: { left: '3%', right: '4%', bottom: '3%', top: '14%', containLabel: true },
-      xAxis: {
-        type: 'category',
-        data: campaigns.map((c: any) => c.name.length > 15 ? c.name.slice(0, 15) + '…' : c.name),
-        axisLabel: { rotate: 35, fontSize: 10 },
+        chart.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          legend: { data: ['Open Rate', 'Click Rate'], right: 10, top: 0 },
+          grid: { left: '3%', right: '4%', bottom: '3%', top: '14%', containLabel: true },
+          xAxis: {
+            type: 'category',
+            data: campaigns.map((c: any) => c.name.length > 15 ? c.name.slice(0, 15) + '…' : c.name),
+            axisLabel: { rotate: 35, fontSize: 10 },
+          },
+          yAxis: { type: 'value', axisLabel: { formatter: '{value}%' } },
+          series: [
+            {
+              name: 'Open Rate',
+              type: 'bar',
+              data: campaigns.map((c: any) => c.openRate),
+              barMaxWidth: 24,
+              itemStyle: { borderRadius: [4, 4, 0, 0] },
+            },
+            {
+              name: 'Click Rate',
+              type: 'bar',
+              data: campaigns.map((c: any) => c.clickRate),
+              barMaxWidth: 24,
+              itemStyle: { borderRadius: [4, 4, 0, 0] },
+            },
+          ],
+        });
+        window.addEventListener('resize', () => chart.resize());
       },
-      yAxis: { type: 'value', axisLabel: { formatter: '{value}%' } },
-      series: [
-        {
-          name: 'Open Rate',
-          type: 'bar',
-          data: campaigns.map((c: any) => c.openRate),
-          barMaxWidth: 24,
-          itemStyle: { borderRadius: [4, 4, 0, 0] },
-        },
-        {
-          name: 'Click Rate',
-          type: 'bar',
-          data: campaigns.map((c: any) => c.clickRate),
-          barMaxWidth: 24,
-          itemStyle: { borderRadius: [4, 4, 0, 0] },
-        },
-      ],
-    });
-    window.addEventListener('resize', () => chart.resize());
-  }
+    },
+    {
+      id: 'email-heatmap-chart',
+      setup: (echarts) => {
+        const el = document.getElementById('email-heatmap-chart')!;
+        const chart = echarts.init(el, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
+        const raw = (window as any).__email_heatmap || [];
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const hours = Array.from({ length: 16 }, (_, i) => `${i + 6}:00`);
 
-  // Send Times Heatmap
-  const heatEl = document.getElementById('email-heatmap-chart');
-  if (heatEl) {
-    const chart = echarts.init(heatEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
-    const raw = (window as any).__email_heatmap || [];
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const hours = Array.from({ length: 16 }, (_, i) => `${i + 6}:00`);
+        const data = raw.map((d: any) => [d.hour - 6, d.day, d.engagement]);
+        const maxVal = Math.max(...raw.map((d: any) => d.engagement));
 
-    const data = raw.map((d: any) => [d.hour - 6, d.day, d.engagement]);
-    const maxVal = Math.max(...raw.map((d: any) => d.engagement));
-
-    chart.setOption({
-      tooltip: {
-        formatter: (p: any) => `${days[p.value[1]]} ${hours[p.value[0]]}<br/>Engagement: ${p.value[2]}`,
+        chart.setOption({
+          tooltip: {
+            formatter: (p: any) => `${days[p.value[1]]} ${hours[p.value[0]]}<br/>Engagement: ${p.value[2]}`,
+          },
+          grid: { left: '8%', right: '12%', bottom: '10%', top: '5%' },
+          xAxis: { type: 'category', data: hours, axisLabel: { fontSize: 9, interval: 2 } },
+          yAxis: { type: 'category', data: days, axisLabel: { fontSize: 10 } },
+          visualMap: {
+            min: 0,
+            max: maxVal,
+            calculable: true,
+            orient: 'vertical',
+            right: 0,
+            top: 'center',
+            inRange: { color: ['#1a1a24', '#242432', '#4f46e5', '#818cf8', '#a5b4fc'] },
+            textStyle: { color: '#8892a8', fontSize: 10 },
+          },
+          series: [{
+            type: 'heatmap',
+            data,
+            label: { show: false },
+            emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(129,140,248,0.5)' } },
+          }],
+        });
+        window.addEventListener('resize', () => chart.resize());
       },
-      grid: { left: '8%', right: '12%', bottom: '10%', top: '5%' },
-      xAxis: { type: 'category', data: hours, axisLabel: { fontSize: 9, interval: 2 } },
-      yAxis: { type: 'category', data: days, axisLabel: { fontSize: 10 } },
-      visualMap: {
-        min: 0,
-        max: maxVal,
-        calculable: true,
-        orient: 'vertical',
-        right: 0,
-        top: 'center',
-        inRange: { color: ['#1a1a24', '#242432', '#4f46e5', '#818cf8', '#a5b4fc'] },
-        textStyle: { color: '#8892a8', fontSize: 10 },
-      },
-      series: [{
-        type: 'heatmap',
-        data,
-        label: { show: false },
-        emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(129,140,248,0.5)' } },
-      }],
-    });
-    window.addEventListener('resize', () => chart.resize());
-  }
+    },
+  ]);
 </script>
