@@ -1,5 +1,6 @@
 /* Global Styles — Growth Dashboard */
-@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+/* Fonts are loaded via <link> in DashboardLayout.astro (non-blocking).
+   Removed @import to eliminate render-blocking CSS fetch — LCP improvement. */
 @import "./tokens.css";
 
 /* Reset */
