@@ -1,6 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import {
+  generateCrmMetrics,
+  generateEmailMetrics,
+  generateMartechHealth,
+  generateSeoMetrics,
+  generateSocialMetrics,
+  generateWebMetrics,
+} from '../../src/utils/mock-generator';
 import { generateExecutiveReport } from '../../src/utils/report-generator';
-import { generateWebMetrics, generateSeoMetrics, generateEmailMetrics, generateSocialMetrics, generateCrmMetrics, generateMartechHealth } from '../../src/utils/mock-generator';
 
 const reportData = {
   web: generateWebMetrics(),

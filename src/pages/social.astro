@@ -1,10 +1,10 @@
 ---
-import DashboardLayout from '../layouts/DashboardLayout.astro';
-import MetricCard from '../components/ui/MetricCard.astro';
 import ChartContainer from '../components/charts/ChartContainer.astro';
-import { getConnector } from '../connectors/registry';
-import { formatNumber, formatPercent } from '../utils/formatters';
 import DataSourceTag from '../components/ui/DataSourceTag.astro';
+import MetricCard from '../components/ui/MetricCard.astro';
+import { getConnector } from '../connectors/registry';
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import { formatNumber, formatPercent } from '../utils/formatters';
 
 import { getDefaultDateRange } from '../utils/date-range';
 const dateRange = getDefaultDateRange('30d');
@@ -14,7 +14,8 @@ const social = socialResult.data;
 
 // Aggregate totals
 const totalFollowers = social.platforms.reduce((a, p) => a + p.followers, 0);
-const avgEngagement = social.platforms.reduce((a, p) => a + p.engagementRate, 0) / social.platforms.length;
+const avgEngagement =
+  social.platforms.reduce((a, p) => a + p.engagementRate, 0) / social.platforms.length;
 const totalReferral = social.platforms.reduce((a, p) => a + p.referralTraffic, 0);
 
 // Serialize for client

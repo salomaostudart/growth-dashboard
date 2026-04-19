@@ -1,6 +1,11 @@
-import type { IConnector, ConnectorResult, ConnectorHealth, DateRangeParams } from '../base/connector.interface';
-import type { WebMetrics } from '../base/connector.schema';
 import { generateWebMetrics } from '../../utils/mock-generator';
+import type {
+  ConnectorHealth,
+  ConnectorResult,
+  DateRangeParams,
+  IConnector,
+} from '../base/connector.interface';
+import type { WebMetrics } from '../base/connector.schema';
 
 export class WebMockConnector implements IConnector<WebMetrics> {
   readonly name = 'Google Analytics 4 (Mock)';

@@ -58,9 +58,9 @@
   --shadow-glow: 0 0 20px rgba(129, 140, 248, 0.15);
 
   /* Typography */
-  --font-heading: 'Oswald', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-heading: "Oswald", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -134,13 +134,23 @@ svg:not([role]):not([aria-label]) {
   -webkit-tap-highlight-color: rgba(129, 140, 248, 0.15);
 }
 
-button, a, [role="button"], [role="option"], input, select, textarea {
+button,
+a,
+[role="button"],
+[role="option"],
+input,
+select,
+textarea {
   min-height: 44px;
   min-width: 44px;
 }
 
 /* Exceptions — inline elements that shouldn't be 44px */
-a:not([class]), .data-table a, .ds-tag, .delta, .nav-icon::before {
+a:not([class]),
+.data-table a,
+.ds-tag,
+.delta,
+.nav-icon::before {
   min-height: unset;
   min-width: unset;
 }

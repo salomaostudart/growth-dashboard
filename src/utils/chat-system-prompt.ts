@@ -5,9 +5,10 @@
 import type { Role } from './rbac';
 
 export function buildSystemPrompt(role: Role): string {
-  const roleContext = role === 'viewer'
-    ? 'The user is a viewer — do not share revenue, CAC, or pipeline dollar values.'
-    : 'The user has full data access.';
+  const roleContext =
+    role === 'viewer'
+      ? 'The user is a viewer — do not share revenue, CAC, or pipeline dollar values.'
+      : 'The user has full data access.';
 
   return `You are GrowthHQ Assistant, an AI analyst for a Digital Growth Command Center.
 

@@ -1,6 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { buildChatContext, estimateTokens } from '../../src/utils/chat-context-builder';
-import { generateWebMetrics, generateSeoMetrics, generateEmailMetrics, generateSocialMetrics, generateCrmMetrics, generateMartechHealth } from '../../src/utils/mock-generator';
+import {
+  generateCrmMetrics,
+  generateEmailMetrics,
+  generateMartechHealth,
+  generateSeoMetrics,
+  generateSocialMetrics,
+  generateWebMetrics,
+} from '../../src/utils/mock-generator';
 
 const data = {
   web: generateWebMetrics(),

@@ -1,6 +1,11 @@
-import type { IConnector, ConnectorResult, ConnectorHealth, DateRangeParams } from '../base/connector.interface';
-import type { EmailMetrics } from '../base/connector.schema';
 import { generateEmailMetrics } from '../../utils/mock-generator';
+import type {
+  ConnectorHealth,
+  ConnectorResult,
+  DateRangeParams,
+  IConnector,
+} from '../base/connector.interface';
+import type { EmailMetrics } from '../base/connector.schema';
 
 export class EmailMockConnector implements IConnector<EmailMetrics> {
   readonly name = 'Mailchimp (Mock)';

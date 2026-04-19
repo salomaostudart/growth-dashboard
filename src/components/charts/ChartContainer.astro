@@ -10,14 +10,7 @@ interface Props {
 
 import DataSourceTag from '../ui/DataSourceTag.astro';
 
-const {
-  title,
-  subtitle,
-  source = 'mock',
-  sourceName = 'Mock',
-  height = '320px',
-  id,
-} = Astro.props;
+const { title, subtitle, source = 'mock', sourceName = 'Mock', height = '320px', id } = Astro.props;
 ---
 
 <div class="chart-container">

@@ -1,6 +1,11 @@
-import type { IConnector, ConnectorResult, ConnectorHealth, DateRangeParams } from '../base/connector.interface';
-import type { MartechHealth } from '../base/connector.schema';
 import { generateMartechHealth } from '../../utils/mock-generator';
+import type {
+  ConnectorHealth,
+  ConnectorResult,
+  DateRangeParams,
+  IConnector,
+} from '../base/connector.interface';
+import type { MartechHealth } from '../base/connector.schema';
 
 export class MartechMockConnector implements IConnector<MartechHealth> {
   readonly name = 'Martech Stack (Mock)';

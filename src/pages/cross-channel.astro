@@ -1,11 +1,11 @@
 ---
-import DashboardLayout from '../layouts/DashboardLayout.astro';
-import MetricCard from '../components/ui/MetricCard.astro';
 import ChartContainer from '../components/charts/ChartContainer.astro';
-import { getConnector } from '../connectors/registry';
-import { formatNumber, formatPercent } from '../utils/formatters';
 import DataSourceTag from '../components/ui/DataSourceTag.astro';
-import { buildSankeyData, buildCrossChannelSummary } from '../utils/sankey-transformer';
+import MetricCard from '../components/ui/MetricCard.astro';
+import { getConnector } from '../connectors/registry';
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import { formatNumber, formatPercent } from '../utils/formatters';
+import { buildCrossChannelSummary, buildSankeyData } from '../utils/sankey-transformer';
 
 import { getDefaultDateRange } from '../utils/date-range';
 const dateRange = getDefaultDateRange('30d');
@@ -26,14 +26,18 @@ const sankeyJson = JSON.stringify(sankeyData);
 const combinedSource = webResult.source === 'live' && crmResult.source === 'live' ? 'live' : 'mock';
 
 // Channel attribution table with conversion rates
-const channelTable = crm.channelAttribution.map(ch => {
+const channelTable = crm.channelAttribution.map((ch) => {
   const mixKey = Object.entries({
-    organic: 'Organic Search', direct: 'Direct', social: 'Social Media',
-    email: 'Email', paid: 'Paid Search', referral: 'Referral',
+    organic: 'Organic Search',
+    direct: 'Direct',
+    social: 'Social Media',
+    email: 'Email',
+    paid: 'Paid Search',
+    referral: 'Referral',
   }).find(([, name]) => name === ch.channel)?.[0];
 
-  const pct = mixKey ? (web.channelMix as Record<string, number>)[mixKey] ?? 0 : 0;
-  const sessions = Math.round(web.sessions * pct / 100);
+  const pct = mixKey ? ((web.channelMix as Record<string, number>)[mixKey] ?? 0) : 0;
+  const sessions = Math.round((web.sessions * pct) / 100);
   const convRate = sessions > 0 ? (ch.leads / sessions) * 100 : 0;
 
   return { ...ch, sessions, convRate };

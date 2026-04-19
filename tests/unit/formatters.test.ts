@@ -1,5 +1,13 @@
-import { describe, it, expect } from 'vitest';
-import { formatNumber, formatPercent, formatDelta, formatDuration, formatCurrency, formatLatency, timeAgo } from '../../src/utils/formatters';
+import { describe, expect, it } from 'vitest';
+import {
+  formatCurrency,
+  formatDelta,
+  formatDuration,
+  formatLatency,
+  formatNumber,
+  formatPercent,
+  timeAgo,
+} from '../../src/utils/formatters';
 
 describe('formatNumber', () => {
   it('formats millions', () => {

@@ -48,7 +48,10 @@ Deno.serve(async (req: Request) => {
   }
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser(token);
 
   if (authError || !user) {
     return new Response(JSON.stringify({ error: 'Invalid token' }), { status: 401 });
@@ -63,11 +66,13 @@ Deno.serve(async (req: Request) => {
     .gte('created_at', oneHourAgo);
 
   if ((count || 0) >= RATE_LIMIT) {
-    return new Response(JSON.stringify({ error: `Rate limit: ${RATE_LIMIT} messages/hour` }), { status: 429 });
+    return new Response(JSON.stringify({ error: `Rate limit: ${RATE_LIMIT} messages/hour` }), {
+      status: 429,
+    });
   }
 
   // Parse request — systemPrompt is server-controlled, ignore client value
-  const { question, context } = await req.json() as ChatRequest;
+  const { question, context } = (await req.json()) as ChatRequest;
 
   if (!question?.trim()) {
     return new Response(JSON.stringify({ error: 'Question is required' }), { status: 400 });
@@ -80,7 +85,9 @@ Answer questions about web traffic, SEO, email marketing, social media, CRM pipe
 Be concise and data-driven. Use specific numbers from the context. Format with markdown.`;
 
   if (!CLAUDE_API_KEY) {
-    return new Response(JSON.stringify({ error: 'Claude API key not configured' }), { status: 500 });
+    return new Response(JSON.stringify({ error: 'Claude API key not configured' }), {
+      status: 500,
+    });
   }
 
   // Call Claude API with streaming
@@ -95,17 +102,21 @@ Be concise and data-driven. Use specific numbers from the context. Format with m
       model: MODEL,
       max_tokens: 1024,
       system: systemPrompt,
-      messages: [{
-        role: 'user',
-        content: `Dashboard data:\n${context}\n\nQuestion: ${question}`,
-      }],
+      messages: [
+        {
+          role: 'user',
+          content: `Dashboard data:\n${context}\n\nQuestion: ${question}`,
+        },
+      ],
       stream: true,
     }),
   });
 
   if (!claudeResponse.ok) {
-    const err = await claudeResponse.text();
-    return new Response(JSON.stringify({ error: `Claude API error: ${claudeResponse.status}` }), { status: 502 });
+    const _err = await claudeResponse.text();
+    return new Response(JSON.stringify({ error: `Claude API error: ${claudeResponse.status}` }), {
+      status: 502,
+    });
   }
 
   // Stream SSE to client
@@ -114,7 +125,7 @@ Be concise and data-driven. Use specific numbers from the context. Format with m
 
   const stream = new ReadableStream({
     async start(controller) {
-      const reader = claudeResponse.body!.getReader();
+      const reader = claudeResponse.body?.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
 
@@ -136,9 +147,13 @@ Be concise and data-driven. Use specific numbers from the context. Format with m
               const parsed = JSON.parse(data);
               if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
                 fullAnswer += parsed.delta.text;
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: parsed.delta.text })}\n\n`));
+                controller.enqueue(
+                  encoder.encode(`data: ${JSON.stringify({ text: parsed.delta.text })}\n\n`),
+                );
               }
-            } catch { /* skip malformed lines */ }
+            } catch {
+              /* skip malformed lines */
+            }
           }
         }
 
@@ -162,7 +177,7 @@ Be concise and data-driven. Use specific numbers from the context. Format with m
     headers: {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
       'Access-Control-Allow-Origin': 'https://growth.sal.dev.br',
     },
   });

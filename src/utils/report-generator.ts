@@ -3,10 +3,20 @@
  * from all connector data. Used by MCP tool `generate_report`.
  */
 import type {
-  WebMetrics, SeoMetrics, EmailMetrics,
-  SocialMetrics, CrmMetrics, MartechHealth,
+  CrmMetrics,
+  EmailMetrics,
+  MartechHealth,
+  SeoMetrics,
+  SocialMetrics,
+  WebMetrics,
 } from '../connectors/base/connector.schema';
-import { formatNumber, formatPercent, formatCurrency, formatDuration, formatLatency } from './formatters';
+import {
+  formatCurrency,
+  formatDuration,
+  formatLatency,
+  formatNumber,
+  formatPercent,
+} from './formatters';
 import { generateInsights } from './insights-engine';
 
 export interface ReportData {
@@ -31,8 +41,8 @@ export function generateExecutiveReport(data: ReportData): string {
 
   // Web Performance
   sections.push('## Web Performance');
-  sections.push(`| Metric | Value |`);
-  sections.push(`|---|---|`);
+  sections.push('| Metric | Value |');
+  sections.push('|---|---|');
   sections.push(`| Sessions | ${formatNumber(web.sessions)} |`);
   sections.push(`| Users | ${formatNumber(web.users)} |`);
   sections.push(`| Pageviews | ${formatNumber(web.pageviews)} |`);
@@ -52,8 +62,8 @@ export function generateExecutiveReport(data: ReportData): string {
 
   // SEO
   sections.push('## SEO Performance');
-  sections.push(`| Metric | Value |`);
-  sections.push(`|---|---|`);
+  sections.push('| Metric | Value |');
+  sections.push('|---|---|');
   sections.push(`| Impressions | ${formatNumber(seo.impressions)} |`);
   sections.push(`| Clicks | ${formatNumber(seo.clicks)} |`);
   sections.push(`| CTR | ${formatPercent(seo.ctr)} |`);
@@ -63,15 +73,15 @@ export function generateExecutiveReport(data: ReportData): string {
   sections.push('### Top 5 Queries');
   sections.push('| Query | Clicks | Position |');
   sections.push('|---|---|---|');
-  seo.topQueries.slice(0, 5).forEach(q => {
+  seo.topQueries.slice(0, 5).forEach((q) => {
     sections.push(`| ${q.query} | ${q.clicks} | ${q.position.toFixed(1)} |`);
   });
   sections.push('');
 
   // Email
   sections.push('## Email Marketing');
-  sections.push(`| Metric | Value |`);
-  sections.push(`|---|---|`);
+  sections.push('| Metric | Value |');
+  sections.push('|---|---|');
   sections.push(`| Open Rate | ${formatPercent(email.openRate)} |`);
   sections.push(`| Click Rate | ${formatPercent(email.clickRate)} |`);
   sections.push(`| Subscribers | ${formatNumber(email.totalSubscribers)} |`);
@@ -82,21 +92,23 @@ export function generateExecutiveReport(data: ReportData): string {
   sections.push('## Social Media');
   sections.push('| Platform | Followers | Engagement | Referral Traffic |');
   sections.push('|---|---|---|---|');
-  social.platforms.forEach(p => {
-    sections.push(`| ${p.name} | ${formatNumber(p.followers)} | ${formatPercent(p.engagementRate)} | ${formatNumber(p.referralTraffic)} |`);
+  social.platforms.forEach((p) => {
+    sections.push(
+      `| ${p.name} | ${formatNumber(p.followers)} | ${formatPercent(p.engagementRate)} | ${formatNumber(p.referralTraffic)} |`,
+    );
   });
   sections.push('');
 
   // Pipeline
   sections.push('## CRM Pipeline');
-  sections.push(`| Stage | Count |`);
-  sections.push(`|---|---|`);
+  sections.push('| Stage | Count |');
+  sections.push('|---|---|');
   sections.push(`| Leads | ${formatNumber(crm.funnel.leads)} |`);
   sections.push(`| MQL | ${formatNumber(crm.funnel.mql)} |`);
   sections.push(`| SQL | ${formatNumber(crm.funnel.sql)} |`);
   sections.push(`| Pipeline | ${formatNumber(crm.funnel.pipeline)} |`);
   sections.push(`| Won | ${formatNumber(crm.funnel.won)} |`);
-  const winRate = crm.funnel.pipeline > 0 ? (crm.funnel.won / crm.funnel.pipeline * 100) : 0;
+  const winRate = crm.funnel.pipeline > 0 ? (crm.funnel.won / crm.funnel.pipeline) * 100 : 0;
   sections.push(`| Win Rate | ${formatPercent(winRate)} |`);
   sections.push('');
 
@@ -104,40 +116,42 @@ export function generateExecutiveReport(data: ReportData): string {
   sections.push('### Channel Attribution');
   sections.push('| Channel | Leads | Won | CAC |');
   sections.push('|---|---|---|---|');
-  crm.channelAttribution.forEach(ch => {
+  crm.channelAttribution.forEach((ch) => {
     sections.push(`| ${ch.channel} | ${ch.leads} | ${ch.won} | ${formatCurrency(ch.cac)} |`);
   });
   sections.push('');
 
   // Martech Health
   sections.push('## Martech Health');
-  const healthy = martech.systems.filter(s => s.status === 'healthy').length;
+  const healthy = martech.systems.filter((s) => s.status === 'healthy').length;
   sections.push(`Status: ${healthy}/${martech.systems.length} systems healthy\n`);
   sections.push('| System | Status | Uptime | Latency | Cost/mo |');
   sections.push('|---|---|---|---|---|');
-  martech.systems.forEach(s => {
-    sections.push(`| ${s.name} | ${s.status} | ${formatPercent(s.uptime)} | ${formatLatency(s.latencyMs)} | ${formatCurrency(s.monthlyCost)} |`);
+  martech.systems.forEach((s) => {
+    sections.push(
+      `| ${s.name} | ${s.status} | ${formatPercent(s.uptime)} | ${formatLatency(s.latencyMs)} | ${formatCurrency(s.monthlyCost)} |`,
+    );
   });
   sections.push('');
 
   // Insights
   if (insights.length > 0) {
     sections.push('## Key Insights');
-    const negatives = insights.filter(i => i.type === 'negative');
-    const positives = insights.filter(i => i.type === 'positive');
-    const neutrals = insights.filter(i => i.type === 'neutral');
+    const negatives = insights.filter((i) => i.type === 'negative');
+    const positives = insights.filter((i) => i.type === 'positive');
+    const neutrals = insights.filter((i) => i.type === 'neutral');
 
     if (negatives.length > 0) {
       sections.push('### Concerns');
-      negatives.forEach(i => sections.push(`- **${i.title}**: ${i.description}`));
+      negatives.forEach((i) => sections.push(`- **${i.title}**: ${i.description}`));
     }
     if (positives.length > 0) {
       sections.push('### Wins');
-      positives.forEach(i => sections.push(`- **${i.title}**: ${i.description}`));
+      positives.forEach((i) => sections.push(`- **${i.title}**: ${i.description}`));
     }
     if (neutrals.length > 0) {
       sections.push('### Observations');
-      neutrals.forEach(i => sections.push(`- **${i.title}**: ${i.description}`));
+      neutrals.forEach((i) => sections.push(`- **${i.title}**: ${i.description}`));
     }
     sections.push('');
   }

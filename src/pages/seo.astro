@@ -1,10 +1,10 @@
 ---
-import DashboardLayout from '../layouts/DashboardLayout.astro';
-import MetricCard from '../components/ui/MetricCard.astro';
 import ChartContainer from '../components/charts/ChartContainer.astro';
-import { getConnector } from '../connectors/registry';
-import { formatNumber, formatPercent, calcDelta } from '../utils/formatters';
 import DataSourceTag from '../components/ui/DataSourceTag.astro';
+import MetricCard from '../components/ui/MetricCard.astro';
+import { getConnector } from '../connectors/registry';
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import { calcDelta, formatNumber, formatPercent } from '../utils/formatters';
 
 import { getDefaultDateRange } from '../utils/date-range';
 const dateRange = getDefaultDateRange('90d');
@@ -12,9 +12,9 @@ const dateRange = getDefaultDateRange('90d');
 const seoResult = await getConnector('seo').fetch(dateRange);
 const seo = seoResult.data;
 
-const fmt = (v: number | null) => v !== null ? Number(v.toFixed(1)) : undefined;
-const impressionsDelta = fmt(calcDelta(seo.topQueries.map(q => q.impressions)));
-const clicksDelta = fmt(calcDelta(seo.topQueries.map(q => q.clicks)));
+const fmt = (v: number | null) => (v !== null ? Number(v.toFixed(1)) : undefined);
+const impressionsDelta = fmt(calcDelta(seo.topQueries.map((q) => q.impressions)));
+const clicksDelta = fmt(calcDelta(seo.topQueries.map((q) => q.clicks)));
 
 // Serialize for client charts
 const queriesData = JSON.stringify(seo.topQueries.slice(0, 10));

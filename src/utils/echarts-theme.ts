@@ -27,7 +27,9 @@ export const dashboardThemeLight = {
   },
   grid: { left: '3%', right: '4%', bottom: '3%', top: '10%', containLabel: true },
   color: ['#4f46e5', '#059669', '#d97706', '#dc2626', '#7c3aed', '#0891b2', '#ea580c', '#db2777'],
-  series: { line: { smooth: true, lineStyle: { width: 2 }, areaStyle: { opacity: 0.08 }, symbolSize: 4 } },
+  series: {
+    line: { smooth: true, lineStyle: { width: 2 }, areaStyle: { opacity: 0.08 }, symbolSize: 4 },
+  },
 };
 
 export const dashboardTheme = {

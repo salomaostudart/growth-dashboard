@@ -1,6 +1,11 @@
-import type { IConnector, ConnectorResult, ConnectorHealth, DateRangeParams } from '../base/connector.interface';
-import type { SocialMetrics } from '../base/connector.schema';
 import { generateSocialMetrics } from '../../utils/mock-generator';
+import type {
+  ConnectorHealth,
+  ConnectorResult,
+  DateRangeParams,
+  IConnector,
+} from '../base/connector.interface';
+import type { SocialMetrics } from '../base/connector.schema';
 
 export class SocialMockConnector implements IConnector<SocialMetrics> {
   readonly name = 'Social Media (Mock)';

@@ -1,4 +1,4 @@
-import { supabase, isConfigured } from './supabase';
+import { isConfigured, supabase } from './supabase';
 
 /**
  * Fetch the latest metric snapshot for the selected project from Supabase.
@@ -7,15 +7,13 @@ import { supabase, isConfigured } from './supabase';
 export async function fetchProjectMetrics(source: string): Promise<Record<string, unknown> | null> {
   if (!isConfigured || !supabase) return null;
 
-  const slug = (typeof localStorage !== 'undefined' ? localStorage.getItem('growthhq-project') : null) || 'demo-enterprise';
+  const slug =
+    (typeof localStorage !== 'undefined' ? localStorage.getItem('growthhq-project') : null) ||
+    'demo-enterprise';
   if (!slug) return null;
 
   // Resolve project id
-  const projectResp = await supabase
-    .from('projects')
-    .select('id')
-    .eq('slug', slug)
-    .single();
+  const projectResp = await supabase.from('projects').select('id').eq('slug', slug).single();
 
   if (projectResp.error || !projectResp.data) return null;
   const projectId = projectResp.data.id;

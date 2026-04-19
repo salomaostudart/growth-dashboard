@@ -52,8 +52,15 @@ export function isAtLeast(userRole: Role, requiredRole: Role): boolean {
 /** Nav items visible to this role */
 export function getVisibleNavItems(_role: Role): string[] {
   const base = [
-    'overview', 'web-performance', 'seo', 'email',
-    'social', 'crm-pipeline', 'cross-channel', 'martech-health', 'about',
+    'overview',
+    'web-performance',
+    'seo',
+    'email',
+    'social',
+    'crm-pipeline',
+    'cross-channel',
+    'martech-health',
+    'about',
   ];
   // All pages visible to all roles — revenue data hidden at component level
   return base;
@@ -62,8 +69,11 @@ export function getVisibleNavItems(_role: Role): string[] {
 /** Role display config */
 export function getRoleBadge(role: Role): { label: string; color: string } {
   switch (role) {
-    case 'admin': return { label: 'Admin', color: '#818cf8' };
-    case 'analyst': return { label: 'Analyst', color: '#10b981' };
-    case 'viewer': return { label: 'Viewer', color: '#94a3b8' };
+    case 'admin':
+      return { label: 'Admin', color: '#818cf8' };
+    case 'analyst':
+      return { label: 'Analyst', color: '#10b981' };
+    case 'viewer':
+      return { label: 'Viewer', color: '#94a3b8' };
   }
 }

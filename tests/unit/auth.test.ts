@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 describe('auth', () => {
   describe('redirectToLogin', () => {
@@ -7,7 +7,7 @@ describe('auth', () => {
 
     function buildLoginUrl(returnPath?: string): string {
       const redirect = returnPath || '/current-page';
-      return '/login' + (redirect !== '/' ? '?redirect=' + encodeURIComponent(redirect) : '');
+      return `/login${redirect !== '/' ? `?redirect=${encodeURIComponent(redirect)}` : ''}`;
     }
 
     it('redirects to /login without query when path is /', () => {
@@ -19,7 +19,9 @@ describe('auth', () => {
     });
 
     it('encodes special characters in redirect path', () => {
-      expect(buildLoginUrl('/report?date=2026-01-01')).toBe('/login?redirect=%2Freport%3Fdate%3D2026-01-01');
+      expect(buildLoginUrl('/report?date=2026-01-01')).toBe(
+        '/login?redirect=%2Freport%3Fdate%3D2026-01-01',
+      );
     });
   });
 });

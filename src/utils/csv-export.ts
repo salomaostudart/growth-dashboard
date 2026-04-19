@@ -7,18 +7,20 @@ export function exportTableToCSV(tableEl: HTMLTableElement, filename: string) {
   const rows: string[][] = [];
 
   // Headers
-  const headers = Array.from(tableEl.querySelectorAll('thead th'))
-    .map(th => `"${(th.textContent || '').trim()}"`);
+  const headers = Array.from(tableEl.querySelectorAll('thead th')).map(
+    (th) => `"${(th.textContent || '').trim()}"`,
+  );
   rows.push(headers);
 
   // Body
-  tableEl.querySelectorAll('tbody tr').forEach(tr => {
-    const cells = Array.from(tr.querySelectorAll('td'))
-      .map(td => `"${(td.textContent || '').trim().replace(/"/g, '""')}"`);
+  tableEl.querySelectorAll('tbody tr').forEach((tr) => {
+    const cells = Array.from(tr.querySelectorAll('td')).map(
+      (td) => `"${(td.textContent || '').trim().replace(/"/g, '""')}"`,
+    );
     rows.push(cells);
   });
 
-  const csv = rows.map(r => r.join(',')).join('\n');
+  const csv = rows.map((r) => r.join(',')).join('\n');
   const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
 
@@ -32,7 +34,7 @@ export function exportTableToCSV(tableEl: HTMLTableElement, filename: string) {
 
 /** Add export buttons to all .table-section elements on the page */
 export function initCSVExport() {
-  document.querySelectorAll('.table-section').forEach(section => {
+  document.querySelectorAll('.table-section').forEach((section) => {
     const header = section.querySelector('.table-header');
     const table = section.querySelector('.data-table') as HTMLTableElement;
     const title = section.querySelector('.table-title')?.textContent?.trim() || 'export';

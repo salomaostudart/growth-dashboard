@@ -1,7 +1,7 @@
 ---
-import DashboardLayout from '../layouts/DashboardLayout.astro';
 import { getConnector } from '../connectors/registry';
-import { formatNumber, formatPercent, formatCurrency } from '../utils/formatters';
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import { formatCurrency, formatNumber, formatPercent } from '../utils/formatters';
 import { generateInsights } from '../utils/insights-engine';
 import { generateExecutiveReport } from '../utils/report-generator';
 
@@ -26,7 +26,7 @@ const martech = martechR.data;
 
 const insights = generateInsights({ web, seo, email, crm, martech });
 const topInsights = insights.slice(0, 5);
-const recommendations = insights.filter(i => i.type === 'negative').slice(0, 5);
+const recommendations = insights.filter((i) => i.type === 'negative').slice(0, 5);
 
 const currentDate = new Date().toISOString().split('T')[0];
 
@@ -41,18 +41,102 @@ interface KpiRow {
 }
 
 const kpiRows: KpiRow[] = [
-  { metric: 'Sessions', category: 'Web', current: web.sessions, target: web.targets?.sessions?.target ?? null, direction: 'higher', format: 'number' },
-  { metric: 'Users', category: 'Web', current: web.users, target: web.targets?.users?.target ?? null, direction: 'higher', format: 'number' },
-  { metric: 'Bounce Rate', category: 'Web', current: web.bounceRate, target: web.targets?.bounceRate?.target ?? null, direction: 'lower', format: 'percent' },
-  { metric: 'Conversion Rate', category: 'Web', current: web.conversionRate, target: web.targets?.conversionRate?.target ?? null, direction: 'higher', format: 'percent' },
-  { metric: 'Impressions', category: 'SEO', current: seo.impressions, target: seo.targets?.impressions?.target ?? null, direction: 'higher', format: 'number' },
-  { metric: 'Clicks', category: 'SEO', current: seo.clicks, target: seo.targets?.clicks?.target ?? null, direction: 'higher', format: 'number' },
-  { metric: 'Avg Position', category: 'SEO', current: seo.avgPosition, target: seo.targets?.avgPosition?.target ?? null, direction: 'lower', format: 'number' },
-  { metric: 'Open Rate', category: 'Email', current: email.openRate, target: email.targets?.openRate?.target ?? null, direction: 'higher', format: 'percent' },
-  { metric: 'Click Rate', category: 'Email', current: email.clickRate, target: email.targets?.clickRate?.target ?? null, direction: 'higher', format: 'percent' },
-  { metric: 'Leads', category: 'CRM', current: crm.funnel.leads, target: crm.targets?.leads?.target ?? null, direction: 'higher', format: 'number' },
-  { metric: 'MQL', category: 'CRM', current: crm.funnel.mql, target: crm.targets?.mql?.target ?? null, direction: 'higher', format: 'number' },
-  { metric: 'SQL', category: 'CRM', current: crm.funnel.sql, target: crm.targets?.sql?.target ?? null, direction: 'higher', format: 'number' },
+  {
+    metric: 'Sessions',
+    category: 'Web',
+    current: web.sessions,
+    target: web.targets?.sessions?.target ?? null,
+    direction: 'higher',
+    format: 'number',
+  },
+  {
+    metric: 'Users',
+    category: 'Web',
+    current: web.users,
+    target: web.targets?.users?.target ?? null,
+    direction: 'higher',
+    format: 'number',
+  },
+  {
+    metric: 'Bounce Rate',
+    category: 'Web',
+    current: web.bounceRate,
+    target: web.targets?.bounceRate?.target ?? null,
+    direction: 'lower',
+    format: 'percent',
+  },
+  {
+    metric: 'Conversion Rate',
+    category: 'Web',
+    current: web.conversionRate,
+    target: web.targets?.conversionRate?.target ?? null,
+    direction: 'higher',
+    format: 'percent',
+  },
+  {
+    metric: 'Impressions',
+    category: 'SEO',
+    current: seo.impressions,
+    target: seo.targets?.impressions?.target ?? null,
+    direction: 'higher',
+    format: 'number',
+  },
+  {
+    metric: 'Clicks',
+    category: 'SEO',
+    current: seo.clicks,
+    target: seo.targets?.clicks?.target ?? null,
+    direction: 'higher',
+    format: 'number',
+  },
+  {
+    metric: 'Avg Position',
+    category: 'SEO',
+    current: seo.avgPosition,
+    target: seo.targets?.avgPosition?.target ?? null,
+    direction: 'lower',
+    format: 'number',
+  },
+  {
+    metric: 'Open Rate',
+    category: 'Email',
+    current: email.openRate,
+    target: email.targets?.openRate?.target ?? null,
+    direction: 'higher',
+    format: 'percent',
+  },
+  {
+    metric: 'Click Rate',
+    category: 'Email',
+    current: email.clickRate,
+    target: email.targets?.clickRate?.target ?? null,
+    direction: 'higher',
+    format: 'percent',
+  },
+  {
+    metric: 'Leads',
+    category: 'CRM',
+    current: crm.funnel.leads,
+    target: crm.targets?.leads?.target ?? null,
+    direction: 'higher',
+    format: 'number',
+  },
+  {
+    metric: 'MQL',
+    category: 'CRM',
+    current: crm.funnel.mql,
+    target: crm.targets?.mql?.target ?? null,
+    direction: 'higher',
+    format: 'number',
+  },
+  {
+    metric: 'SQL',
+    category: 'CRM',
+    current: crm.funnel.sql,
+    target: crm.targets?.sql?.target ?? null,
+    direction: 'higher',
+    format: 'number',
+  },
 ];
 
 function formatValue(val: number, fmt: 'number' | 'percent' | 'currency'): string {
@@ -77,12 +161,36 @@ function targetStatus(pct: number): 'on-track' | 'warning' | 'behind' {
 
 // Channel performance summary
 const channelRows = [
-  { channel: 'Organic', sessions: Math.round(web.sessions * web.channelMix.organic / 100), share: web.channelMix.organic },
-  { channel: 'Direct', sessions: Math.round(web.sessions * web.channelMix.direct / 100), share: web.channelMix.direct },
-  { channel: 'Paid', sessions: Math.round(web.sessions * web.channelMix.paid / 100), share: web.channelMix.paid },
-  { channel: 'Social', sessions: Math.round(web.sessions * web.channelMix.social / 100), share: web.channelMix.social },
-  { channel: 'Email', sessions: Math.round(web.sessions * web.channelMix.email / 100), share: web.channelMix.email },
-  { channel: 'Referral', sessions: Math.round(web.sessions * web.channelMix.referral / 100), share: web.channelMix.referral },
+  {
+    channel: 'Organic',
+    sessions: Math.round((web.sessions * web.channelMix.organic) / 100),
+    share: web.channelMix.organic,
+  },
+  {
+    channel: 'Direct',
+    sessions: Math.round((web.sessions * web.channelMix.direct) / 100),
+    share: web.channelMix.direct,
+  },
+  {
+    channel: 'Paid',
+    sessions: Math.round((web.sessions * web.channelMix.paid) / 100),
+    share: web.channelMix.paid,
+  },
+  {
+    channel: 'Social',
+    sessions: Math.round((web.sessions * web.channelMix.social) / 100),
+    share: web.channelMix.social,
+  },
+  {
+    channel: 'Email',
+    sessions: Math.round((web.sessions * web.channelMix.email) / 100),
+    share: web.channelMix.email,
+  },
+  {
+    channel: 'Referral',
+    sessions: Math.round((web.sessions * web.channelMix.referral) / 100),
+    share: web.channelMix.referral,
+  },
 ].sort((a, b) => b.sessions - a.sessions);
 
 // Serialize for client-side download
@@ -96,10 +204,25 @@ const reportData = {
     conversionRate: web.conversionRate,
     channelMix: web.channelMix,
   },
-  seo: { impressions: seo.impressions, clicks: seo.clicks, ctr: seo.ctr, avgPosition: seo.avgPosition },
-  email: { openRate: email.openRate, clickRate: email.clickRate, totalSubscribers: email.totalSubscribers },
+  seo: {
+    impressions: seo.impressions,
+    clicks: seo.clicks,
+    ctr: seo.ctr,
+    avgPosition: seo.avgPosition,
+  },
+  email: {
+    openRate: email.openRate,
+    clickRate: email.clickRate,
+    totalSubscribers: email.totalSubscribers,
+  },
   crm: { funnel: crm.funnel },
-  social: { platforms: social.platforms.map(p => ({ name: p.name, followers: p.followers, engagementRate: p.engagementRate })) },
+  social: {
+    platforms: social.platforms.map((p) => ({
+      name: p.name,
+      followers: p.followers,
+      engagementRate: p.engagementRate,
+    })),
+  },
 };
 
 // Pre-generate markdown on server side for MD download

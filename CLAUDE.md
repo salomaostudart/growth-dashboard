@@ -14,6 +14,7 @@ Produto pessoal para unificacao de metricas de marketing digital em um unico pai
 - **Validacao:** Zod 4 (schema validation nos connectors)
 - **Testes:** Vitest 4 (unit) + Playwright (E2E + acessibilidade + performance)
 - **Design:** Oswald + Inter + CSS tokens
+- **Linter/Formatter:** Biome (substitui eslint + prettier — Rust, 30x mais rapido)
 
 ## Arquitetura
 Connector Pattern — cada fonte de dados implementa `IConnector<T>`.
@@ -28,7 +29,9 @@ npm run build      # Build estatico
 npm run test       # Unit tests (Vitest)
 npm run test:e2e   # E2E + acessibilidade + performance (Playwright)
 npm run type-check # TypeScript type checking (astro check)
-npm run lint       # ESLint (src/)
+npm run lint       # Biome check (linter)
+npm run format     # Biome format --write (formatter)
+npm run check      # Biome check --write (lint + format juntos)
 npm run ci         # type-check + test + build (pipeline completo)
 ```
 
@@ -74,8 +77,17 @@ Cada canal tem sua pasta em `src/connectors/`:
 - `social/` — Social media (mock LinkedIn/Meta-shaped)
 - `webflow/` — Martech health (mock Webflow-shaped)
 
+## Security
+- Checklist completo: `docs/security/` (10 areas defense-in-depth)
+- Secrets: nunca em codigo, usar `.env` local + `wrangler secret put` em producao
+- Pre-commit: `gitleaks protect --staged` bloqueia secrets acidentais
+- Supply chain: `npm audit --omit=dev` antes de cada release
+- Disclosure: `SECURITY.md` na raiz (email privado, nao issue publica)
+- Gitleaks `--no-verify` permitido so quando `docs/security/*.md` tem exemplos de anti-patterns em code blocks (nao sao secrets reais)
+
 ## Regras
 - Nao commitar secrets (.env, service accounts)
 - Mock data deve ter variancia realista (weekday/weekend, trends, spikes)
 - Todo chart e KPI deve ter DataSourceTag visivel
 - Acessibilidade WCAG 2.1 AA obrigatoria (axe-core no E2E)
+- Biome e o linter/formatter padrao — nao usar eslint ou prettier

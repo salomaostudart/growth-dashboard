@@ -1,6 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import { buildSankeyData, buildCrossChannelSummary, CHANNEL_MAP } from '../../src/utils/sankey-transformer';
-import type { WebMetrics, CrmMetrics } from '../../src/connectors/base/connector.schema';
+import { describe, expect, it } from 'vitest';
+import type { CrmMetrics, WebMetrics } from '../../src/connectors/base/connector.schema';
+import {
+  CHANNEL_MAP,
+  buildCrossChannelSummary,
+  buildSankeyData,
+} from '../../src/utils/sankey-transformer';
 
 // Minimal fixtures matching the Zod schemas
 const mockWeb: WebMetrics = {
@@ -14,12 +18,12 @@ const mockWeb: WebMetrics = {
   deviceBreakdown: { desktop: 60, mobile: 30, tablet: 10 },
   trafficByDay: [{ date: '2026-04-01', sessions: 350, users: 250 }],
   channelMix: {
-    organic: 40,   // 4000 sessions
-    direct: 25,    // 2500
-    social: 12,    // 1200
-    email: 8,      // 800
-    paid: 10,      // 1000
-    referral: 5,   // 500
+    organic: 40, // 4000 sessions
+    direct: 25, // 2500
+    social: 12, // 1200
+    email: 8, // 800
+    paid: 10, // 1000
+    referral: 5, // 500
   },
 };
 
@@ -34,9 +38,7 @@ const mockCrm: CrmMetrics = {
     { channel: 'Paid Search', leads: 70, mql: 45, sql: 23, pipeline: 12, won: 5, cac: 200 },
     { channel: 'Referral', leads: 40, mql: 30, sql: 10, pipeline: 7, won: 2, cac: 30 },
   ],
-  pipelineByStage: [
-    { stage: 'Discovery', value: 50000, count: 20, confidence: 'low' as const },
-  ],
+  pipelineByStage: [{ stage: 'Discovery', value: 50000, count: 20, confidence: 'low' as const }],
 };
 
 describe('buildSankeyData', () => {
@@ -44,7 +46,7 @@ describe('buildSankeyData', () => {
     const result = buildSankeyData(mockWeb, mockCrm);
 
     // 6 channels + Sessions + Bounced + Leads + MQL + SQL + Pipeline + Won + 4 lost nodes = 17
-    const nodeNames = result.nodes.map(n => n.name);
+    const nodeNames = result.nodes.map((n) => n.name);
     expect(nodeNames).toContain('Sessions');
     expect(nodeNames).toContain('Leads');
     expect(nodeNames).toContain('MQL');
@@ -57,58 +59,60 @@ describe('buildSankeyData', () => {
   it('converts channelMix percentages to absolute sessions', () => {
     const result = buildSankeyData(mockWeb, mockCrm);
 
-    const organicLink = result.links.find(l => l.source === 'Organic Search' && l.target === 'Sessions');
+    const organicLink = result.links.find(
+      (l) => l.source === 'Organic Search' && l.target === 'Sessions',
+    );
     expect(organicLink).toBeDefined();
-    expect(organicLink!.value).toBe(4000); // 40% of 10000
+    expect(organicLink?.value).toBe(4000); // 40% of 10000
 
-    const emailLink = result.links.find(l => l.source === 'Email' && l.target === 'Sessions');
-    expect(emailLink!.value).toBe(800); // 8% of 10000
+    const emailLink = result.links.find((l) => l.source === 'Email' && l.target === 'Sessions');
+    expect(emailLink?.value).toBe(800); // 8% of 10000
   });
 
   it('has Sessions → Leads link with total leads', () => {
     const result = buildSankeyData(mockWeb, mockCrm);
-    const link = result.links.find(l => l.source === 'Sessions' && l.target === 'Leads');
+    const link = result.links.find((l) => l.source === 'Sessions' && l.target === 'Leads');
     expect(link).toBeDefined();
-    expect(link!.value).toBe(500);
+    expect(link?.value).toBe(500);
   });
 
   it('adds bounced/no-conversion link', () => {
     const result = buildSankeyData(mockWeb, mockCrm);
-    const link = result.links.find(l => l.target === 'Bounced / No Conversion');
+    const link = result.links.find((l) => l.target === 'Bounced / No Conversion');
     expect(link).toBeDefined();
-    expect(link!.value).toBe(9500); // 10000 - 500
+    expect(link?.value).toBe(9500); // 10000 - 500
   });
 
   it('creates funnel progression links', () => {
     const result = buildSankeyData(mockWeb, mockCrm);
 
-    const leadsToMql = result.links.find(l => l.source === 'Leads' && l.target === 'MQL');
-    expect(leadsToMql!.value).toBe(300);
+    const leadsToMql = result.links.find((l) => l.source === 'Leads' && l.target === 'MQL');
+    expect(leadsToMql?.value).toBe(300);
 
-    const pipelineToWon = result.links.find(l => l.source === 'Pipeline' && l.target === 'Won');
-    expect(pipelineToWon!.value).toBe(30);
+    const pipelineToWon = result.links.find((l) => l.source === 'Pipeline' && l.target === 'Won');
+    expect(pipelineToWon?.value).toBe(30);
   });
 
   it('creates drop-off links for each funnel stage', () => {
     const result = buildSankeyData(mockWeb, mockCrm);
 
-    const lostAtLeads = result.links.find(l => l.target === 'Lost at Leads');
-    expect(lostAtLeads!.value).toBe(200); // 500 - 300
+    const lostAtLeads = result.links.find((l) => l.target === 'Lost at Leads');
+    expect(lostAtLeads?.value).toBe(200); // 500 - 300
 
-    const lostAtPipeline = result.links.find(l => l.target === 'Lost at Pipeline');
-    expect(lostAtPipeline!.value).toBe(50); // 80 - 30
+    const lostAtPipeline = result.links.find((l) => l.target === 'Lost at Pipeline');
+    expect(lostAtPipeline?.value).toBe(50); // 80 - 30
   });
 
   it('skips channels with 0% sessions', () => {
     const zeroWeb = { ...mockWeb, channelMix: { ...mockWeb.channelMix, referral: 0 } };
     const result = buildSankeyData(zeroWeb, mockCrm);
-    const refLink = result.links.find(l => l.source === 'Referral');
+    const refLink = result.links.find((l) => l.source === 'Referral');
     expect(refLink).toBeUndefined();
   });
 
   it('produces no duplicate nodes', () => {
     const result = buildSankeyData(mockWeb, mockCrm);
-    const names = result.nodes.map(n => n.name);
+    const names = result.nodes.map((n) => n.name);
     expect(names.length).toBe(new Set(names).size);
   });
 });
@@ -134,8 +138,8 @@ describe('buildCrossChannelSummary', () => {
     const summary = buildCrossChannelSummary(mockWeb, mockCrm);
     // Email: 100 leads / 800 sessions = 12.5%
     expect(summary.bestConvertingChannel).toBeDefined();
-    expect(summary.bestConvertingChannel!.name).toBe('Email');
-    expect(summary.bestConvertingChannel!.rate).toBe(12.5);
+    expect(summary.bestConvertingChannel?.name).toBe('Email');
+    expect(summary.bestConvertingChannel?.rate).toBe(12.5);
   });
 
   it('computes win rate', () => {
@@ -146,6 +150,13 @@ describe('buildCrossChannelSummary', () => {
 
 describe('CHANNEL_MAP', () => {
   it('maps all 6 GA4 channelMix keys', () => {
-    expect(Object.keys(CHANNEL_MAP)).toEqual(['organic', 'direct', 'social', 'email', 'paid', 'referral']);
+    expect(Object.keys(CHANNEL_MAP)).toEqual([
+      'organic',
+      'direct',
+      'social',
+      'email',
+      'paid',
+      'referral',
+    ]);
   });
 });
