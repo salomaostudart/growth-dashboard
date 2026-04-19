@@ -23,7 +23,8 @@ const {
   tooltip,
 } = Astro.props;
 
-const deltaType = delta === undefined ? 'neutral' : delta > 0 ? 'positive' : delta < 0 ? 'negative' : 'neutral';
+const deltaType =
+  delta === undefined ? 'neutral' : delta > 0 ? 'positive' : delta < 0 ? 'negative' : 'neutral';
 const deltaFormatted = delta !== undefined ? `${delta > 0 ? '+' : ''}${delta.toFixed(1)}%` : '';
 
 // Generate sparkline SVG path
@@ -35,11 +36,13 @@ function generateSparklinePath(data: number[]): string {
   const width = 120;
   const height = 32;
   const step = width / (data.length - 1);
-  return data.map((val, i) => {
-    const x = i * step;
-    const y = height - ((val - min) / range) * height;
-    return `${i === 0 ? 'M' : 'L'}${x},${y}`;
-  }).join(' ');
+  return data
+    .map((val, i) => {
+      const x = i * step;
+      const y = height - ((val - min) / range) * height;
+      return `${i === 0 ? 'M' : 'L'}${x},${y}`;
+    })
+    .join(' ');
 }
 
 const sparklinePath = generateSparklinePath(sparklineData);

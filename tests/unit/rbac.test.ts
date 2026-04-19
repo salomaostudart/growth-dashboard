@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
+  type Role,
   getPermissions,
+  getRoleBadge,
+  getVisibleNavItems,
   hasPermission,
   isAtLeast,
-  getVisibleNavItems,
-  getRoleBadge,
-  type Role,
 } from '../../src/utils/rbac';
 
 describe('getPermissions', () => {
@@ -85,7 +85,7 @@ describe('getRoleBadge', () => {
 
   it('returns a color for each role', () => {
     const roles: Role[] = ['admin', 'analyst', 'viewer'];
-    roles.forEach(r => {
+    roles.forEach((r) => {
       expect(getRoleBadge(r).color).toMatch(/^#/);
     });
   });

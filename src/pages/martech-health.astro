@@ -1,11 +1,11 @@
 ---
-import DashboardLayout from '../layouts/DashboardLayout.astro';
+import ChartContainer from '../components/charts/ChartContainer.astro';
+import DataSourceTag from '../components/ui/DataSourceTag.astro';
 import MetricCard from '../components/ui/MetricCard.astro';
 import StatusBadge from '../components/ui/StatusBadge.astro';
-import ChartContainer from '../components/charts/ChartContainer.astro';
 import { getConnector } from '../connectors/registry';
-import { formatPercent, formatLatency, formatCurrency, timeAgo } from '../utils/formatters';
-import DataSourceTag from '../components/ui/DataSourceTag.astro';
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import { formatCurrency, formatLatency, formatPercent, timeAgo } from '../utils/formatters';
 
 import { getDefaultDateRange } from '../utils/date-range';
 const dateRange = getDefaultDateRange('30d');
@@ -14,11 +14,13 @@ const martechResult = await getConnector('martech').fetch(dateRange);
 const martech = martechResult.data;
 
 // Aggregates
-const healthySystems = martech.systems.filter(s => s.status === 'healthy').length;
+const healthySystems = martech.systems.filter((s) => s.status === 'healthy').length;
 const totalSystems = martech.systems.length;
-const avgUptime = totalSystems > 0 ? martech.systems.reduce((a, s) => a + s.uptime, 0) / totalSystems : 0;
+const avgUptime =
+  totalSystems > 0 ? martech.systems.reduce((a, s) => a + s.uptime, 0) / totalSystems : 0;
 const totalCost = martech.systems.reduce((a, s) => a + s.monthlyCost, 0);
-const avgLatency = totalSystems > 0 ? martech.systems.reduce((a, s) => a + s.latencyMs, 0) / totalSystems : 0;
+const avgLatency =
+  totalSystems > 0 ? martech.systems.reduce((a, s) => a + s.latencyMs, 0) / totalSystems : 0;
 
 // Maturity score (0-100): weighted by status, uptime, latency
 function calcMaturityScore(): number {
@@ -28,18 +30,25 @@ function calcMaturityScore(): number {
     if (s.status === 'healthy') sysScore += 40;
     else if (s.status === 'degraded') sysScore += 20;
     sysScore += Math.min(s.uptime, 100) * 0.4;
-    sysScore += Math.max(0, 20 - (s.latencyMs / 50));
+    sysScore += Math.max(0, 20 - s.latencyMs / 50);
     score += sysScore;
   }
   return totalSystems > 0 ? Math.round(score / totalSystems) : 0;
 }
 const maturityScore = calcMaturityScore();
-const maturityLevel = maturityScore >= 80 ? 'Excellent' : maturityScore >= 60 ? 'Good' : maturityScore >= 40 ? 'Fair' : 'Needs Work';
+const maturityLevel =
+  maturityScore >= 80
+    ? 'Excellent'
+    : maturityScore >= 60
+      ? 'Good'
+      : maturityScore >= 40
+        ? 'Fair'
+        : 'Needs Work';
 
 // Success rate from automation log
-const successfulRuns = martech.automationLog.filter(l => l.status === 'success').length;
-const automationSuccessRate = martech.automationLog.length > 0
-  ? (successfulRuns / martech.automationLog.length * 100) : 0;
+const successfulRuns = martech.automationLog.filter((l) => l.status === 'success').length;
+const automationSuccessRate =
+  martech.automationLog.length > 0 ? (successfulRuns / martech.automationLog.length) * 100 : 0;
 
 // Serialize for client
 const systemsData = JSON.stringify(martech.systems);

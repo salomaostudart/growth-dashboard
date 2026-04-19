@@ -23,16 +23,31 @@ export interface AlertPayload {
 
 export const DEFAULT_THRESHOLDS: AlertThreshold[] = [
   { metric: 'bounceRate', condition: 'above', value: 55, message: 'Bounce rate above 55%' },
-  { metric: 'conversionRate', condition: 'below', value: 1.5, message: 'Conversion rate below 1.5%' },
-  { metric: 'avgSessionDuration', condition: 'below', value: 60, message: 'Avg session duration below 60s' },
+  {
+    metric: 'conversionRate',
+    condition: 'below',
+    value: 1.5,
+    message: 'Conversion rate below 1.5%',
+  },
+  {
+    metric: 'avgSessionDuration',
+    condition: 'below',
+    value: 60,
+    message: 'Avg session duration below 60s',
+  },
   { metric: 'emailOpenRate', condition: 'below', value: 18, message: 'Email open rate below 18%' },
-  { metric: 'unsubscribeRate', condition: 'above', value: 0.5, message: 'Unsubscribe rate above 0.5%' },
+  {
+    metric: 'unsubscribeRate',
+    condition: 'above',
+    value: 0.5,
+    message: 'Unsubscribe rate above 0.5%',
+  },
   { metric: 'systemsDown', condition: 'above', value: 0, message: 'Martech systems not healthy' },
 ];
 
 export function checkThresholds(
   metrics: Record<string, number>,
-  thresholds: AlertThreshold[] = DEFAULT_THRESHOLDS
+  thresholds: AlertThreshold[] = DEFAULT_THRESHOLDS,
 ): AlertPayload[] {
   const alerts: AlertPayload[] = [];
 
@@ -60,7 +75,10 @@ export function checkThresholds(
   return alerts;
 }
 
-export async function dispatchWebhook(webhookUrl: string, alerts: AlertPayload[]): Promise<boolean> {
+export async function dispatchWebhook(
+  webhookUrl: string,
+  alerts: AlertPayload[],
+): Promise<boolean> {
   if (!webhookUrl || alerts.length === 0) return false;
 
   try {
@@ -69,7 +87,7 @@ export async function dispatchWebhook(webhookUrl: string, alerts: AlertPayload[]
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         text: `🚨 GrowthHQ Alert — ${alerts.length} threshold(s) crossed`,
-        blocks: alerts.map(a => ({
+        blocks: alerts.map((a) => ({
           type: 'section',
           text: {
             type: 'mrkdwn',

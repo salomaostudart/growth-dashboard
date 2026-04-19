@@ -1,10 +1,10 @@
 ---
-import DashboardLayout from '../layouts/DashboardLayout.astro';
-import MetricCard from '../components/ui/MetricCard.astro';
 import ChartContainer from '../components/charts/ChartContainer.astro';
-import { getConnector } from '../connectors/registry';
-import { formatNumber, formatCurrency, calcDelta } from '../utils/formatters';
 import DataSourceTag from '../components/ui/DataSourceTag.astro';
+import MetricCard from '../components/ui/MetricCard.astro';
+import { getConnector } from '../connectors/registry';
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import { calcDelta, formatCurrency, formatNumber } from '../utils/formatters';
 
 import { getDefaultDateRange } from '../utils/date-range';
 const dateRange = getDefaultDateRange('30d');
@@ -13,12 +13,12 @@ const crmResult = await getConnector('crm').fetch(dateRange);
 const crm = crmResult.data;
 
 // Funnel conversion rates
-const mqlRate = crm.funnel.leads > 0 ? (crm.funnel.mql / crm.funnel.leads * 100) : 0;
-const sqlRate = crm.funnel.mql > 0 ? (crm.funnel.sql / crm.funnel.mql * 100) : 0;
-const winRate = crm.funnel.pipeline > 0 ? (crm.funnel.won / crm.funnel.pipeline * 100) : 0;
+const mqlRate = crm.funnel.leads > 0 ? (crm.funnel.mql / crm.funnel.leads) * 100 : 0;
+const sqlRate = crm.funnel.mql > 0 ? (crm.funnel.sql / crm.funnel.mql) * 100 : 0;
+const winRate = crm.funnel.pipeline > 0 ? (crm.funnel.won / crm.funnel.pipeline) * 100 : 0;
 
-const fmt = (v: number | null) => v !== null ? Number(v.toFixed(1)) : undefined;
-const leadsDelta = fmt(calcDelta(crm.leadVelocity.map(d => d.leads)));
+const fmt = (v: number | null) => (v !== null ? Number(v.toFixed(1)) : undefined);
+const leadsDelta = fmt(calcDelta(crm.leadVelocity.map((d) => d.leads)));
 
 // Serialize for client
 const funnelData = JSON.stringify(crm.funnel);

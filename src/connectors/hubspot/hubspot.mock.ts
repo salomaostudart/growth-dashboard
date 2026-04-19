@@ -1,6 +1,11 @@
-import type { IConnector, ConnectorResult, ConnectorHealth, DateRangeParams } from '../base/connector.interface';
-import type { CrmMetrics } from '../base/connector.schema';
 import { generateCrmMetrics } from '../../utils/mock-generator';
+import type {
+  ConnectorHealth,
+  ConnectorResult,
+  DateRangeParams,
+  IConnector,
+} from '../base/connector.interface';
+import type { CrmMetrics } from '../base/connector.schema';
 
 export class CrmMockConnector implements IConnector<CrmMetrics> {
   readonly name = 'HubSpot CRM (Mock)';

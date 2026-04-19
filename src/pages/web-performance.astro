@@ -1,10 +1,10 @@
 ---
-import DashboardLayout from '../layouts/DashboardLayout.astro';
-import MetricCard from '../components/ui/MetricCard.astro';
 import ChartContainer from '../components/charts/ChartContainer.astro';
-import { getConnector } from '../connectors/registry';
-import { formatNumber, formatPercent, formatDuration, calcDelta } from '../utils/formatters';
 import DataSourceTag from '../components/ui/DataSourceTag.astro';
+import MetricCard from '../components/ui/MetricCard.astro';
+import { getConnector } from '../connectors/registry';
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import { calcDelta, formatDuration, formatNumber, formatPercent } from '../utils/formatters';
 
 import { getDefaultDateRange } from '../utils/date-range';
 const dateRange = getDefaultDateRange('30d');
@@ -18,13 +18,13 @@ const bounceRate = web.bounceRate;
 const deviceBreakdown = web.deviceBreakdown;
 
 // Traffic sparklines
-const sessionSparkline = web.trafficByDay.slice(-14).map(d => d.sessions);
-const userSparkline = web.trafficByDay.slice(-14).map(d => d.users);
+const sessionSparkline = web.trafficByDay.slice(-14).map((d) => d.sessions);
+const userSparkline = web.trafficByDay.slice(-14).map((d) => d.users);
 
-const fmt = (v: number | null) => v !== null ? Number(v.toFixed(1)) : undefined;
-const sessionsDelta = fmt(calcDelta(web.trafficByDay.map(d => d.sessions)));
-const usersDelta = fmt(calcDelta(web.trafficByDay.map(d => d.users)));
-const pageviewsDelta = fmt(calcDelta(web.trafficByDay.map(d => d.sessions * 2.5)));
+const fmt = (v: number | null) => (v !== null ? Number(v.toFixed(1)) : undefined);
+const sessionsDelta = fmt(calcDelta(web.trafficByDay.map((d) => d.sessions)));
+const usersDelta = fmt(calcDelta(web.trafficByDay.map((d) => d.users)));
+const pageviewsDelta = fmt(calcDelta(web.trafficByDay.map((d) => d.sessions * 2.5)));
 
 // Serialize for client
 const trafficData = JSON.stringify(web.trafficByDay);

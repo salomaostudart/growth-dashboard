@@ -5,7 +5,7 @@
  * Flow: Channel → Sessions → Leads → MQL → SQL → Pipeline → Won
  * channelMix values are percentages — multiplied by total sessions.
  */
-import type { WebMetrics, CrmMetrics } from '../connectors/base/connector.schema';
+import type { CrmMetrics, WebMetrics } from '../connectors/base/connector.schema';
 
 export interface SankeyNode {
   name: string;
@@ -35,7 +35,7 @@ export const CHANNEL_MAP: Record<string, string> = {
 export function buildSankeyData(web: WebMetrics, crm: CrmMetrics): SankeyData {
   const mix = web.channelMix;
   const totalSessions = web.sessions;
-  const _attrByChannel = new Map(crm.channelAttribution.map(a => [a.channel, a]));
+  const _attrByChannel = new Map(crm.channelAttribution.map((a) => [a.channel, a]));
 
   const nodes: SankeyNode[] = [];
   const nodeSet = new Set<string>();
@@ -53,7 +53,7 @@ export function buildSankeyData(web: WebMetrics, crm: CrmMetrics): SankeyData {
 
   for (const [key, channelName] of Object.entries(CHANNEL_MAP)) {
     const pct = mix[key as keyof typeof mix] ?? 0;
-    const sessions = Math.round(totalSessions * pct / 100);
+    const sessions = Math.round((totalSessions * pct) / 100);
 
     if (sessions <= 0) continue;
 
@@ -130,8 +130,11 @@ export function buildCrossChannelSummary(web: WebMetrics, crm: CrmMetrics): Cros
   let topKey = 'organic';
   let topVal = 0;
   for (const [key, pct] of Object.entries(mix) as [string, number][]) {
-    const abs = Math.round(totalSessions * pct / 100);
-    if (abs > topVal) { topKey = key; topVal = abs; }
+    const abs = Math.round((totalSessions * pct) / 100);
+    if (abs > topVal) {
+      topKey = key;
+      topVal = abs;
+    }
   }
   const topChannel = { name: CHANNEL_MAP[topKey] || topKey, sessions: topVal };
 
@@ -139,8 +142,8 @@ export function buildCrossChannelSummary(web: WebMetrics, crm: CrmMetrics): Cros
   let bestConvertingChannel: { name: string; rate: number } | null = null;
   for (const [key, channelName] of Object.entries(CHANNEL_MAP)) {
     const pct = mix[key as keyof typeof mix] ?? 0;
-    const sessions = Math.round(totalSessions * pct / 100);
-    const attr = crm.channelAttribution.find(a => a.channel === channelName);
+    const sessions = Math.round((totalSessions * pct) / 100);
+    const attr = crm.channelAttribution.find((a) => a.channel === channelName);
     if (sessions > 0 && attr && attr.leads > 0) {
       const rate = (attr.leads / sessions) * 100;
       if (!bestConvertingChannel || rate > bestConvertingChannel.rate) {

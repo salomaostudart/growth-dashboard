@@ -1,10 +1,10 @@
 ---
-import DashboardLayout from '../layouts/DashboardLayout.astro';
-import MetricCard from '../components/ui/MetricCard.astro';
 import ChartContainer from '../components/charts/ChartContainer.astro';
 import AlertBanner from '../components/ui/AlertBanner.astro';
-import { getConnector, getAllConnectors } from '../connectors/registry';
-import { formatNumber, formatPercent, calcDelta } from '../utils/formatters';
+import MetricCard from '../components/ui/MetricCard.astro';
+import { getAllConnectors, getConnector } from '../connectors/registry';
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import { calcDelta, formatNumber, formatPercent } from '../utils/formatters';
 import { generateInsights } from '../utils/insights-engine';
 
 import { getDefaultDateRange } from '../utils/date-range';
@@ -23,26 +23,46 @@ const crm = crmResult.data;
 const martech = martechResult.data;
 
 // System health summary
-const healthySystems = martech.systems.filter(s => s.status === 'healthy').length;
+const healthySystems = martech.systems.filter((s) => s.status === 'healthy').length;
 const totalSystems = martech.systems.length;
 
 // Generate sparkline data from traffic
-const sessionSparkline = web.trafficByDay.slice(-14).map(d => d.sessions);
+const sessionSparkline = web.trafficByDay.slice(-14).map((d) => d.sessions);
 
 // Alerts
-const alerts: Array<{ type: 'warning' | 'danger' | 'info'; message: string; metric?: string; value?: string }> = [];
-if (web.bounceRate > 55) alerts.push({ type: 'warning', message: 'Bounce rate above threshold', metric: 'Bounce Rate', value: formatPercent(web.bounceRate) });
-const degradedSystems = martech.systems.filter(s => s.status !== 'healthy');
-degradedSystems.forEach(s => alerts.push({ type: 'danger', message: `${s.name} is ${s.status}`, metric: 'Uptime', value: formatPercent(s.uptime) }));
+const alerts: Array<{
+  type: 'warning' | 'danger' | 'info';
+  message: string;
+  metric?: string;
+  value?: string;
+}> = [];
+if (web.bounceRate > 55)
+  alerts.push({
+    type: 'warning',
+    message: 'Bounce rate above threshold',
+    metric: 'Bounce Rate',
+    value: formatPercent(web.bounceRate),
+  });
+const degradedSystems = martech.systems.filter((s) => s.status !== 'healthy');
+degradedSystems.forEach((s) =>
+  alerts.push({
+    type: 'danger',
+    message: `${s.name} is ${s.status}`,
+    metric: 'Uptime',
+    value: formatPercent(s.uptime),
+  }),
+);
 
 // Connector sources for all cards
 const connectors = getAllConnectors();
 
-const fmt = (v: number | null) => v !== null ? Number(v.toFixed(1)) : undefined;
-const sessionsDelta = fmt(calcDelta(web.trafficByDay.map(d => d.sessions)));
-const impressionsDelta = fmt(calcDelta(seo.topQueries.map(q => q.impressions)));
-const conversionDelta = fmt(calcDelta(web.trafficByDay.map(d => d.sessions * web.conversionRate / 100)));
-const pipelineDelta = fmt(calcDelta(crm.leadVelocity.map(d => d.leads)));
+const fmt = (v: number | null) => (v !== null ? Number(v.toFixed(1)) : undefined);
+const sessionsDelta = fmt(calcDelta(web.trafficByDay.map((d) => d.sessions)));
+const impressionsDelta = fmt(calcDelta(seo.topQueries.map((q) => q.impressions)));
+const conversionDelta = fmt(
+  calcDelta(web.trafficByDay.map((d) => (d.sessions * web.conversionRate) / 100)),
+);
+const pipelineDelta = fmt(calcDelta(crm.leadVelocity.map((d) => d.leads)));
 
 // Insights
 const insights = generateInsights({ web, seo, email, crm, martech });

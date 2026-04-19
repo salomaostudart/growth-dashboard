@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Lighthouse-style performance checks using Playwright.
@@ -29,13 +29,13 @@ test.describe('Performance & Quality', () => {
     for (let i = 0; i < count; i++) {
       const box = await cards.nth(i).boundingBox();
       expect(box).not.toBeNull();
-      expect(box!.height).toBeGreaterThan(50);
+      expect(box?.height).toBeGreaterThan(50);
     }
   });
 
   test('no application errors on page load', async ({ page }) => {
     const errors: string[] = [];
-    page.on('console', msg => {
+    page.on('console', (msg) => {
       if (msg.type() === 'error') {
         const text = msg.text();
         // Ignore Vite dev server transient errors (cold start, HMR)
@@ -43,7 +43,7 @@ test.describe('Performance & Quality', () => {
         errors.push(text);
       }
     });
-    page.on('pageerror', err => errors.push(err.message));
+    page.on('pageerror', (err) => errors.push(err.message));
 
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     expect(errors).toEqual([]);
@@ -68,14 +68,14 @@ test.describe('Performance & Quality', () => {
     const fontsLoaded = await page.evaluate(() => {
       return document.fonts.ready.then(() => {
         const families = new Set<string>();
-        document.fonts.forEach(font => families.add(font.family));
+        document.fonts.forEach((font) => families.add(font.family));
         return Array.from(families);
       });
     });
 
     // Oswald (headings) and Inter (body) should be loaded
-    const hasOswald = fontsLoaded.some(f => f.toLowerCase().includes('oswald'));
-    const hasInter = fontsLoaded.some(f => f.toLowerCase().includes('inter'));
+    const hasOswald = fontsLoaded.some((f) => f.toLowerCase().includes('oswald'));
+    const hasInter = fontsLoaded.some((f) => f.toLowerCase().includes('inter'));
     expect(hasOswald).toBe(true);
     expect(hasInter).toBe(true);
   });
@@ -87,7 +87,7 @@ test.describe('Performance & Quality', () => {
     const sidebar = page.locator('.sidebar');
     const box = await sidebar.boundingBox();
     // Sidebar should be off-screen (translateX(-100%))
-    expect(box!.x).toBeLessThan(0);
+    expect(box?.x).toBeLessThan(0);
 
     // Mobile menu button should be visible
     const menuBtn = page.locator('.mobile-menu-btn');

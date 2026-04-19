@@ -1,19 +1,19 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  WebMetricsSchema,
-  SeoMetricsSchema,
-  EmailMetricsSchema,
-  SocialMetricsSchema,
   CrmMetricsSchema,
+  EmailMetricsSchema,
   MartechHealthSchema,
+  SeoMetricsSchema,
+  SocialMetricsSchema,
+  WebMetricsSchema,
 } from '../../src/connectors/base/connector.schema';
 import {
-  generateWebMetrics,
-  generateSeoMetrics,
-  generateEmailMetrics,
-  generateSocialMetrics,
   generateCrmMetrics,
+  generateEmailMetrics,
   generateMartechHealth,
+  generateSeoMetrics,
+  generateSocialMetrics,
+  generateWebMetrics,
 } from '../../src/utils/mock-generator';
 
 // Schema-to-key mapping for validation in fetch() tests
@@ -75,7 +75,10 @@ describe('Live Connectors — snapshot-based', () => {
     fs.mkdirSync(snapshotDir, { recursive: true });
 
     const mockData = generateWebMetrics();
-    fs.writeFileSync(snapshotPath, JSON.stringify({ fetchedAt: new Date().toISOString(), data: mockData }));
+    fs.writeFileSync(
+      snapshotPath,
+      JSON.stringify({ fetchedAt: new Date().toISOString(), data: mockData }),
+    );
 
     try {
       const { WebLiveConnector } = await import('../../src/connectors/ga4/ga4.connector');
@@ -104,10 +107,15 @@ describe('Live Connectors — snapshot-based', () => {
     fs.mkdirSync(snapshotDir, { recursive: true });
 
     const mockData = generateSeoMetrics();
-    fs.writeFileSync(snapshotPath, JSON.stringify({ fetchedAt: new Date().toISOString(), data: mockData }));
+    fs.writeFileSync(
+      snapshotPath,
+      JSON.stringify({ fetchedAt: new Date().toISOString(), data: mockData }),
+    );
 
     try {
-      const { SeoLiveConnector } = await import('../../src/connectors/search-console/gsc.connector');
+      const { SeoLiveConnector } = await import(
+        '../../src/connectors/search-console/gsc.connector'
+      );
       const connector = new SeoLiveConnector();
 
       expect(connector.name).toBe('Google Search Console');
@@ -177,7 +185,7 @@ describe('Connector Registry', () => {
     const { getAllConnectors } = await import('../../src/connectors/registry');
     const connectors = getAllConnectors();
 
-    for (const [key, connector] of Object.entries(connectors)) {
+    for (const [_key, connector] of Object.entries(connectors)) {
       const health = await connector.health();
       expect(health.status).toBe('healthy');
       expect(health.lastCheck).toBeInstanceOf(Date);

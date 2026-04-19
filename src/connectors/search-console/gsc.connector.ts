@@ -1,10 +1,17 @@
-import type { IConnector, ConnectorResult, ConnectorHealth, DateRangeParams } from '../base/connector.interface';
-import type { SeoMetrics } from '../base/connector.schema';
-import { SeoMetricsSchema } from '../base/connector.schema';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import type {
+  ConnectorHealth,
+  ConnectorResult,
+  DateRangeParams,
+  IConnector,
+} from '../base/connector.interface';
+import type { SeoMetrics } from '../base/connector.schema';
+import { SeoMetricsSchema } from '../base/connector.schema';
 
-const SNAPSHOT_PATH = fileURLToPath(new URL('../../data/snapshots/gsc-snapshot.json', import.meta.url));
+const SNAPSHOT_PATH = fileURLToPath(
+  new URL('../../data/snapshots/gsc-snapshot.json', import.meta.url),
+);
 
 export class SeoLiveConnector implements IConnector<SeoMetrics> {
   readonly name = 'Google Search Console';
@@ -28,7 +35,14 @@ export class SeoLiveConnector implements IConnector<SeoMetrics> {
         data: null as unknown as SeoMetrics,
         source: 'live',
         fetchedAt: new Date(),
-        errors: [{ code: 'SNAPSHOT_ERROR', message: `GSC snapshot error: ${message}`, timestamp: new Date(), recoverable: true }],
+        errors: [
+          {
+            code: 'SNAPSHOT_ERROR',
+            message: `GSC snapshot error: ${message}`,
+            timestamp: new Date(),
+            recoverable: true,
+          },
+        ],
       };
     }
   }
@@ -48,9 +62,19 @@ export class SeoLiveConnector implements IConnector<SeoMetrics> {
         };
       }
 
-      return { status: 'healthy', lastCheck: new Date(), latencyMs: 0, message: 'Snapshot up to date' };
+      return {
+        status: 'healthy',
+        lastCheck: new Date(),
+        latencyMs: 0,
+        message: 'Snapshot up to date',
+      };
     } catch {
-      return { status: 'down', lastCheck: new Date(), latencyMs: 0, message: 'Snapshot file not found' };
+      return {
+        status: 'down',
+        lastCheck: new Date(),
+        latencyMs: 0,
+        message: 'Snapshot file not found',
+      };
     }
   }
 }

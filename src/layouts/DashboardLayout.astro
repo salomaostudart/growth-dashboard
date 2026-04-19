@@ -24,10 +24,17 @@ const [webR, seoR, emailR, socialR, crmR, martechR] = await Promise.all([
 ]);
 // Role determined at runtime via Supabase session (default: 'viewer' for safety)
 const userRole = 'viewer' as const;
-const chatContext = buildChatContext({
-  web: webR.data, seo: seoR.data, email: emailR.data,
-  social: socialR.data, crm: crmR.data, martech: martechR.data,
-}, userRole);
+const chatContext = buildChatContext(
+  {
+    web: webR.data,
+    seo: seoR.data,
+    email: emailR.data,
+    social: socialR.data,
+    crm: crmR.data,
+    martech: martechR.data,
+  },
+  userRole,
+);
 const chatSystemPrompt = buildSystemPrompt(userRole);
 
 const navItems = [
@@ -43,12 +50,12 @@ const navItems = [
   { id: 'docs', label: 'Docs', href: '/docs/', icon: 'book' },
   { id: 'about', label: 'About', href: '/about/', icon: 'grid' },
 ];
+import AuthGate from '../components/ui/AuthGate.astro';
+import ChatPanel from '../components/ui/ChatPanel.astro';
 import CommandPalette from '../components/ui/CommandPalette.astro';
 import OnboardingBanner from '../components/ui/OnboardingBanner.astro';
-import AuthGate from '../components/ui/AuthGate.astro';
-import RoleBadge from '../components/ui/RoleBadge.astro';
-import ChatPanel from '../components/ui/ChatPanel.astro';
 import ProjectSelector from '../components/ui/ProjectSelector.astro';
+import RoleBadge from '../components/ui/RoleBadge.astro';
 ---
 
 <!DOCTYPE html>

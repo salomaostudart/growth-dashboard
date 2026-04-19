@@ -14,7 +14,10 @@ function extractValue(context: string, label: string): string {
 }
 
 function extractSection(context: string, tag: string): string {
-  return context.split('\n').filter(l => l.startsWith(`[${tag}]`)).join('\n');
+  return context
+    .split('\n')
+    .filter((l) => l.startsWith(`[${tag}]`))
+    .join('\n');
 }
 
 export const MOCK_RESPONSES: MockResponse[] = [

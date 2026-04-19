@@ -1,6 +1,11 @@
-import type { IConnector, ConnectorResult, ConnectorHealth, DateRangeParams } from '../base/connector.interface';
-import type { SeoMetrics } from '../base/connector.schema';
 import { generateSeoMetrics } from '../../utils/mock-generator';
+import type {
+  ConnectorHealth,
+  ConnectorResult,
+  DateRangeParams,
+  IConnector,
+} from '../base/connector.interface';
+import type { SeoMetrics } from '../base/connector.schema';
 
 export class SeoMockConnector implements IConnector<SeoMetrics> {
   readonly name = 'Google Search Console (Mock)';

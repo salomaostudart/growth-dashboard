@@ -1,10 +1,17 @@
-import type { IConnector, ConnectorResult, ConnectorHealth, DateRangeParams } from '../base/connector.interface';
-import type { WebMetrics } from '../base/connector.schema';
-import { WebMetricsSchema } from '../base/connector.schema';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import type {
+  ConnectorHealth,
+  ConnectorResult,
+  DateRangeParams,
+  IConnector,
+} from '../base/connector.interface';
+import type { WebMetrics } from '../base/connector.schema';
+import { WebMetricsSchema } from '../base/connector.schema';
 
-const SNAPSHOT_PATH = fileURLToPath(new URL('../../data/snapshots/ga4-snapshot.json', import.meta.url));
+const SNAPSHOT_PATH = fileURLToPath(
+  new URL('../../data/snapshots/ga4-snapshot.json', import.meta.url),
+);
 
 export class WebLiveConnector implements IConnector<WebMetrics> {
   readonly name = 'Google Analytics 4';
@@ -28,7 +35,14 @@ export class WebLiveConnector implements IConnector<WebMetrics> {
         data: null as unknown as WebMetrics,
         source: 'live',
         fetchedAt: new Date(),
-        errors: [{ code: 'SNAPSHOT_ERROR', message: `GA4 snapshot error: ${message}`, timestamp: new Date(), recoverable: true }],
+        errors: [
+          {
+            code: 'SNAPSHOT_ERROR',
+            message: `GA4 snapshot error: ${message}`,
+            timestamp: new Date(),
+            recoverable: true,
+          },
+        ],
       };
     }
   }
@@ -48,9 +62,19 @@ export class WebLiveConnector implements IConnector<WebMetrics> {
         };
       }
 
-      return { status: 'healthy', lastCheck: new Date(), latencyMs: 0, message: 'Snapshot up to date' };
+      return {
+        status: 'healthy',
+        lastCheck: new Date(),
+        latencyMs: 0,
+        message: 'Snapshot up to date',
+      };
     } catch {
-      return { status: 'down', lastCheck: new Date(), latencyMs: 0, message: 'Snapshot file not found' };
+      return {
+        status: 'down',
+        lastCheck: new Date(),
+        latencyMs: 0,
+        message: 'Snapshot file not found',
+      };
     }
   }
 }

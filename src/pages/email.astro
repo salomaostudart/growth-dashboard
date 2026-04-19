@@ -1,10 +1,10 @@
 ---
-import DashboardLayout from '../layouts/DashboardLayout.astro';
-import MetricCard from '../components/ui/MetricCard.astro';
 import ChartContainer from '../components/charts/ChartContainer.astro';
-import { getConnector } from '../connectors/registry';
-import { formatNumber, formatPercent } from '../utils/formatters';
 import DataSourceTag from '../components/ui/DataSourceTag.astro';
+import MetricCard from '../components/ui/MetricCard.astro';
+import { getConnector } from '../connectors/registry';
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import { formatNumber, formatPercent } from '../utils/formatters';
 
 import { getDefaultDateRange } from '../utils/date-range';
 const dateRange = getDefaultDateRange('30d');
