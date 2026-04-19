@@ -37,10 +37,22 @@ npm run ci         # type-check + test + build (pipeline completo)
 - **Manual:** `npx wrangler deploy` (publica no Worker `growth-dashboard-worker`).
 - **Rollback:** `npx wrangler rollback` (volta pro deployment anterior).
 - **Logs:** `npx wrangler tail` (streaming em tempo real).
-- **Pages legacy (pre-cutover):** `npm run deploy` ainda funciona ate TP3 custom domain ser migrado.
+- **Pages legacy:** `npm run deploy` ainda funciona — Pages `growth-dashboard` preservado como rollback de 7-30 dias (apos TP3 cutover 18/04, dominio `growth.sal.dev.br` serve do Worker).
 
-Config: `wrangler.jsonc` na raiz. Build cmd no Workers Builds = `npm run ci`.
-Contexto: `hq/reference/cicd-cloudflare-roadmap-2026-04.md`.
+Config: `wrangler.jsonc` na raiz (tem `compatibility_flags: ["nodejs_compat"]` desde 18/04). Build cmd no Workers Builds = `npm run ci`.
+
+### Build-time secrets (Workers Builds dashboard)
+
+Configurar em Cloudflare Dashboard > Workers & Pages > growth-dashboard-worker > Settings > Builds > Environment variables (flag **Plain**, nao Secret — sao publicas por design):
+
+| Nome | Origem | Valor |
+|---|---|---|
+| `PUBLIC_SUPABASE_URL` | `.env` local | `https://<ref>.supabase.co` |
+| `PUBLIC_SUPABASE_ANON_KEY` | `.env` local | `eyJ...` (JWT anon, publica por design + RLS protege) |
+
+Sem esses env vars, o build Astro falha com `undefined is not a valid URL` ao instanciar cliente Supabase.
+
+Contexto completo: `hq/reference/cicd-cloudflare-roadmap-2026-04.md`.
 
 ## Testes
 Rodar unit tests antes de qualquer implementacao. Se falhar, corrigir primeiro.
