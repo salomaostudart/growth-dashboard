@@ -197,83 +197,84 @@ const referralData = JSON.stringify(social.referralByDay);
 </script>
 
 <script>
-  import echarts from '../utils/echarts-setup';
-  import { dashboardTheme } from '../utils/echarts-theme';
+  import { lazyInitCharts } from '../utils/echarts-loader';
 
-  echarts.registerTheme('dashboard', dashboardTheme);
+  lazyInitCharts([
+    {
+      id: 'social-followers-chart',
+      setup: (echarts) => {
+        const el = document.getElementById('social-followers-chart')!;
+        const chart = echarts.init(el, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
+        const platforms = (window as any).__social_platforms || [];
 
-  // Followers bar chart
-  const followEl = document.getElementById('social-followers-chart');
-  if (followEl) {
-    const chart = echarts.init(followEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
-    const platforms = (window as any).__social_platforms || [];
-
-    chart.setOption({
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      legend: { data: ['Followers', 'Growth %'], right: 10, top: 0 },
-      grid: { left: '3%', right: '8%', bottom: '3%', top: '14%', containLabel: true },
-      xAxis: { type: 'category', data: platforms.map((p: any) => p.name) },
-      yAxis: [
-        { type: 'value', name: 'Followers' },
-        { type: 'value', name: 'Growth %', axisLabel: { formatter: '{value}%' } },
-      ],
-      series: [
-        {
-          name: 'Followers',
-          type: 'bar',
-          data: platforms.map((p: any) => p.followers),
-          barMaxWidth: 40,
-          itemStyle: { borderRadius: [4, 4, 0, 0] },
-        },
-        {
-          name: 'Growth %',
-          type: 'line',
-          yAxisIndex: 1,
-          data: platforms.map((p: any) => p.followerGrowth),
-          symbolSize: 8,
-          lineStyle: { width: 2 },
-        },
-      ],
-    });
-    window.addEventListener('resize', () => chart.resize());
-  }
-
-  // Referral stacked area
-  const refEl = document.getElementById('social-referral-chart');
-  if (refEl) {
-    const chart = echarts.init(refEl, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
-    const raw = (window as any).__social_referral || [];
-
-    // Group by date, stack by platform
-    const dates = [...new Set(raw.map((r: any) => r.date))].sort();
-    const platforms = [...new Set(raw.map((r: any) => r.platform))];
-
-    const series = (platforms as string[]).map((platform: string) => ({
-      name: platform,
-      type: 'line',
-      stack: 'referral',
-      areaStyle: { opacity: 0.3 },
-      smooth: true,
-      symbolSize: 0,
-      lineStyle: { width: 1.5 },
-      data: (dates as string[]).map((date: string) => {
-        const entry = raw.find((r: any) => r.date === date && r.platform === platform);
-        return entry ? entry.sessions : 0;
-      }),
-    }));
-
-    chart.setOption({
-      tooltip: { trigger: 'axis' },
-      legend: { data: platforms, right: 10, top: 0, textStyle: { fontSize: 10 } },
-      grid: { left: '3%', right: '4%', bottom: '3%', top: '14%', containLabel: true },
-      xAxis: {
-        type: 'category',
-        data: dates,
-        axisLabel: { formatter: (v: string) => { const d = new Date(v); return `${d.getMonth()+1}/${d.getDate()}`; }, interval: 6 },
+        chart.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          legend: { data: ['Followers', 'Growth %'], right: 10, top: 0 },
+          grid: { left: '3%', right: '8%', bottom: '3%', top: '14%', containLabel: true },
+          xAxis: { type: 'category', data: platforms.map((p: any) => p.name) },
+          yAxis: [
+            { type: 'value', name: 'Followers' },
+            { type: 'value', name: 'Growth %', axisLabel: { formatter: '{value}%' } },
+          ],
+          series: [
+            {
+              name: 'Followers',
+              type: 'bar',
+              data: platforms.map((p: any) => p.followers),
+              barMaxWidth: 40,
+              itemStyle: { borderRadius: [4, 4, 0, 0] },
+            },
+            {
+              name: 'Growth %',
+              type: 'line',
+              yAxisIndex: 1,
+              data: platforms.map((p: any) => p.followerGrowth),
+              symbolSize: 8,
+              lineStyle: { width: 2 },
+            },
+          ],
+        });
+        window.addEventListener('resize', () => chart.resize());
       },
-      yAxis: { type: 'value' },
-      series,
-    });
-    window.addEventListener('resize', () => chart.resize());
-  }
+    },
+    {
+      id: 'social-referral-chart',
+      setup: (echarts) => {
+        const el = document.getElementById('social-referral-chart')!;
+        const chart = echarts.init(el, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
+        const raw = (window as any).__social_referral || [];
+
+        const dates = [...new Set(raw.map((r: any) => r.date))].sort();
+        const platforms = [...new Set(raw.map((r: any) => r.platform))];
+
+        const series = (platforms as string[]).map((platform: string) => ({
+          name: platform,
+          type: 'line',
+          stack: 'referral',
+          areaStyle: { opacity: 0.3 },
+          smooth: true,
+          symbolSize: 0,
+          lineStyle: { width: 1.5 },
+          data: (dates as string[]).map((date: string) => {
+            const entry = raw.find((r: any) => r.date === date && r.platform === platform);
+            return entry ? entry.sessions : 0;
+          }),
+        }));
+
+        chart.setOption({
+          tooltip: { trigger: 'axis' },
+          legend: { data: platforms, right: 10, top: 0, textStyle: { fontSize: 10 } },
+          grid: { left: '3%', right: '4%', bottom: '3%', top: '14%', containLabel: true },
+          xAxis: {
+            type: 'category',
+            data: dates,
+            axisLabel: { formatter: (v: string) => { const d = new Date(v); return `${d.getMonth()+1}/${d.getDate()}`; }, interval: 6 },
+          },
+          yAxis: { type: 'value' },
+          series,
+        });
+        window.addEventListener('resize', () => chart.resize());
+      },
+    },
+  ]);
 </script>

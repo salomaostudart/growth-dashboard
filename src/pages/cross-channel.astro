@@ -170,74 +170,72 @@ const channelTable = crm.channelAttribution.map((ch) => {
 </script>
 
 <script>
-  import echarts from '../utils/echarts-setup';
-  import { dashboardTheme } from '../utils/echarts-theme';
+  import { lazyInitCharts } from '../utils/echarts-loader';
 
-  echarts.registerTheme('dashboard', dashboardTheme);
+  lazyInitCharts([
+    {
+      id: 'sankey-chart',
+      setup: (echarts) => {
+        const el = document.getElementById('sankey-chart')!;
+        const chart = echarts.init(el, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
+        const data = (window as any).__sankey_data || { nodes: [], links: [] };
 
-  const el = document.getElementById('sankey-chart');
-  if (el) {
-    const chart = echarts.init(el, 'dashboard', { devicePixelRatio: Math.max(window.devicePixelRatio, 2) });
-    const data = (window as any).__sankey_data || { nodes: [], links: [] };
+        const channelColors: Record<string, string> = {
+          'Organic Search': '#818cf8',
+          'Direct': '#06b6d4',
+          'Social Media': '#f59e0b',
+          'Email': '#10b981',
+          'Paid Search': '#ef4444',
+          'Referral': '#8b5cf6',
+        };
 
-    const channelColors: Record<string, string> = {
-      'Organic Search': '#818cf8',
-      'Direct': '#06b6d4',
-      'Social Media': '#f59e0b',
-      'Email': '#10b981',
-      'Paid Search': '#ef4444',
-      'Referral': '#8b5cf6',
-    };
-
-    chart.setOption({
-      tooltip: {
-        trigger: 'item',
-        formatter: (params: any) => {
-          if (params.dataType === 'edge') {
-            return `${params.data.source} → ${params.data.target}<br/><strong>${params.data.value.toLocaleString()}</strong>`;
-          }
-          return `<strong>${params.name}</strong>`;
-        },
-      },
-      series: [{
-        type: 'sankey',
-        layout: 'none',
-        emphasis: { focus: 'adjacency' },
-        nodeAlign: 'left',
-        data: data.nodes.map((n: any) => ({
-          name: n.name,
-          itemStyle: {
-            color: channelColors[n.name]
-              || (n.name.startsWith('Lost') || n.name === 'Bounced / No Conversion' ? '#475569' : undefined),
+        chart.setOption({
+          tooltip: {
+            trigger: 'item',
+            formatter: (params: any) => {
+              if (params.dataType === 'edge') {
+                return `${params.data.source} → ${params.data.target}<br/><strong>${params.data.value.toLocaleString()}</strong>`;
+              }
+              return `<strong>${params.name}</strong>`;
+            },
           },
-        })),
-        links: data.links,
-        lineStyle: {
-          color: 'gradient',
-          opacity: 0.35,
-        },
-        label: {
-          color: '#e2e8f0',
-          fontSize: 11,
-          fontFamily: 'Inter, sans-serif',
-          position: 'outside',
-        },
-        nodeWidth: 20,
-        nodeGap: 12,
-        left: '8%',
-        right: '18%',
-        top: '5%',
-        bottom: '5%',
-      }],
-    });
+          series: [{
+            type: 'sankey',
+            layout: 'none',
+            emphasis: { focus: 'adjacency' },
+            nodeAlign: 'left',
+            data: data.nodes.map((n: any) => ({
+              name: n.name,
+              itemStyle: {
+                color: channelColors[n.name]
+                  || (n.name.startsWith('Lost') || n.name === 'Bounced / No Conversion' ? '#475569' : undefined),
+              },
+            })),
+            links: data.links,
+            lineStyle: { color: 'gradient', opacity: 0.35 },
+            label: {
+              color: '#e2e8f0',
+              fontSize: 11,
+              fontFamily: 'Inter, sans-serif',
+              position: 'outside',
+            },
+            nodeWidth: 20,
+            nodeGap: 12,
+            left: '8%',
+            right: '18%',
+            top: '5%',
+            bottom: '5%',
+          }],
+        });
 
-    window.addEventListener('resize', () => chart.resize());
+        window.addEventListener('resize', () => chart.resize());
 
-    // Theme change support
-    document.addEventListener('click', (e) => {
-      if ((e.target as HTMLElement).closest('#theme-toggle')) {
-        setTimeout(() => chart.resize(), 100);
-      }
-    });
-  }
+        document.addEventListener('click', (e) => {
+          if ((e.target as HTMLElement).closest('#theme-toggle')) {
+            setTimeout(() => chart.resize(), 100);
+          }
+        });
+      },
+    },
+  ]);
 </script>
