@@ -44,6 +44,9 @@
         "noExplicitAny": "warn",
         "noConsole": "off"
       },
+      "complexity": {
+        "noForEach": "warn"
+      },
       "style": {
         "noNonNullAssertion": "warn",
         "useConst": "error"
